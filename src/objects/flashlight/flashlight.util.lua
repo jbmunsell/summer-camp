@@ -25,7 +25,9 @@ function flashlightUtil.renderFlashlight(instance)
 	else
 		instance.Dust:FindFirstChildWhichIsA("ParticleEmitter"):Emit(10)
 	end
-	instance.LightPart.Transparency = (enabled and 0 or 0.9)
+	local v = (enabled and 0.7 or 0.2)
+	instance.LightPart.Color = Color3.fromHSV(0, 0, v)
+	instance.LightPart.Material = (enabled and Enum.Material.Neon or Enum.Material.SmoothPlastic)
 end
 
 -- Toggle light state
