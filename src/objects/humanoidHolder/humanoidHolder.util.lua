@@ -60,7 +60,7 @@ function humanoidHolderUtil.renderHumanoidHolder(holder)
 
 		-- Force humanoid sit
 		owner.Sit = true
-		owner:LoadAnimation(config.humanoidHolder.animation):Play()
+		-- owner:LoadAnimation(config.humanoidHolder.animation):Play()
 	end
 end
 
