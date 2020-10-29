@@ -7,7 +7,7 @@ local objectsUtil = require(env.src.objects.util)
 return objectsUtil.createObjectConfig({
 	instanceTag = "Object_FoodTray",
 	className = "foodTray",
-	genes = { env.src.pickup },
+	genes = { env.src.objects.pickup },
 
 	pickup = {
 		stowable = false,

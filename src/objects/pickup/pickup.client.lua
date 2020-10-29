@@ -10,8 +10,8 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local input = env.src.input
-local pickup = env.src.pickup
 local objects = env.src.objects
+local pickup = objects.pickup
 
 -- modules
 local rx = require(axis.lib.rx)

@@ -8,8 +8,8 @@
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
-local interact = env.src.interact
 local objects = env.src.objects
+local interact = objects.interact
 
 -- modules
 local objectsUtil = require(objects.util)

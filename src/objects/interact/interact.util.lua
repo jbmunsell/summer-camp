@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local objects = env.src.objects
-local interact = env.src.interact
+local interact = objects.interact
 
 -- modules
 local rx = require(axis.lib.rx)

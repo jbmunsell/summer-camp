@@ -12,7 +12,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local input = env.src.input
 local objects = env.src.objects
-local interact = env.src.interact
+local interact = objects.interact
 
 -- modules
 local rx = require(axis.lib.rx)

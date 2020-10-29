@@ -2,12 +2,13 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local objectsUtil = require(env.src.objects.util)
+local objects = env.src.objects
+local objectsUtil = require(objects.util)
 
 return objectsUtil.createObjectConfig({
 	instanceTag = "Object_StickyNoteStack",
 	className = "stickyNoteStack",
-	genes = { env.src.pickup },
+	genes = { objects.pickup },
 	state = {
 		count = 10,
 	},

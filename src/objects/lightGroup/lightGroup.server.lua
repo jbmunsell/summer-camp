@@ -9,8 +9,8 @@
 -- env
 local env  = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local interact = env.src.interact
 local objects = env.src.objects
+local interact = objects.interact
 local lightGroup = objects.lightGroup
 
 -- modules

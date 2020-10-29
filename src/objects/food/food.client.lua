@@ -9,9 +9,9 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local interact = env.src.interact
 local objects = env.src.objects
-local pickup = env.src.pickup
+local interact = objects.interact
+local pickup = objects.pickup
 local food = objects.food
 local foodTray = objects.foodTray
 

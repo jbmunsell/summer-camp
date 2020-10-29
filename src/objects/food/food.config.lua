@@ -8,7 +8,7 @@ local objectsUtil = require(env.src.objects.util)
 return objectsUtil.createObjectConfig({
 	instanceTag = "Object_Food",
 	className = "food",
-	genes = { env.src.pickup },
+	genes = { env.src.objects.pickup },
 	state = {
 		tray = tableau.null,
 	},

@@ -8,7 +8,7 @@ local objectsUtil = require(env.src.objects.util)
 return objectsUtil.createObjectConfig({
 	instanceTag = "Object_Dodgeball",
 	className = "dodgeball",
-	genes = { env.src.pickup },
+	genes = { env.src.objects.pickup },
 	state = {
 		hot = false,
 		thrower = tableau.null,

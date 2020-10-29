@@ -12,9 +12,9 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local pickup = env.src.pickup
 local objects = env.src.objects
-local interact = env.src.interact
+local pickup = objects.pickup
+local interact = objects.interact
 
 -- modules
 local rx = require(axis.lib.rx)

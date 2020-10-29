@@ -11,7 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local input = env.src.input
-local pickup = env.src.pickup
+local pickup = env.src.objects.pickup
 local stickyNoteStack = env.src.objects.stickyNoteStack
 
 -- modules

@@ -9,8 +9,8 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local pickup = env.src.pickup
 local objects = env.src.objects
+local pickup = objects.pickup
 local foodTray = objects.foodTray
 
 -- modules

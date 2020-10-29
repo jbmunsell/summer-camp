@@ -10,7 +10,7 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local CollectionService = game:GetService("CollectionService")
 local axis = env.packages.axis
-local interact = env.src.interact
+local interact = env.src.objects.interact
 local mattress = env.src.objects.mattress
 
 -- modules

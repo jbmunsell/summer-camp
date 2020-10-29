@@ -7,7 +7,7 @@ local objectsUtil = require(env.src.objects.util)
 return objectsUtil.createObjectConfig({
 	instanceTag = "Object_Flashlight",
 	className = "flashlight",
-	genes = { env.src.pickup },
+	genes = { env.src.objects.pickup },
 	state = {
 		enabled = false,
 	},

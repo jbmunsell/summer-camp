@@ -11,8 +11,8 @@ local Players = game:GetService("Players")
 local PhysicsService = game:GetService("PhysicsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local pickup = env.src.pickup
 local objects = env.src.objects
+local pickup = objects.pickup
 local stickyNoteStack = env.src.objects.stickyNoteStack
 
 -- modules

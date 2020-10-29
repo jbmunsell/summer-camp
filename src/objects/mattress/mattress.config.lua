@@ -8,7 +8,7 @@ local objectsUtil = require(env.src.objects.util)
 return objectsUtil.createObjectConfig({
 	instanceTag = "Object_Mattress",
 	className = "mattress",
-	genes = { env.src.interact },
+	genes = { env.src.objects.interact },
 	state = {
 		owner = tableau.null,
 	},

@@ -7,7 +7,7 @@ local objectsUtil = require(env.src.objects.util)
 return objectsUtil.createObjectConfig({
 	instanceTag = "Object_Door",
 	className = "door",
-	genes = { env.src.interact },
+	genes = { env.src.objects.interact },
 	state = {
 		open = false,
 	},

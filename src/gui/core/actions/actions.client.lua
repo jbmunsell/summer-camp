@@ -9,9 +9,9 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local pickup = env.src.pickup
 local objects = env.src.objects
 local ragdoll = env.src.ragdoll
+local pickup = objects.pickup
 local actions = env.src.gui.core.actions
 
 -- modules

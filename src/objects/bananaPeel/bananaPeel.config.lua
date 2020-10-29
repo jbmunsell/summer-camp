@@ -7,7 +7,7 @@ local objectsUtil = require(env.src.objects.util)
 return objectsUtil.createObjectConfig({
 	className = "bananaPeel",
 	instanceTag = "Object_BananaPeel",
-	genes = { env.src.pickup },
+	genes = { env.src.objects.pickup },
 	state = {
 		slips = 3,
 		hot = true,
