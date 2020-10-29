@@ -1,0 +1,17 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"Name": "PushRagdoll",
+			"ClassName": "BindableFunction"
+		},
+		{
+			"Name": "PopRagdoll",
+			"ClassName": "BindableFunction"
+		},
+		{
+			"Name": "tryDive",
+			"ClassName": "BindableFunction"
+		}
+	]
+}

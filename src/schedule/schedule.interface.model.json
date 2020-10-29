@@ -1,0 +1,19 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"Name": "GameTimeScale",
+			"ClassName": "NumberValue",
+			"Properties": {
+				"Value": 0
+			}
+		},
+		{
+			"Name": "GameTimeHours",
+			"ClassName": "NumberValue",
+			"Properties": {
+				"Value": 0
+			}
+		}
+	]
+}

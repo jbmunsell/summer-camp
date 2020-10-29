@@ -1,0 +1,29 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "EquipFromInventoryRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "ThrowRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "DropRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "ToggleEquipRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "UnequipRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "ObjectEquipped"
+		}
+	]
+}

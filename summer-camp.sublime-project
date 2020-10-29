@@ -1,0 +1,10 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"binary_file_patterns": ["_assembled/*", "*.rbxmx", "*.rbxm"],
+			"file_exclude_patterns": ["*.DS_Store"]
+		}
+	]
+}

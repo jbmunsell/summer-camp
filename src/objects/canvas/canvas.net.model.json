@@ -1,0 +1,13 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "CanvasOwnershipRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "CanvasChangeRequested"
+		}
+	]
+}

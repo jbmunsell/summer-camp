@@ -1,0 +1,42 @@
+{
+  "name": "summer-camp",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+
+      "boot": {
+        "$path": "boot/boot.server.lua"
+      }
+    },
+
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+
+        "boot": {
+          "$path": "boot/boot.client.lua"
+        }
+      }
+    },
+
+    "ServerStorage": {
+      "$className": "ServerStorage",
+
+      "src": {
+        "$path": "src"
+      }
+    },
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+
+      "packages": {
+        "$path": "packages"
+      }
+    }
+  }
+}

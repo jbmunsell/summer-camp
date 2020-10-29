@@ -1,0 +1,17 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"ClassName": "RemoteFunction",
+			"Name": "RequestThrow"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "Slipped"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "Destroyed"
+		}
+	]
+}
