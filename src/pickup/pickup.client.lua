@@ -41,12 +41,16 @@ rx.Observable.from(pickup.net.ObjectEquipped)
 		pickupUtil.equip(character, object)
 	end)
 
--- Throw on activated
-inputStreams.click
+-- Simple activation pass
+local clickWithHeldStream = inputStreams.click
 	:map(function ()
 		return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character)
 			:first()
 	end)
+clickWithHeldStream:subscribe(dart.forward(pickup.net.ObjectActivated))
+
+-- Throw on activated
+clickWithHeldStream
 	:filter(function (instance)
 		return instance and objectsUtil.getConfig(instance).pickup.throwOnActivated
 	end)

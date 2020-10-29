@@ -15,6 +15,10 @@
 		},
 		{
 			"ClassName": "RemoteEvent",
+			"Name": "ObjectActivated"
+		},
+		{
+			"ClassName": "RemoteEvent",
 			"Name": "ToggleEquipRequested"
 		},
 		{

@@ -266,5 +266,14 @@ function pickupUtil.getPlayerObjectActionRequestStream(remote, class)
 		:filter(dart.boolAnd)
 end
 
+-- Get activated stream
+function pickupUtil.getActivatedStream(class)
+	if RunService:IsClient() then
+		return pickupUtil.getClickWhileHoldingStream(class)
+	elseif RunService:IsServer() then
+		return rx.Observable.from(pickup.net.ObjectActivated)
+	end
+end
+
 -- return lib
 return pickupUtil
