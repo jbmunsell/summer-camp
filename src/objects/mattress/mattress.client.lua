@@ -72,6 +72,6 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Bind to mattress interacted
-rx.Observable.from(interact.interface.ClientInteracted)
-	:filter(dart.hasTag(mattressConfig.instanceTag))
+interactUtil.getInteractStream(mattress)
+	:map(dart.omitFirst)
 	:subscribe(layOnMattress)

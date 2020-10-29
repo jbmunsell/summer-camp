@@ -8,9 +8,14 @@
 
 -- env
 local RunService = game:GetService("RunService")
--- local env = require(game:GetService("ReplicatedStorage").src.env)
+local env = require(game:GetService("ReplicatedStorage").src.env)
+local axis = env.packages.axis
+local objects = env.src.objects
+local interact = env.src.interact
 
 -- modules
+local rx = require(axis.lib.rx)
+local objectsUtil = require(objects.util)
 
 -- lib
 local interactUtil = {}
@@ -38,6 +43,21 @@ function interactUtil.isLocked(instance)
 		if lock.Value then return true end
 	end
 	return false
+end
+
+-- Get interact stream
+function interactUtil.getInteractStream(class)
+	if RunService:IsServer() then
+		return rx.Observable.from(interact.net.ClientInteracted)
+			:filter(function (_, instance)
+				return objectsUtil.hasFullState(instance, class)
+			end)
+	elseif RunService:IsClient() then
+		return rx.Observable.from(interact.interface.ClientInteracted)
+			:filter(function (instance)
+				return objectsUtil.hasFullState(instance, class)
+			end)
+	end
 end
 
 -- return lib

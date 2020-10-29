@@ -19,6 +19,7 @@ local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local objectsUtil = require(objects.util)
+local interactUtil = require(interact.util)
 
 -- set state
 local function renderLightGroup(instance)
@@ -74,9 +75,6 @@ end
 objectsUtil.initObjectClass(lightGroup):subscribe(initLightGroup)
 
 -- Light group interacted
-rx.Observable.from(interact.net.ClientInteracted.OnServerEvent)
+interactUtil.getInteractStream(lightGroup)
 	:map(dart.omitFirst)
-	:filter(function (instance)
-		return objectsUtil.hasFullState(instance, lightGroup)
-	end)
 	:subscribe(toggleLightGroupState)
