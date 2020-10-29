@@ -64,7 +64,9 @@ local function getNightTimeScaleModifier()
 
 	-- Count players in mattresses
 	local inBed = objectsUtil.getObjects(mattress)
-		:map(dart.index("state", "mattress", "owner", "value"))
+		:map(function (instance)
+			return instance.state.humanoidHolder.owner.Value
+		end)
 		:filter()
 		:size()
 
@@ -112,7 +114,7 @@ nightStop = nightStop
 	:map(dart.constant(scheduleConfig.DaytimeScale))
 local mattressesChanged = rx.Observable.fromInstanceTag(mattressConfig.instanceTag)
 	:flatMap(function (mattressInstance)
-		return rx.Observable.from(mattressInstance.state.mattress.owner)
+		return rx.Observable.from(mattressInstance.state.humanoidHolder.owner)
 	end)
 	:filter(isNight)
 	:map(getNightTimeScaleModifier)

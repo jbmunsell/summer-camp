@@ -31,6 +31,11 @@ function interactUtil.createLock(instance, lockName)
 	Instance.new("BoolValue", instance.state.interact.locks).Name = lockName
 	interactUtil.setLockEnabled(instance, lockName, false)
 end
+function interactUtil.createLocks(instance, ...)
+	for _, lockName in pairs({...}) do
+		interactUtil.createLock(instance, lockName)
+	end
+end
 
 -- Set lock enabled
 function interactUtil.setLockEnabled(instance, lockName, enabled)
