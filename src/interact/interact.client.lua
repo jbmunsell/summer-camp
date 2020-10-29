@@ -70,10 +70,14 @@ local function getInteractionHolds(instance)
 end
 
 -- Get distance modifier
+local function getHoldPosition(hold)
+	return (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
+end
 local function getHoldOffset(hold)
-	local cameraCFrame = workspace.CurrentCamera.CFrame
-	local pos = (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
-	return (pos - cameraCFrame.Position)
+	return (getHoldPosition(hold) - workspace.CurrentCamera.CFrame.p)
+end
+local function getHoldDistance(hold)
+	return env.LocalPlayer:DistanceFromCharacter(getHoldPosition(hold))
 end
 local function getDistanceModifier(hold)
 	local offset = getHoldOffset(hold)
@@ -82,12 +86,12 @@ local function getDistanceModifier(hold)
 	if dot <= 0 then
 		return math.huge
 	end
-	return offset.magnitude * (1 - dot)
+	return getHoldDistance(hold) * (1 - dot)
 end
 
 -- Is in range
 local function isInRange(hold)
-	return getHoldOffset(hold).magnitude <= interactConfig.distanceThreshold
+	return getHoldDistance(hold) <= interactConfig.distanceThreshold
 end
 
 -- Get best interactor

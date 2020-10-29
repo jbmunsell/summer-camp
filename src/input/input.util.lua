@@ -12,11 +12,15 @@ local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local enum = env.src.enum
+local pickup = env.src.pickup
+local objects = env.src.objects
 
 -- modules
 local rx = require(axis.lib.rx)
 local tableau = require(axis.lib.tableau)
 local InstanceTags = require(enum.InstanceTags)
+local pickupUtil = require(pickup.util)
+local objectsUtil = require(objects.util)
 
 -- lib
 local inputUtil = {}
@@ -33,6 +37,7 @@ function inputUtil.updateMaintainedRaycastParams()
 		CollectionService:GetTagged(InstanceTags.GhostPart)
 	)
 	table.insert(instances, env.LocalPlayer.Character)
+	instances = tableau.concat(instances, pickupUtil.getLocalCharacterHeldObjects():raw())
 
 	maintainedRaycastParams = RaycastParams.new()
 	maintainedRaycastParams.FilterType = Enum.RaycastFilterType.Blacklist
@@ -42,8 +47,13 @@ inputUtil.updateMaintainedRaycastParams()
 local function fromTag(tag)
 	return rx.Observable.from(CollectionService:GetInstanceAddedSignal(tag))
 end
-fromTag(InstanceTags.FXPart)
-	:merge(fromTag(InstanceTags.GhostPart))
+
+-- Update on any item holder changed
+objectsUtil.getObjectsStream(pickup)
+	:flatMap(function (instance)
+		return rx.Observable.from(instance.state.pickup.holder)
+	end)
+	:merge(fromTag(InstanceTags.FXPart), fromTag(InstanceTags.GhostPart))
 	:subscribe(inputUtil.updateMaintainedRaycastParams)
 
 -- Basic raycast params

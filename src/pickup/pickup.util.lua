@@ -111,6 +111,10 @@ function pickupUtil.getCharacterHeldObjects(character)
 			return object.state.pickup.holder.Value == character
 		end)
 end
+function pickupUtil.getLocalCharacterHeldObjects()
+	if not env.LocalPlayer.Character then return tableau.from({}) end
+	return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character)
+end
 
 -- Strip object
 -- 	This function breaks an object's grip weld and clears its holder and owner state values
