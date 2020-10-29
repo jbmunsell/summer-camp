@@ -272,6 +272,12 @@ function pickupUtil.getActivatedStream(class)
 		return pickupUtil.getClickWhileHoldingStream(class)
 	elseif RunService:IsServer() then
 		return rx.Observable.from(pickup.net.ObjectActivated)
+			:map(dart.index("Character"))
+			:filter()
+			:map(function (character)
+				return character, pickupUtil.characterHoldsObject(character, class)
+			end)
+			:filter(dart.boolAnd)
 	end
 end
 
