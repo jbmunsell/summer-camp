@@ -8,7 +8,7 @@ local interactConfig = {
 	},
 
 	distanceThreshold = 40,
-	duration = 0.5,
+	duration = 0.3,
 }
 
 return interactConfig
