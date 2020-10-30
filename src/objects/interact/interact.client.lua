@@ -177,11 +177,14 @@ local buttonDownStream = createButtonInputStream(interactPrompt.InteractButton.I
 local buttonUpStream = createButtonInputStream(interactPrompt.InteractButton.InputEnded, false)
 local buttonStateStream = buttonDownStream:merge(buttonUpStream)
 	:startWith(false)
-local advancingInteractionStateStream = keyStateStream
+local advancingInteract = keyStateStream
 	:combineLatest(buttonStateStream, dart.boolOr)
+	:multicast(rx.BehaviorSubject.new(false))
 
 -- Connect to heartbeat to sense interactables and place prompt
 local hotInteractor = rx.Observable.heartbeat()
+	:mapToLatest(advancingInteract)
+	:reject()
 	:map(getBestInteractor)
 	:distinctUntilChanged()
 	:multicast(rx.BehaviorSubject.new())
@@ -191,7 +194,7 @@ local interactionTimer = rx.BehaviorSubject.new(interactConfig.duration)
 
 -- Decrease by dt when we have a hot one AND we are triggering interaction with mouse or keys
 rx.Observable.heartbeat()
-	:combineLatest(hotInteractor, advancingInteractionStateStream, function (dt, hot, advancing)
+	:combineLatest(hotInteractor, advancingInteract, function (dt, hot, advancing)
 		return hot and advancing and dt or 0
 	end)
 	:reject(dart.equals(0))
@@ -200,7 +203,7 @@ rx.Observable.heartbeat()
 	end)
 
 -- When we stop advancing OR when the hot interactable changes, reset timer
-advancingInteractionStateStream
+advancingInteract
 	:reject()
 	:merge(hotInteractor)
 	:map(dart.constant(interactConfig.duration))
@@ -213,9 +216,13 @@ hotInteractor
 	:subscribe(updateInteractPrompt)
 
 -- Whenever the timer is less than zero and it used to be greater than zero, trigger interaction
-interactionTimer
+local holdComplete = interactionTimer
 	:map(function (x) return x < 0 end)
 	:distinctUntilChanged()
 	:filter()
 	:mapToLatest(hotInteractor)
+holdComplete:subscribe(function ()
+	advancingInteract:push(false)
+end)
+holdComplete
 	:subscribe(triggerInteract)
