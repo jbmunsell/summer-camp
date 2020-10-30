@@ -9,6 +9,7 @@ return objectsUtil.createObjectConfig({
 	genes = { env.src.objects.interact },
 	state = {
 		owner = tableau.null,
+		entryOffset = CFrame.new(),
 	},
 
 	animation = env.res.animations.Corpse,
