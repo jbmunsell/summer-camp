@@ -50,11 +50,11 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Stream representing all banana peels at their point of creation
-local peelObjectStream = genesUtil.initGene(bananaPeel)
+local peelInstanceStream = genesUtil.initGene(bananaPeel)
 
 -- Currently the only thing influencing peel's hot value is
 -- 	whether or not it is being held by a person
-peelObjectStream
+peelInstanceStream
 	:flatMap(function (peel)
 		return rx.Observable.from(peel.state.pickup.holder)
 			:map(dart.boolNot)
@@ -66,7 +66,7 @@ peelObjectStream
 	end)
 
 -- Destroy banana peels after a number of slips
-local peelExpiredStream = peelObjectStream
+local peelExpiredStream = peelInstanceStream
 	:flatMap(function (peel)
 		return rx.Observable.from(peel.state.bananaPeel.slips)
 			:filter(dart.equals(0))
@@ -77,8 +77,7 @@ peelExpiredStream
 	:subscribe(destroyBananaPeel)
 
 -- Stream representing character slipping on a peel
-local characterTripStream = peelObjectStream
-	:delay(0.1)
+local characterTripStream = peelInstanceStream
 	:flatMap(function (peel)
 		return rx.Observable.fromPlayerTouchedDescendant(peel,
 			genesUtil.getConfig(peel).bananaPeel.peelDebounce)
