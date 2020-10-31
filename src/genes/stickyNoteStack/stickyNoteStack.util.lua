@@ -76,13 +76,19 @@ function stickyNoteStackUtil.setNoteText(note, text)
 end
 
 -- Tag note with FXPart so that it gets ignored by raycasts and stuff
+function stickyNoteStackUtil.removeTags(note)
+	for _, tag in pairs(CollectionService:GetTags(note)) do
+		CollectionService:RemoveTag(note, tag)
+	end
+end
 function stickyNoteStackUtil.tagNote(note)
 	CollectionService:AddTag(note, "FXPart")
 end
 
 -- Create sticky note from raycast data and text
 function stickyNoteStackUtil.createNote(stack, raycastData, text)
-	local note = env.res.genes.StickyNote:Clone()
+	local note = stack:Clone()
+	stickyNoteStackUtil.removeTags(note)
 	note.Color = stack.Color
 	note.CFrame = stack.CFrame
 	stickyNoteStackUtil.tagNote(note)

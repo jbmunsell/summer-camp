@@ -49,6 +49,8 @@ local function updatePreview(stack)
 	end
 	if stack then
 		preview = stack:Clone()
+		stickyNoteStackUtil.removeTags(preview)
+		stickyNoteStackUtil.tagNote(preview)
 		rotation = (math.random() - 0.5) * genesUtil.getConfig(stack).stickyNoteStack.rotationRange
 	end
 end
@@ -74,7 +76,7 @@ local function placePreview(raycastData, stack)
 	else
 		preview.Parent = workspace
 	end
-	preview.CFrame = stickyNoteStackUtil.getWorldCFrame(raycastData)
+	preview.CFrame = stickyNoteStackUtil.getWorldCFrame(stack, raycastData)
 		:toWorldSpace(preview.StickAttachment.CFrame:inverse())
 end
 
@@ -100,6 +102,7 @@ holdingStream
 		return packageRaycastData(inputUtil.raycastMouse()), stack
 	end)
 	:filter(dart.boolAnd)
+	:filter(function () return preview end)
 	:subscribe(placePreview)
 
 -- Bind click

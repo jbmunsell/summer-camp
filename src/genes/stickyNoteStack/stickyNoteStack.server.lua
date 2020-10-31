@@ -28,6 +28,10 @@ local stickyNoteStackUtil = require(stickyNoteStack.util)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
+local function setStackCount(stack)
+	stack.state.stickyNoteStack.count.Value = genesUtil.getConfig(stack).stickyNoteStack.count
+end
+
 local function unstickNote(note)
 	-- Destroy weld and place back into default collision group
 	axisUtil.destroyChild(note, "StickWeld")
@@ -65,6 +69,7 @@ end
 
 -- Init all sticky note stacks
 genesUtil.initGene(stickyNoteStack)
+	:subscribe(setStackCount)
 
 -- Handle placement requests
 pickupUtil.getPlayerObjectActionRequestStream(
