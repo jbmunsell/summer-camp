@@ -23,34 +23,33 @@ local interactUtil = require(interact.util)
 local foodUtil = require(food.util)
 
 ---------------------------------------------------------------------------------------------------
--- Functions
----------------------------------------------------------------------------------------------------
-
--- init food object
-local function initFood(foodInstance)
-	-- Create pickup override and interact lock
-	pickupUtil.setEquipOverride(foodInstance, foodUtil.equip)
-	interactUtil.createLock(foodInstance, "food")
-	interactUtil.createLock(foodInstance, "foodClient")
-
-	-- Switch map tray holder value to lock and unlock interact
-	rx.Observable.from(foodInstance.state.food.tray)
-		:switchMap(function (tray)
-			return tray
-			and rx.Observable.from(tray.state.pickup.holder)
-				:map(dart.boolify)
-			or rx.Observable.just(false)
-		end)
-		:subscribe(dart.bind(interactUtil.setLockEnabled, foodInstance, "food"))
-end
-
----------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
 -- All foods forever
 local foodStream = genesUtil.initGene(food)
-foodStream:subscribe(initFood)
+
+-- Set equip override
+foodStream
+	:map(dart.drag(foodUtil.equip))
+	:subscribe(pickupUtil.setEquipOverride)
+
+-- Create locks
+foodStream
+	:map(dart.drag("foodServer", "foodClient"))
+	:subscribe(interactUtil.createLocks)
+
+-- Set food server lock based on whether or not the food instance has a tray that has a holder
+foodStream
+	:flatMap(function (foodInstance)
+		return rx.Observable.from(foodInstance.state.food.tray)
+			:switchMap(function (tray)
+				return tray and rx.Observable.from(tray.state.pickup.holder):map(dart.boolify)
+				or rx.Observable.just(false)
+			end)
+			:map(dart.carry(foodInstance, "foodServer"))
+	end)
+	:subscribe(interactUtil.setLockEnabled)
 
 -- Food activated
 pickupUtil.getActivatedStream(food)

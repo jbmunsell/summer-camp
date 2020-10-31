@@ -28,9 +28,6 @@ local interactUtil = require(interact.util)
 
 -- Init an instance by creating state folder
 local function initInstance(instance)
-	-- Create interact locks
-	interactUtil.createLock(instance, "pickup")
-
 	-- When the holder changes, play and stop hold animation accordingly
 	local function tryUpdate(character)
 		if character then
@@ -54,6 +51,11 @@ end
 -- Pickup object stream
 local pickupInstanceStream = genesUtil.initGene(pickup)
 pickupInstanceStream:subscribe(initInstance)
+
+-- Create locks
+pickupInstanceStream
+	:map(dart.drag("pickup"))
+	:subscribe(interactUtil.createLocks)
 
 -- We should only be able to interact with an object if it has no holder and is enabled
 pickupInstanceStream
