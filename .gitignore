@@ -1,4 +1,4 @@
 # Ignore mac platform files
 *.DS_Store
 _assembled/*
-packages/*
+packages/Ragdoll.rbxmx
