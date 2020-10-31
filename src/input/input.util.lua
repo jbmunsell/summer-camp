@@ -12,15 +12,15 @@ local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local enum = env.src.enum
-local objects = env.src.objects
-local pickup = objects.pickup
+local genes = env.src.genes
+local pickup = genes.pickup
 
 -- modules
 local rx = require(axis.lib.rx)
 local tableau = require(axis.lib.tableau)
 local InstanceTags = require(enum.InstanceTags)
 local pickupUtil = require(pickup.util)
-local objectsUtil = require(objects.util)
+local genesUtil = require(genes.util)
 
 -- lib
 local inputUtil = {}
@@ -49,11 +49,12 @@ local function fromTag(tag)
 end
 
 -- Update on any item holder changed
-objectsUtil.getObjectsStream(pickup)
+genesUtil.getInstanceStream(pickup)
 	:flatMap(function (instance)
 		return rx.Observable.from(instance.state.pickup.holder)
 	end)
-	:merge(fromTag(InstanceTags.FXPart), fromTag(InstanceTags.GhostPart))
+	:merge(fromTag(InstanceTags.FXPart), fromTag(InstanceTags.GhostPart),
+		rx.Observable.from(env.LocalPlayer.CharacterAdded))
 	:subscribe(inputUtil.updateMaintainedRaycastParams)
 
 -- Basic raycast params

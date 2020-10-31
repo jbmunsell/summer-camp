@@ -15,16 +15,15 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local schedule = env.src.schedule
 local notifications = env.src.gui.notifications
-local objects = env.src.objects
-local mattress = objects.mattress
+local genes = env.src.genes
+local mattress = genes.mattress
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local scheduleStreams = require(schedule.streams)
 local scheduleConfig = require(schedule.config)
-local mattressConfig = require(mattress.config)
-local objectsUtil = require(objects.util)
+local genesUtil = require(genes.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -63,7 +62,7 @@ local function getNightTimeScaleModifier()
 	end
 
 	-- Count players in mattresses
-	local inBed = objectsUtil.getObjects(mattress)
+	local inBed = genesUtil.getInstances(mattress)
 		:map(function (instance)
 			return instance.state.humanoidHolder.owner.Value
 		end)
@@ -112,7 +111,7 @@ nightStart = nightStart
 nightStop = nightStop
 	:distinctUntilChanged()
 	:map(dart.constant(scheduleConfig.DaytimeScale))
-local mattressesChanged = rx.Observable.fromInstanceTag(mattressConfig.instanceTag)
+local mattressesChanged = genesUtil.getInstanceStream(mattress)
 	:flatMap(function (mattressInstance)
 		return rx.Observable.from(mattressInstance.state.humanoidHolder.owner)
 	end)

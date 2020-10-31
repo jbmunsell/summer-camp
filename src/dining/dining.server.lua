@@ -7,13 +7,13 @@
 --
 
 -- env
-local CollectionService = game:GetService("CollectionService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local schedule = env.src.schedule
 local dining = env.src.dining
-local food = env.src.objects.food
-local foodTray = env.src.objects.foodTray
+local genes = env.src.genes
+local food = genes.food
+local foodTray = genes.foodTray
 
 -- modules
 local dart = require(axis.lib.dart)
@@ -22,8 +22,7 @@ local axisUtil = require(axis.lib.axisUtil)
 local scheduleStreams = require(schedule.streams)
 local diningConfig = require(dining.config)
 local foodUtil = require(food.util)
-local foodConfig = require(food.config)
-local foodTrayConfig = require(foodTray.config)
+local genesUtil = require(genes.util)
 
 -- Try
 if not workspace:FindFirstChild("dining") then
@@ -64,7 +63,7 @@ local function fillFreshTrolleyTrays()
 			local tray = env.res.dining.Tray:Clone()
 			tray.CFrame = spawnPoint.WorldCFrame + Vector3.new(0, 0.1 * (i - 1), 0)
 			tray.Parent = trolley
-			CollectionService:AddTag(tray, foodTrayConfig.instanceTag)
+			genesUtil.addGene(tray, foodTray)
 		end
 	end)
 end
@@ -82,7 +81,7 @@ local function fillServingTables(mealKey)
 				:random()
 			local dish = env.res.dining.food[dishName]:Clone()
 			dish.Parent = servingTable.Dishes
-			CollectionService:AddTag(dish, foodConfig.instanceTag)
+			genesUtil.addGene(dish, food)
 			axisUtil.snapAttachments(dishAttachment, foodUtil.getBottomAttachment(dish))
 		end)
 end

@@ -9,7 +9,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local objects = env.src.objects
+local genes = env.src.genes
 local schedule = env.src.schedule
 local activities = env.src.activities
 
@@ -19,7 +19,7 @@ local dart     = require(axis.lib.dart)
 local tableau  = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
 local activityUtil    = require(activities.util)
-local scoreboardUtil  = require(objects.scoreboard.util)
+local scoreboardUtil  = require(genes.scoreboard.util)
 local scheduleStreams = require(schedule.streams)
 local dodgeballActivityConfig = require(activities.dodgeballActivity.config)
 

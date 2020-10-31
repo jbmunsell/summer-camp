@@ -9,9 +9,9 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local objects = env.src.objects
+local genes = env.src.genes
 local ragdoll = env.src.ragdoll
-local pickup = objects.pickup
+local pickup = genes.pickup
 local actions = env.src.gui.core.actions
 
 -- modules
@@ -20,7 +20,7 @@ local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local tableau = require(axis.lib.tableau)
 local Bin = require(axis.classes.Bin)
-local objectsUtil = require(objects.util)
+local genesUtil = require(genes.util)
 local pickupStreams = require(pickup.streams)
 local actionsConfig = require(actions.config)
 
@@ -65,7 +65,7 @@ end
 local function createButtonForObject(object)
 	-- Clone button
 	local button = seeds.actions.ActionModule:Clone()
-	button.Icon.Image = objectsUtil.getConfig(object).pickup.buttonImage
+	button.Icon.Image = genesUtil.getConfig(object).pickup.buttonImage
 	button.Visible = true
 
 	-- Create state

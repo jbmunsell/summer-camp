@@ -9,7 +9,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local objects = env.src.objects
+local genes = env.src.genes
 local activities = env.src.activities
 
 -- modules
@@ -17,14 +17,14 @@ local rx   = require(axis.lib.rx)
 local fx   = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
 local activitiesUtil = require(activities.util)
-local canvasUtil     = require(objects.canvas.util)
-local canvasConfig   = require(objects.canvas.config)
+local canvasUtil     = require(genes.canvas.util)
+local canvasConfig   = require(genes.canvas.config)
 local artClassConfig = require(activities.artClass.config)
 
 -- Create canvas objects within an art class environment
 local function createCanvasObjects(activityInstance)
 	for _, marker in pairs(activityInstance.functional["canvas-markers"]:GetChildren()) do
-		local canvas = env.res.objects.Canvas:Clone()
+		local canvas = env.res.genes.Canvas:Clone()
 		fx.placeModelOnGroundAtPoint(canvas, marker.CFrame)
 		canvas.Parent = activityInstance.functional.canvases
 		env.CollectionService:AddTag(canvas, canvasConfig.instanceTag)
