@@ -51,3 +51,9 @@ end
 -- All foods forever
 local foodStream = objectsUtil.initObjectClass(food)
 foodStream:subscribe(initFood)
+
+-- Food activated
+pickupUtil.getActivatedStream(food)
+	:map(dart.omitFirst)
+	:reject(foodUtil.isFoodEaten)
+	:subscribe(foodUtil.eatFood)

@@ -14,7 +14,9 @@ local pickup = objects.pickup
 local foodTray = objects.foodTray
 
 -- modules
+local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
+local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
 local pickupUtil = require(pickup.util)
 local foodTrayConfig = require(foodTray.config)
@@ -57,6 +59,33 @@ function foodUtil.equip(character, foodInstance)
 		pickupUtil.unequipCharacter(character)
 		pickupUtil.equip(character, foodInstance)
 	end
+end
+
+-- Eat food
+function foodUtil.isFoodEaten(foodInstance)
+	return foodInstance.state.food.eaten.Value
+end
+function foodUtil.eatFood(foodInstance)
+	-- Set state value
+	foodInstance.state.food.eaten.Value = true
+
+	-- Create sound if it doesn't exist
+	local sound = foodInstance:FindFirstChild("EatSound", true)
+	if not sound then
+		sound = env.res.dining.EatSound:Clone()
+		sound.Parent = foodInstance.PrimaryPart
+		if not foodInstance.PrimaryPart then
+			warn("Attempt to play eat sound in a food model with no PrimaryPart")
+			return
+		end
+	end
+	sound:Play()
+
+	-- Fade out all non-dish parts
+	tableau.from(foodInstance:GetDescendants())
+		:filter(dart.isa("BasePart"))
+		:reject(dart.isNamed("DishPart"))
+		:foreach(fx.fadeOutAndDestroy)
 end
 
 -- return lib

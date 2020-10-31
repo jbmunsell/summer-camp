@@ -11,6 +11,7 @@ return objectsUtil.createObjectConfig({
 	genes = { env.src.objects.pickup },
 	state = {
 		tray = tableau.null,
+		eaten = false,
 	},
 
 	pickup = {
