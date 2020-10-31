@@ -87,10 +87,10 @@ local function initCanvas(instance)
 			and (not owner)
 			and (not playerOwns)
 		end)
-		:map(dart.carry(instance))
+		:map(dart.carry(instance, "canvasClient"))
 
 	-- Set interact enabled according to ownership
-	interactableStream:subscribe(interactUtil.setInteractEnabled)
+	interactableStream:subscribe(interactUtil.setLockEnabled)
 	ownerChanged
 		:map(function (player)
 			return instance, (player == env.LocalPlayer)

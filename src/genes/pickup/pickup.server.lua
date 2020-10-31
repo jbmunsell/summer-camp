@@ -28,6 +28,9 @@ local interactUtil = require(interact.util)
 
 -- Init an instance by creating state folder
 local function initInstance(instance)
+	-- Create interact locks
+	interactUtil.createLock(instance, "pickup")
+
 	-- When the holder changes, play and stop hold animation accordingly
 	local function tryUpdate(character)
 		if character then
@@ -61,9 +64,10 @@ pickupInstanceStream
 			:combineLatest(rx.Observable.from(instance.state.pickup.enabled),
 				rx.Observable.just(interactEnabled),
 				dart.boolAll)
-			:map(dart.carry(instance))
+			:map(dart.boolNot)
+			:map(dart.carry(instance, "pickup"))
 	end)
-	:subscribe(interactUtil.setInteractEnabled)
+	:subscribe(interactUtil.setLockEnabled)
 
 -- Connect to pickup objects that have touch enabled
 local touchPickupStream = pickupInstanceStream
