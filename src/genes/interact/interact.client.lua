@@ -96,7 +96,6 @@ local function isInSight(characterAttachment, instance, hold)
 	local params = inputUtil.getBasicRaycastParams()
 	local pos = (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
 	local result = workspace:Raycast(charpos, (pos - charpos), params)
-	print(result.Instance)
 
 	return not result
 	or not result.Instance
@@ -119,7 +118,7 @@ local function getBestHold()
 			getInteractionHolds(instance)
 				:filter(dart.bind(isInRange, attachment, instance))
 				:foreach(function (hold)
-					local dmod = getDistanceModifier(attachment, instance, hold)
+					local dmod = getDistanceModifier(attachment, hold)
 					if dmod < closestModifier then
 						closestModifier = dmod
 						closestInstance = instance

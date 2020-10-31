@@ -159,9 +159,6 @@ local function integrate(baseGeneData, geneData)
 
 	-- Skip the initial recursion with baseGeneData
 	if baseGeneData ~= geneData then
-		if baseGeneData.name == "lightGroup" then
-			print("integrating " .. geneData.name)
-		end
 		setmetatable(baseGeneData.config[geneData.name], { __index = geneData.config[geneData.name] })
 	end
 
