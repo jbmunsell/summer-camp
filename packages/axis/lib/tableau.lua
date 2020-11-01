@@ -319,18 +319,20 @@ end
 -- min
 function ftable:min(getValue)
 	getValue = getValue or function (...) return ... end
-	assert(type(getValue) == "function", "ftable:min requires a function")
+	assert(type(getValue) == "function", "ftable:min requires a function or nil")
 
 	if #self.data == 0 then return nil end
 	
-	local cmin = self.data[1]
-	local cval = getValue(cmin)
-	for i = 2, #self.data do
-		local vi = self.data[i]
-		local ival = getValue(vi)
-		if ival and ival < cval then
-			cmin = vi
-			cval = ival
+	-- local cmin = self.data[1]
+	-- local cval = getValue(cmin)
+	-- for i = 2, #self.data do
+	local cmin = nil
+	local cval = math.huge
+	for _, v in pairs(self.data) do
+		local val = getValue(v)
+		if val and val < cval then
+			cmin = v
+			cval = val
 		end
 	end
 	return cmin, cval

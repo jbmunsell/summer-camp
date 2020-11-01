@@ -50,6 +50,19 @@ function axisUtil.getPlayerHumanoidRootPart(player)
 	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
 
+-- Get position
+function axisUtil.getPosition(instance)
+	if instance:IsA("Model") then
+		local primary = instance.PrimaryPart
+		assert(primary, "Attempt to call getPosition on a model with no PrimaryPart: " .. instance:GetFullName())
+		return primary.Position
+	elseif instance:IsA("BasePart") then
+		return instance.Position
+	elseif instance:IsA("Attachment") then
+		return instance.WorldPosition
+	end
+end
+
 -- Get local humanoid
 function axisUtil.getLocalHumanoid()
 	if not RunService:IsClient() then
