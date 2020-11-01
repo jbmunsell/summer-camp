@@ -12,7 +12,7 @@ local axis = env.packages.axis
 local schedule = env.src.schedule
 local dining = env.src.dining
 local genes = env.src.genes
-local food = genes.food
+local dish = genes.dish
 local foodTray = genes.foodTray
 
 -- modules
@@ -21,7 +21,7 @@ local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
 local scheduleStreams = require(schedule.streams)
 local diningConfig = require(dining.config)
-local foodUtil = require(food.util)
+local dishUtil = require(dish.util)
 local genesUtil = require(genes.util)
 
 -- Try
@@ -79,10 +79,10 @@ local function fillServingTables(mealKey)
 			local servingTable = dart.getNamedAncestor(dishAttachment, "ServingTable")
 			local dishName = tableau.from(diningConfig[mealKey][servingTable.config.dishType.Value .. "List"])
 				:random()
-			local dish = env.res.dining.food[dishName]:Clone()
-			dish.Parent = servingTable.Dishes
-			genesUtil.addGene(dish, food)
-			axisUtil.snapAttachments(dishAttachment, foodUtil.getBottomAttachment(dish))
+			local dishInstance = env.res.dining.dishes[dishName]:Clone()
+			dishInstance.Parent = servingTable.Dishes
+			genesUtil.addGene(dishInstance, dish)
+			axisUtil.snapAttachments(dishAttachment, dishUtil.getBottomAttachment(dishInstance))
 		end)
 end
 
@@ -94,10 +94,10 @@ local function initMeal(mealChunk)
 	-- Create new trays in trolleys
 	fillFreshTrolleyTrays()
 
-	-- Clear old food from tables
+	-- Clear old dish from tables
 	clearServingTables()
 
-	-- Place new food on tables
+	-- Place new dish on tables
 	fillServingTables(mealChunk.MealKey)
 end
 

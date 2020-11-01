@@ -1,9 +1,9 @@
 --
 --	Jackson Munsell
 --	24 Oct 2020
---	food.server.lua
+--	dish.server.lua
 --
---	Food object server driver
+--	dish object server driver
 --
 
 -- env
@@ -12,7 +12,7 @@ local axis = env.packages.axis
 local genes = env.src.genes
 local interact = genes.interact
 local pickup = genes.pickup
-local food = genes.food
+local dish = genes.dish
 
 -- modules
 local rx = require(axis.lib.rx)
@@ -20,39 +20,33 @@ local dart = require(axis.lib.dart)
 local pickupUtil = require(pickup.util)
 local genesUtil = require(genes.util)
 local interactUtil = require(interact.util)
-local foodUtil = require(food.util)
+local dishUtil = require(dish.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
 -- All foods forever
-local foodStream = genesUtil.initGene(food)
+local dishStream = genesUtil.initGene(dish)
 
 -- Set equip override
-foodStream
-	:map(dart.drag(foodUtil.equip))
+dishStream
+	:map(dart.drag(dishUtil.equip))
 	:subscribe(pickupUtil.setEquipOverride)
 
 -- Create locks
-foodStream
-	:map(dart.drag("foodServer", "foodClient"))
+dishStream
+	:map(dart.drag("dishServer", "dishClient"))
 	:subscribe(interactUtil.createLocks)
 
--- Set food server lock based on whether or not the food instance has a tray that has a holder
-foodStream
+-- Set dish server lock based on whether or not the dish instance has a tray that has a holder
+dishStream
 	:flatMap(function (foodInstance)
-		return rx.Observable.from(foodInstance.state.food.tray)
+		return rx.Observable.from(foodInstance.state.dish.tray)
 			:switchMap(function (tray)
 				return tray and rx.Observable.from(tray.state.pickup.holder):map(dart.boolify)
 				or rx.Observable.just(false)
 			end)
-			:map(dart.carry(foodInstance, "foodServer"))
+			:map(dart.carry(foodInstance, "dishServer"))
 	end)
 	:subscribe(interactUtil.setLockEnabled)
-
--- Food activated
-pickupUtil.getActivatedStream(food)
-	:map(dart.omitFirst)
-	:reject(foodUtil.isFoodEaten)
-	:subscribe(foodUtil.eatFood)

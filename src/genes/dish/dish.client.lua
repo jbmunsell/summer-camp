@@ -1,9 +1,9 @@
 --
 --	Jackson Munsell
 --	24 Oct 2020
---	food.client.lua
+--	dish.client.lua
 --
---	Food object client driver
+--	Dish object client driver
 --
 
 -- env
@@ -12,7 +12,7 @@ local axis = env.packages.axis
 local genes = env.src.genes
 local interact = genes.interact
 local pickup = genes.pickup
-local food = genes.food
+local dish = genes.dish
 local foodTray = genes.foodTray
 
 -- modules
@@ -21,7 +21,7 @@ local dart = require(axis.lib.dart)
 local pickupUtil = require(pickup.util)
 local interactUtil = require(interact.util)
 local genesUtil = require(genes.util)
-local foodUtil = require(food.util)
+local dishUtil = require(dish.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -29,16 +29,16 @@ local foodUtil = require(food.util)
 
 -- Set lock enabled factory function
 local function setLockEnabled(enabled)
-	return function (foodInstance)
-		interactUtil.setLockEnabled(foodInstance, "foodClient", enabled)
+	return function (dishInstance)
+		interactUtil.setLockEnabled(dishInstance, "dishClient", enabled)
 	end
 end
 
--- Update food locks
+-- Update dish locks
 local function updateFoodLocks()
 	-- First, go ahead and unlock everything. Then we'll only lock what should be locked
-	local allFood = genesUtil.getInstances(food)
-	allFood:foreach(setLockEnabled(false))
+	local allDishes = genesUtil.getInstances(dish)
+	allDishes:foreach(setLockEnabled(false))
 
 	-- Get tray that local player is holding
 	local tray = env.LocalPlayer.Character
@@ -49,18 +49,18 @@ local function updateFoodLocks()
 	if not tray then return end
 
 	-- Functions
-	local function isOnTray(foodInstance)
-		return foodInstance.state.food.tray.Value == tray
+	local function isOnTray(dishInstance)
+		return dishInstance.state.dish.tray.Value == tray
 	end
 	local function lockDishType(dishType)
-		allFood:filter(function (f) return foodUtil.getDishType(f) == dishType end)
+		allDishes:filter(function (f) return dishUtil.getDishType(f) == dishType end)
 			:foreach(setLockEnabled(true))
 	end
 
-	-- Lock food of the same type that we have on our tray
-	allFood
+	-- Lock dish of the same type that we have on our tray
+	allDishes
 		:filter(isOnTray)
-		:map(foodUtil.getDishType)
+		:map(dishUtil.getDishType)
 		:foreach(lockDishType)
 end
 
@@ -69,14 +69,14 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- All foods forever
-local foodStream = genesUtil.getInstanceStream(food)
+local dishStream = genesUtil.getInstanceStream(dish)
 local foodTrayStream = genesUtil.getInstanceStream(foodTray)
 
--- When any food becomes attached to this local player's tray, lock all
--- 	other food objects of that type
-local foodTrayValueStream = foodStream
+-- When any dish becomes attached to this local player's tray, lock all
+-- 	other dish objects of that type
+local foodTrayValueStream = dishStream
 	:flatMap(function (foodInstance)
-		return rx.Observable.from(foodInstance.state.food.tray)
+		return rx.Observable.from(foodInstance.state.dish.tray)
 			:merge(rx.Observable.fromInstanceLeftGame(foodInstance))
 	end)
 
