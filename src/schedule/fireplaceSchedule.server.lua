@@ -33,7 +33,8 @@ local firesEnabled = rx.BehaviorSubject.new()
 
 -- Render fireplace
 local function renderFireplace(instance)
-	fx.setFXEnabled(instance, firesEnabled:getValue())
+	instance.state.fireplace.enabled.Value = firesEnabled:getValue()
+	-- fx.setFXEnabled(instance, firesEnabled:getValue())
 end
 
 -- Set fireplaces enabled
