@@ -201,6 +201,7 @@ function Observable.fromInstanceLeftGame(instance)
 end
 
 -- From player touched descendant
+-- 	TODO: Get rid of this in favor of fromHumanoidTouchedDescendant
 function Observable.fromPlayerTouchedDescendant(instance, debounce)
 	local instances = (instance:IsA("BasePart") and { instance } or instance:GetDescendants())
 	local observable = Observable.from(instances)
@@ -210,6 +211,18 @@ function Observable.fromPlayerTouchedDescendant(instance, debounce)
 		:filter()
 		:map(function (player)
 			return instance, player
+		end)
+	return (debounce and observable:throttleFirst(debounce) or observable)
+end
+function Observable.fromHumanoidTouchedDescendant(instance, debounce)
+	local instances = (instance:IsA("BasePart") and { instance } or instance:GetDescendants())
+	local observable = Observable.from(instances)
+		:filter(function (d) return d:IsA("BasePart") end)
+		:flatMap(function (d) return Observable.from(d.Touched) end)
+		:map(function (hit) return hit.Parent and hit.Parent:FindFirstChildWhichIsA("Humanoid") end)
+		:filter()
+		:map(function (humanoid)
+			return instance, humanoid
 		end)
 	return (debounce and observable:throttleFirst(debounce) or observable)
 end
