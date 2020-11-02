@@ -26,8 +26,6 @@ local marshmallowUtil = require(marshmallow.util)
 local marshmallows = genesUtil.initGene(marshmallow)
 
 -- Render when their fire time changes
--- genesUtil.fromStateChanged(marshmallows, path.new().state.marshmallow.fireTime)
--- 	:subscribe(marshmallowUtil.renderMarshmallow)
 local fireTimeChanged = marshmallows
 	:flatMap(function (instance)
 		return rx.Observable.from(instance.state.marshmallow.fireTime)
@@ -48,7 +46,6 @@ marshmallows
 		return rx.Observable.from(instance.state.marshmallow.stage)
 			:map(dart.constant(instance))
 	end)
-	:tap(print)
 	:subscribe(marshmallowUtil.renderMarshmallow)
 
 -- Increase fire time for all marshmallows that are either burning or near fire

@@ -2,21 +2,18 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
-local tableau = require(env.packages.axis.lib.tableau)
+-- local tableau = require(env.packages.axis.lib.tableau)
 
 local genesUtil = require(genes.util)
 
 return genesUtil.createGeneData({
 	instanceTag = "gene_marshmallow",
 	name = "marshmallow",
-	genes = { genes.edible },
+	genes = { genes.edible, genes.skewerable },
 	state = {
 		fireTime = 0,
 		stage = "normal",
 		destroyed = false,
-		
-		stick = tableau.null,
-		stickSlotIndex = 0,
 	},
 
 	config = {
