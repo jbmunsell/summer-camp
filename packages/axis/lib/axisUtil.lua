@@ -204,13 +204,7 @@ function axisUtil.getObjectCFrame(object)
 		return object:GetPrimaryPartCFrame()
 	end
 end
-function axisUtil.computeAttachInfo(a, b, attachmentName)
-	-- Get attachments
-	local att_a = a:FindFirstChild(attachmentName, true)
-	local att_b = b:FindFirstChild(attachmentName, true)
-	assert(att_a and att_b, "Unable to find attachments for name '" .. attachmentName .. "'; "
-		.. a:GetFullName() .. " and " .. b:GetFullName())
-
+function axisUtil.computeAttachInfo(att_a, att_b)
 	local target = att_a.CFrame * att_b.CFrame:inverse()
 	local current = att_a.Parent.CFrame:toObjectSpace(att_b.Parent.CFrame)
 
@@ -221,6 +215,15 @@ function axisUtil.computeAttachInfo(a, b, attachmentName)
 		current = current,
 	}
 end
+function axisUtil.findAttachments(a, b, attachmentName)
+	local att_a = a:FindFirstChild(attachmentName, true)
+	local att_b = b:FindFirstChild(attachmentName, true)
+
+	assert(att_a and att_b, "Unable to find attachments for name '" .. attachmentName .. "'; "
+		.. a:GetFullName() .. " and " .. b:GetFullName())
+
+	return att_a, att_b
+end
 
 -- This function will simply align the parents of two attachments, moving B to match A's CFrame.
 -- 	It does not create a weld.
@@ -228,20 +231,11 @@ function axisUtil.snapAttachments(att_a, att_b)
 	att_b.Parent.CFrame = att_a.WorldCFrame:toWorldSpace(att_b.CFrame:inverse())
 end
 
--- This function will align the parents of two attachments so that B matches A's CFrame,
--- 	doing so using a weld.
-function axisUtil.snapAttach(a, b, attachmentName)
-	local info = axisUtil.computeAttachInfo(a, b, attachmentName)
-	local weld = Instance.new("Weld")
-	weld.Part0 = info.att_a.Parent
-	weld.Part1 = info.att_b.Parent
-	weld.C0 = info.target
-	weld.Parent = a
-
-	return weld
-end
-function axisUtil.smoothAttach(a, b, attachmentName, tweenInfo)
-	local info = axisUtil.computeAttachInfo(a, b, attachmentName)
+-- Smooth attach attachments
+function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
+	local att_a = a:FindFirstChild(aName, true)
+	local att_b = b:FindFirstChild(bName, true)
+	local info = axisUtil.computeAttachInfo(att_a, att_b)
 	local originalCFrame = info.att_b.Parent.CFrame
 	local function getTargetCFrame()
 		return info.att_a.WorldCFrame:toWorldSpace(info.att_b.CFrame:inverse())
@@ -250,7 +244,7 @@ function axisUtil.smoothAttach(a, b, attachmentName, tweenInfo)
 	local wasAnchored = info.att_b.Parent.Anchored
 	info.att_b.Parent.Anchored = true
 
-	local weld = Instance.new("Weld")
+	local weld = Instance.new("Weld", a)
 	weld.C0 = info.target
 
 	local collisionGroups = {}
@@ -273,15 +267,30 @@ function axisUtil.smoothAttach(a, b, attachmentName, tweenInfo)
 			part.CollisionGroupId = group
 		end
 
-		weld.Part0 = info.att_a.Parent
-		weld.Part1 = info.att_b.Parent
-		if not weld.Parent then
-			weld.Parent = a
+		if weld:IsDescendantOf(game) then
+			weld.Part0 = info.att_a.Parent
+			weld.Part1 = info.att_b.Parent
 		end
 	end)
 	tween:Play()
 
 	return weld, tween, info
+end
+
+-- This function will align the parents of two attachments so that B matches A's CFrame,
+-- 	doing so using a weld.
+function axisUtil.snapAttach(a, b, attachmentName)
+	local info = axisUtil.computeAttachInfo(axisUtil.findAttachments(a, b, attachmentName))
+	local weld = Instance.new("Weld")
+	weld.Part0 = info.att_a.Parent
+	weld.Part1 = info.att_b.Parent
+	weld.C0 = info.target
+	weld.Parent = a
+
+	return weld
+end
+function axisUtil.smoothAttach(a, b, attachmentName, tweenInfo)
+	return axisUtil.smoothAttachAttachments(a, attachmentName, b, attachmentName, tweenInfo)
 end
 
 -- return lib
