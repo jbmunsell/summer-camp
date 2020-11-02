@@ -14,10 +14,8 @@ local pickup = genes.pickup
 local foodTray = genes.foodTray
 
 -- modules
-local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local pickupUtil = require(pickup.util)
-local genesUtil = require(genes.util)
 
 -- lib
 local dishUtil = {}
@@ -42,8 +40,7 @@ end
 
 -- Equip
 function dishUtil.equip(character, instance)
-	local tray = pickupUtil.getCharacterHeldObjects(character)
-		:first(dart.follow(genesUtil.hasGene, foodTray))
+	local tray = pickupUtil.characterHoldsObject(character, foodTray)
 	if tray then
 		instance.state.dish.tray.Value = tray
 		local attachment = dishUtil.getBottomAttachment(instance)
