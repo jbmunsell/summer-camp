@@ -19,7 +19,7 @@ return genesUtil.createGeneData({
 			throwOnActivated = true,
 			throwMagnitude = 20,
 			stowable = true,
-			buttonImage = "",
+			buttonImage = "rbxassetid://5912747171",
 		},
 
 		whoopieCushion = {
