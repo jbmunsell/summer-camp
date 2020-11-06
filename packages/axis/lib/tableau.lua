@@ -187,6 +187,11 @@ end
 -- Functional tables
 ---------------------------------------------------------------------------------------------------
 
+-- identity function
+local function identity(...)
+	return ...
+end
+
 -- functional table metatable
 local ftable = {}
 ftable._isFunctionalTable = true
@@ -252,7 +257,11 @@ end
 
 -- all
 function ftable:all(f)
-	assert(type(f) == "function", "ftable:all requires a function")
+	local t = type(f)
+	assert(t == "function" or t == "nil", "ftable:all requires a function or nil")
+
+	f = f or identity
+
 	for i, v in pairs(self.data) do
 		if not f(v, i) then
 			return false
@@ -318,7 +327,7 @@ end
 
 -- min
 function ftable:min(getValue)
-	getValue = getValue or function (...) return ... end
+	getValue = getValue or identity
 	assert(type(getValue) == "function", "ftable:min requires a function or nil")
 
 	if #self.data == 0 then return nil end
@@ -341,6 +350,8 @@ end
 -- first
 function ftable:first(f)
 	assert(not f or type(f) == "function", "ftable:first requires a function or nil")
+
+	f = f or identity
 
 	for _, v in pairs(self.data) do
 		if not f or f(v) then
