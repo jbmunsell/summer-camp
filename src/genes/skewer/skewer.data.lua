@@ -16,7 +16,7 @@ return genesUtil.createGeneData({
 
 		pickup = {
 			stowable = false,
-			buttonImage = "",
+			buttonImage = "rbxassetid://5923387058",
 		},
 	},
 })
