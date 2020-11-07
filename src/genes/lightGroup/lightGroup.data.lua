@@ -9,6 +9,10 @@ return genesUtil.createGeneData({
 	name = "lightGroup",
 	genes = { env.src.genes.interact },
 	state = {
-		enabled = false,
+		lightGroup = {
+			switches = {
+				primary = false,
+			},
+		},
 	},
 })

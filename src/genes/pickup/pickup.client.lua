@@ -52,7 +52,7 @@ clickWithHeldStream:subscribe(dart.forward(pickup.net.ObjectActivated))
 -- Throw on activated
 clickWithHeldStream
 	:filter(function (instance)
-		return instance and genesUtil.getConfig(instance).pickup.throwOnActivated
+		return instance and instance.config.pickup.throwOnActivated.Value
 	end)
 	:map(dart.constant(nil)) -- This is because getMouseHit takes optional params
 	:map(inputUtil.getMouseHit)

@@ -8,7 +8,11 @@ return genesUtil.createGeneData({
 	instanceTag = "gene_balloon",
 	name = "balloon",
 	genes = { env.src.genes.pickup },
-	state = {},
+	state = {
+		balloon = {
+
+		},
+	},
 
 	config = {
 		pickup = {

@@ -91,7 +91,7 @@ balloonObjectStream
 	:flatMap(function (balloonInstance)
 		return rx.Observable.fromProperty(balloonInstance.Balloon, "Position")
 			:filter(function (position)
-				return position.Y > genesUtil.getConfig(balloonInstance).balloon.destroyHeight
+				return position.Y > balloonInstance.config.balloon.destroyHeight.Value
 			end)
 			:map(dart.constant(balloonInstance))
 	end)

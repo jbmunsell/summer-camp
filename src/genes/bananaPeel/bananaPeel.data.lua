@@ -9,9 +9,11 @@ return genesUtil.createGeneData({
 	instanceTag = "gene_bananaPeel",
 	genes = { env.src.genes.pickup },
 	state = {
-		slips = 3,
-		hot = true,
-		expired = false,
+		bananaPeel = {
+			slips = 3,
+			hot = true,
+			expired = false,
+		},
 	},
 	
 	config = {

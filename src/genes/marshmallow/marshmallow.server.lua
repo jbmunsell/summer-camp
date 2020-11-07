@@ -33,7 +33,7 @@ local fireTimeChanged = marshmallows
 	end)
 fireTimeChanged
 	:filter(function (instance, fireTime)
-		return fireTime > genesUtil.getConfig(instance).marshmallow.fireTimeMax
+		return fireTime > instance.config.marshmallow.fireTimeMax.Value
 		and not instance.state.marshmallow.destroyed.Value
 	end)
 	:subscribe(marshmallowUtil.destroyMarshmallow)
@@ -55,9 +55,9 @@ rx.Observable.heartbeat()
 			:map(dart.drag(dt))
 	end)
 	:filter(function (instance)
-		local config = genesUtil.getConfig(instance).marshmallow
-		local fireTime = instance.state.marshmallow.fireTime.Value / config.fireTimeMax
-		return fireTime >= config.stages.burnt.time
-		or marshmallowUtil.getFireProximity(instance) <= config.cookDistanceThreshold
+		local config = instance.config.marshmallow
+		local fireTime = instance.state.marshmallow.fireTime.Value / config.fireTimeMax.Value
+		return fireTime >= config.stages.burnt.time.Value
+		or marshmallowUtil.getFireProximity(instance) <= config.cookDistanceThreshold.Value
 	end)
 	:subscribe(marshmallowUtil.increaseFireTime)

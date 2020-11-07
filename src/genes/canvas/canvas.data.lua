@@ -10,9 +10,11 @@ return genesUtil.createGeneData({
 	name = "canvas",
 	genes = { env.src.genes.interact },
 	state = {
-		owner = tableau.null,
-		teamToAcceptFrom = tableau.null,
-		locked = false,
+		canvas = {
+			owner = tableau.null,
+			teamToAcceptFrom = tableau.null,
+			locked = false,
+		},
 	},
 
 	config = {

@@ -10,8 +10,10 @@ return genesUtil.createGeneData({
 	name = "dodgeball",
 	genes = { env.src.genes.pickup },
 	state = {
-		hot = false,
-		thrower = tableau.null,
+		dodgeball = {
+			hot = false,
+			thrower = tableau.null,
+		},
 	},
 	interface = {
 		events = { "TouchedNonThrowerPart" },

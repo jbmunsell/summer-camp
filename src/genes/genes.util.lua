@@ -8,6 +8,7 @@
 
 -- env
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 
@@ -19,6 +20,7 @@ local tableau = require(axis.lib.tableau)
 -- lib
 local genesUtil = {}
 local geneInstanceStreams = {}
+local geneFolders = {}
 
 -- Has gene
 function genesUtil.hasGene(instance, gene)
@@ -78,25 +80,12 @@ end
 function genesUtil.initGene(gene)
 	local geneData = require(gene.data)
 	local function initInstance(instance)
-		-- Set data if we haven't already.
-		-- 	This will ensure that we only have the top-level gene set
-		-- 	the data value
-		if not instance:FindFirstChild("dataScript") then
-			genesUtil.setDataScript(instance, gene.data)
-		end
-
-		-- Add config folder if it doesn't already exist
-		if not instance:FindFirstChild("config") then
-			Instance.new("Folder", instance).Name = "config"
-		end
-
-		-- Add state for gene
-		genesUtil.addStateFolder(instance, gene)
-
-		-- Add interface for gene
+		-- Add folders
+		genesUtil.touchFolder(instance, gene, "config")
+		genesUtil.touchFolder(instance, gene, "state")
 		genesUtil.addInterface(instance, gene)
 
-		-- Add tags to apply gene functionality
+		-- Add tags to apply inherited gene functionality
 		genesUtil.getAllSubGenes(gene):foreach(function (g)
 			genesUtil.addGene(instance, g)
 		end)
@@ -107,16 +96,40 @@ function genesUtil.initGene(gene)
 end
 
 -- Add new state folder to object
-function genesUtil.addStateFolder(instance, gene)
-	local geneData = require(gene.data)
-	if not geneData.state then return end
-
-	local state = instance:FindFirstChild("state")
-	if not state then
-		state = Instance.new("Folder", instance)
-		state.Name = "state"
+local function mergeFolders(src, dest)
+	for _, child in pairs(src:GetChildren()) do
+		local existing = dest:FindFirstChild(child.Name)
+		if not existing then
+			-- stick the whole thing there
+			child:Clone().Parent = dest
+		else
+			if child:IsA("Folder") then
+				-- merge folder contents
+				mergeFolders(child, existing)
+			else -- assume value object
+				existing.Value = child.Value
+			end
+		end
 	end
-	tableau.tableToValueObjects(geneData.name, geneData.state).Parent = state
+end
+function genesUtil.touchFolder(instance, gene, tableName)
+	local geneData = require(gene.data)
+	if not geneData[tableName] then return end
+
+	local folder = instance:FindFirstChild(tableName)
+	if not folder then
+		folder = Instance.new("Folder", instance)
+		folder.Name = tableName
+	end
+
+	if not geneFolders[tableName] then
+		geneFolders[tableName] = {}
+	end
+	if not geneFolders[tableName][gene] then
+		geneFolders[tableName][gene] = tableau.tableToValueObjects("", geneData[tableName])
+	end
+	geneFolders[tableName][gene].Parent = ReplicatedStorage
+	mergeFolders(geneFolders[tableName][gene], folder)
 end
 
 -- Filter tag with state
@@ -132,16 +145,15 @@ local function check(folder, tb)
 end
 function genesUtil.hasFullState(instance, gene)
 	-- Check primary state
-	if not instance:FindFirstChild("state")
-	or not instance:FindFirstChild("dataScript") then return end
+	if not instance:FindFirstChild("state") then return end
 
 	-- Chase all genes to see if they have the appropriate state folder
 	return genesUtil.getAllSubGenes(gene)
 		:append({ gene })
 		:all(function (g)
 			local data = require(g.data)
-			return instance.state:FindFirstChild(data.name)
-			and check(instance.state[data.name], data.state)
+			return not data.state
+			or check(instance.state, data.state)
 		end)
 end
 
@@ -195,41 +207,6 @@ function genesUtil.addInterface(instance, gene)
 	end
 	for _, fname in pairs(functions) do
 		Instance.new("BindableFunction", interface).Name = fname
-	end
-end
-
--- Set config script
-local instanceProxy_mt = {
-	__index = function (self, key)
-		local instance = rawget(self, "instance")
-		local data = rawget(self, "data")
-		local child = instance:FindFirstChild(key)
-		if child then
-			if child:IsA("ValueBase") then
-				return child.Value
-			else
-				return setmetatable({
-					instance = instance[key],
-					data = data[key],
-				}, getmetatable(self))
-			end
-		else
-			return data[key]
-		end
-	end,
-}
-function genesUtil.setDataScript(instance, dataScript)
-	if not instance:FindFirstChild("dataScript") then
-		Instance.new("ObjectValue", instance).Name = "dataScript"
-	end
-	instance.dataScript.Value = dataScript
-end
-function genesUtil.getConfig(instance)
-	if instance:FindFirstChild("dataScript") then
-		return setmetatable({
-			instance = instance.config,
-			data = require(instance.dataScript.Value).config,
-		}, instanceProxy_mt)
 	end
 end
 

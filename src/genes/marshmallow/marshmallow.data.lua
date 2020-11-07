@@ -11,9 +11,11 @@ return genesUtil.createGeneData({
 	name = "marshmallow",
 	genes = { genes.edible, genes.skewerable },
 	state = {
-		fireTime = 0,
-		stage = "normal",
-		destroyed = false,
+		marshmallow = {
+			fireTime = 0,
+			stage = "normal",
+			destroyed = false,
+		},
 	},
 
 	config = {

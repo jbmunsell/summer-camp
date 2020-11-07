@@ -33,7 +33,7 @@ local function throwBall(player, ball, target)
 
 	-- Unequip and launch
 	pickupUtil.unequipCharacter(player.Character)
-	ball.Velocity = (target - ball.Position).unit * genesUtil.getConfig(ball).dodgeball.throwMagnitude
+	ball.Velocity = (target - ball.Position).unit * ball.config.dodgeball.throwMagnitude.Value
 	ball.Float.Enabled = true
 end
 

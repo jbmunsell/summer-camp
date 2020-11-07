@@ -10,7 +10,9 @@ return genesUtil.createGeneData({
 	name = "stickyNoteStack",
 	genes = { genes.pickup },
 	state = {
-		count = 0,
+		stickyNoteStack = {
+			count = 0,
+		},
 	},
 
 	config = {

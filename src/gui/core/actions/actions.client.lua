@@ -65,7 +65,7 @@ end
 local function createButtonForObject(object)
 	-- Clone button
 	local button = seeds.actions.ActionModule:Clone()
-	button.Icon.Image = genesUtil.getConfig(object).pickup.buttonImage
+	button.Icon.Image = object.config.pickup.buttonImage.Value
 	button.Visible = true
 
 	-- Create state

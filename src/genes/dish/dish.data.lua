@@ -11,8 +11,10 @@ return genesUtil.createGeneData({
 	name = "dish",
 	genes = { genes.edible },
 	state = {
-		tray = tableau.null,
-		eaten = false,
+		dish = {
+			tray = tableau.null,
+			eaten = false,
+		},
 	},
 
 	config = {

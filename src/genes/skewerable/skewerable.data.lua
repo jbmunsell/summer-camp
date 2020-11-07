@@ -11,8 +11,10 @@ return genesUtil.createGeneData({
 	name = "skewerable",
 	genes = { genes.pickup },
 	state = {
-		skewer = tableau.null,
-		skewerSlotIndex = -1,
+		skewerable = {
+			skewer = tableau.null,
+			skewerSlotIndex = -1,
+		},
 	},
 
 	config = {},

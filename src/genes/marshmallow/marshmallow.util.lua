@@ -49,12 +49,12 @@ end
 function marshmallowUtil.updateMarshmallowStage(instance)
 	-- We have to use long form accessing here because of metatable magic
 	-- 	with config tables and folders
-	local config = genesUtil.getConfig(instance).marshmallow
-	local fireTime = instance.state.marshmallow.fireTime.Value / config.fireTimeMax
+	local config = instance.config.marshmallow
+	local fireTime = instance.state.marshmallow.fireTime.Value / config.fireTimeMax.Value
 	local max = nil
 	for _, stage in pairs(cookingStages) do
-		if config.stages[stage].time <= fireTime
-		and (not max or (config.stages[max].time < config.stages[stage].time))
+		local t = config.stages[stage].time.Value
+		if t <= fireTime and (not max or (config.stages[max].time.Value < t))
 		then
 			max = stage
 		end
@@ -65,11 +65,11 @@ end
 -- Render marshmallow
 function marshmallowUtil.renderMarshmallow(instance)
 	-- Set texture and size and enable fx if burnt
-	local config = genesUtil.getConfig(instance).marshmallow
+	local config = instance.config.marshmallow
 	local stageName = instance.state.marshmallow.stage.Value
 	local stage = config.stages[stageName]
-	instance.TextureID = stage.texture
-	instance.Size = stage.size
+	instance.TextureID = stage.texture.Value
+	instance.Size = stage.size.Value
 	fx.setFXEnabled(instance, (stageName == "burnt"))
 end
 

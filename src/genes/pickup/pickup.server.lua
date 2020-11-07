@@ -60,7 +60,7 @@ pickupInstanceStream
 -- We should only be able to interact with an object if it has no holder and is enabled
 pickupInstanceStream
 	:flatMap(function (instance)
-		local interactEnabled = genesUtil.getConfig(instance).pickup.interactPickupEnabled
+		local interactEnabled = instance.config.pickup.interactPickupEnabled.Value
 		return rx.Observable.from(instance.state.pickup.holder)
 			:map(dart.boolNot)
 			:combineLatest(rx.Observable.from(instance.state.pickup.enabled),
@@ -74,7 +74,7 @@ pickupInstanceStream
 -- Connect to pickup objects that have touch enabled
 local touchPickupStream = pickupInstanceStream
 	:filter(function (instance)
-		return genesUtil.getConfig(instance).pickup.touchPickupEnabled
+		return instance.config.pickup.touchPickupEnabled.Value
 	end)
 	:flatMap(rx.Observable.fromPlayerTouchedDescendant)
 	:map(function (instance, player)
@@ -93,7 +93,7 @@ local throwStream = rx.Observable.from(pickup.net.ThrowRequested)
 throwStream
 	:map(function (player, target)
 		local throwObject = pickupUtil.getCharacterHeldObjects(player.Character):first()
-		local throwPower = genesUtil.getConfig(throwObject).pickup.throwMagnitude
+		local throwPower = throwObject.config.pickup.throwMagnitude.Value
 		return player.Character, target, throwPower
 	end)
 	:filter(function (a, b, c) return a and b and c end)

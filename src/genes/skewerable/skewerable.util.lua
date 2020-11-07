@@ -52,7 +52,7 @@ function skewerableUtil.renderSlotWeld(instance)
 	local state = instance.state.skewerable
 	local slotIndex = state.skewerSlotIndex.Value
 	local skewerInstance = state.skewer.Value
-	if slotIndex > genesUtil.getConfig(skewerInstance).skewer.maxSkewerSlots then
+	if slotIndex > skewerInstance.config.skewer.maxSkewerSlots.Value then
 		state.skewer.Value = nil
 	else
 		-- If it's in range, then smooth attach

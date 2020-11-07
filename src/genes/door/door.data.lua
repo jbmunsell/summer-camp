@@ -9,7 +9,9 @@ return genesUtil.createGeneData({
 	name = "door",
 	genes = { env.src.genes.interact },
 	state = {
-		open = false,
+		door = {
+			open = false,
+		},
 	},
 
 	config = {

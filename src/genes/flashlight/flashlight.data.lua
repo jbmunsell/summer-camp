@@ -9,7 +9,9 @@ return genesUtil.createGeneData({
 	name = "flashlight",
 	genes = { env.src.genes.pickup },
 	state = {
-		enabled = false,
+		flashlight = {
+			enabled = false,
+		},
 	},
 	
 	config = {

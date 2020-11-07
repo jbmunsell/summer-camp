@@ -46,7 +46,7 @@ end
 -- Set tool button highlighted
 local function setToolButtonHighlighted(canvasInstance, button, highlighted)
 	button.ImageColor3 = (highlighted
-		and genesUtil.getConfig(canvasInstance).canvas.activeToolHighlightColor
+		and canvasInstance.config.canvas.activeToolHighlightColor.Value
 		or White)
 end
 

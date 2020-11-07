@@ -29,7 +29,7 @@ end
 -- Non-lib functions
 local function pushDropDebounce(object)
 	object.state.pickup.dropDebounce.Value = true
-	delay(genesUtil.getConfig(object).pickup.dropDebounce, function ()
+	delay(object.config.pickup.dropDebounce.Value, function ()
 		object.state.pickup.dropDebounce.Value = false
 	end)
 end
@@ -40,7 +40,7 @@ local function clearOwner(object)
 	object.state.pickup.owner.Value = nil
 end
 local function isStowable(object)
-	return genesUtil.getConfig(object).pickup.stowable
+	return object.config.pickup.stowable.Value
 end
 local function stowObject(object)
 	object.Parent = ReplicatedStorage
@@ -162,7 +162,7 @@ function pickupUtil.releaseHeldObjects(character)
 	pickupUtil.getCharacterHeldObjects(character)
 		:foreach(function (object)
 			clearHolder(object)
-			if genesUtil.getConfig(object).pickup.throwOnDrop then
+			if object.config.pickup.throwOnDrop.Value then
 				throwObjectInDirection(object, throwOffset)
 			end
 		end)

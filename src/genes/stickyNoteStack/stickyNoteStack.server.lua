@@ -29,14 +29,14 @@ local stickyNoteStackUtil = require(stickyNoteStack.util)
 ---------------------------------------------------------------------------------------------------
 
 local function setStackCount(stack)
-	stack.state.stickyNoteStack.count.Value = genesUtil.getConfig(stack).stickyNoteStack.count
+	stack.state.stickyNoteStack.count.Value = stack.config.stickyNoteStack.count.Value
 end
 
 local function unstickNote(note)
 	-- Destroy weld and place back into default collision group
 	axisUtil.destroyChild(note, "StickWeld")
 	PhysicsService:SetPartCollisionGroup(note, "Default")
-	fx.fadeOutAndDestroy(note, genesUtil.getConfig(note).destroyAnimationDuration)
+	fx.fadeOutAndDestroy(note, note.config.stickyNoteStack.destroyAnimationDuration.Value)
 end
 
 -- Place stack note
@@ -52,10 +52,10 @@ local function placePlayerStackNote(player, stack, raycastData, text)
 	local note = stickyNoteStackUtil.createNote(stack, raycastData, filteredText)
 
 	-- Sticky note destroy stream
-	local config = genesUtil.getConfig(stack).stickyNoteStack
-	local dur = config.removeAfterTimer
+	local config = stack.config.stickyNoteStack
+	local dur = config.removeAfterTimer.Value
 	local timer = (dur and rx.Observable.timer(dur) or rx.Observable.never())
-	local playerLeft = (config.removeAfterOwnerLeft
+	local playerLeft = (config.removeAfterOwnerLeft.Value
 		and rx.Observable.from(Players.PlayerRemoving):filter(dart.equals(player))
 		or rx.Observable.never())
 	timer:merge(playerLeft)

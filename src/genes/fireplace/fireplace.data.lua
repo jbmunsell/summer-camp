@@ -6,7 +6,9 @@ local interactData = genesUtil.createGeneData({
 	instanceTag = "gene_fireplace",
 	name = "fireplace",
 	state = {
-		enabled = false,
+		fireplace = {
+			enabled = false,
+		},
 	},
 
 	config = {

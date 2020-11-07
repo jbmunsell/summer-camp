@@ -36,12 +36,12 @@ local function slip(peel)
 	local torqueUnit = Vector3.new(math.cos(torqueAngle), 0, math.sin(torqueAngle))
 
 	-- Apply impulses to character and banana peel
-	local config = genesUtil.getConfig(peel).bananaPeel
+	local config = peel.config.bananaPeel
 	local character = env.LocalPlayer.Character
-	axisUtil.applyCharacterVelocityImpulse(character, config.characterVelocityImpulse)
-	axisUtil.applyCharacterRotationImpulse(character, torqueUnit * config.characterTorqueMagnitude)
+	axisUtil.applyCharacterVelocityImpulse(character, config.characterVelocityImpulse.Value)
+	axisUtil.applyCharacterRotationImpulse(character, torqueUnit * config.characterTorqueMagnitude.Value)
 	if peel:IsDescendantOf(game) then
-		peel.PrimaryPart.Velocity = throwUnit * config.peelSendMagnitude + config.peelVerticalImpulse
+		peel.PrimaryPart.Velocity = throwUnit * config.peelSendMagnitude.Value + config.peelVerticalImpulse.Value
 	end
 end
 
@@ -64,13 +64,13 @@ slipStream
 -- Get up
 slipStream
 	:delay(function (peel)
-		return genesUtil.getConfig(peel).bananaPeel.getUpDelay
+		return peel.config.bananaPeel.getUpDelay.Value
 	end)
 	:subscribe(getUp)
 
 -- Destroy banana peel
 rx.Observable.from(bananaPeel.net.Destroyed)
 	:map(function (peel)
-		return peel, genesUtil.getConfig(peel).bananaPeel.destroyFadeDuration
+		return peel, peel.config.bananaPeel.destroyFadeDuration.Value
 	end)
 	:subscribe(fx.fadeOutAndDestroy)

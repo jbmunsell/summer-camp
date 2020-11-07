@@ -16,6 +16,7 @@ local humanoidHolder = genes.humanoidHolder
 -- modules
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
+local humanoidHolderData = require(humanoidHolder.data)
 
 -- lib
 local humanoidHolderUtil = {}
@@ -49,14 +50,13 @@ end
 -- Render holder
 function humanoidHolderUtil.renderHumanoidHolder(holder)
 	local owner = holder.state.humanoidHolder.owner.Value
-	local config = genesUtil.getConfig(holder)
 	if not owner then
 		-- If there is no owner, break weld
 		axisUtil.destroyChild(holder, "HumanoidHoldWeld")
 	else
 		-- Smooth attach owner to this instance
 		local weld, _, attachInfo = axisUtil.smoothAttach(holder, owner.Parent,
-			"WaistBackAttachment", config.humanoidHolder.tweenInInfo)
+			"WaistBackAttachment", humanoidHolderData.tweenInInfo)
 		holder.state.humanoidHolder.entryOffset.Value = attachInfo.current
 		weld.Name = "HumanoidHoldWeld"
 
@@ -80,7 +80,7 @@ function humanoidHolderUtil.popHumanoid(humanoid)
 	end
 
 	-- Ease the hold weld BACK to its original offset
-	local info = genesUtil.getConfig(holder).humanoidHolder.tweenOutInfo
+	local info = humanoidHolderData.tweenOutInfo
 	local goal = { C0 = holder.state.humanoidHolder.entryOffset.Value }
 	local tween = TweenService:Create(weld, info, goal)
 	tween.Completed:Connect(function ()

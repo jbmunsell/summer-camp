@@ -28,7 +28,7 @@ local genesUtil = require(genes.util)
 local function destroyBananaPeel(peel)
 	peel.state.bananaPeel.hot.Value = false
 	bananaPeel.net.Destroyed:FireAllClients(peel)
-	delay(genesUtil.getConfig(peel).bananaPeel.destroyFadeDuration + 1, function ()
+	delay(peel.config.bananaPeel.destroyFadeDuration.Value + 1, function ()
 		peel:Destroy()
 	end)
 end
@@ -80,7 +80,7 @@ peelExpiredStream
 local characterTripStream = peelInstanceStream
 	:flatMap(function (peel)
 		return rx.Observable.fromPlayerTouchedDescendant(peel,
-			genesUtil.getConfig(peel).bananaPeel.peelDebounce)
+			peel.config.bananaPeel.peelDebounce.Value)
 	end)
 	:reject(function (peel, player)
 		local humanoid = axisUtil.getPlayerHumanoid(player)
@@ -99,7 +99,7 @@ characterTripStream
 -- Restore network ownership to auto after a couple seconds
 characterTripStream
 	:delay(function (peel)
-		return genesUtil.getConfig(peel).bananaPeel.getUpDelay
+		return peel.config.bananaPeel.getUpDelay.Value
 	end)
 	:filter(function (peel) return peel:IsDescendantOf(game) end)
 	:subscribe(restorePeelOwnership)

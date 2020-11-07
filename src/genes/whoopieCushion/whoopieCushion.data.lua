@@ -9,9 +9,11 @@ return genesUtil.createGeneData({
 	instanceTag = "gene_whoopieCushion",
 	genes = { env.src.genes.pickup },
 	state = {
-		blows = 3,
-		hot = false,
-		filled = false,
+		whoopieCushion = {
+			blows = 3,
+			hot = false,
+			filled = false,
+		},
 	},
 	
 	config = {
@@ -28,9 +30,9 @@ return genesUtil.createGeneData({
 
 			fullSize = Vector3.new(1.514, 0.602, 1.987),
 			emptySize = Vector3.new(1.514, 0.1, 1.987),
-
-			tweenUpInfo = TweenInfo.new(0.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
-			tweenDownInfo = TweenInfo.new(0.1, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
 		},
 	},
+
+	tweenUpInfo = TweenInfo.new(0.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
+	tweenDownInfo = TweenInfo.new(0.1, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
 })

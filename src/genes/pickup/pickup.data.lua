@@ -8,10 +8,12 @@ local pickupData = genesUtil.createGeneData({
 	instanceTag = "gene_pickup",
 	genes = { env.src.genes.interact },
 	state = {
-		enabled = true,
-		dropDebounce = false,
-		holder = tableau.null,
-		owner = tableau.null,
+		pickup = {
+			enabled = true,
+			dropDebounce = false,
+			holder = tableau.null,
+			owner = tableau.null,
+		},
 	},
 
 	config = {

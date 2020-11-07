@@ -8,15 +8,18 @@ return genesUtil.createGeneData({
 	instanceTag = "gene_humanoidHolder",
 	genes = { env.src.genes.interact },
 	state = {
-		owner = tableau.null,
-		entryOffset = CFrame.new(),
+		humanoidHolder = {
+			owner = tableau.null,
+			entryOffset = CFrame.new(),
+		},
 	},
 
 	config = {
 		humanoidHolder = {
 			-- animation = env.res.animations.Corpse,
-			tweenInInfo = TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
-			tweenOutInfo = TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
 		},
 	},
+	
+	tweenInInfo = TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
+	tweenOutInfo = TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
 })

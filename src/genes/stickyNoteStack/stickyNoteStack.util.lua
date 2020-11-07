@@ -38,10 +38,10 @@ end
 
 -- Get world cframe
 function stickyNoteStackUtil.getWorldCFrame(note, raycastData)
-	local config = genesUtil.getConfig(note).stickyNoteStack
+	local config = note.config.stickyNoteStack
 	return CFrame.new(raycastData.position, raycastData.position + raycastData.normal)
-		* config.stickProtrusion
-		* config.stickAngle
+		* config.stickProtrusion.Value
+		* config.stickAngle.Value
 		* CFrame.Angles(0, 0, math.rad(raycastData.rotation or 0))
 end
 

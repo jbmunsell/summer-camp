@@ -11,7 +11,9 @@ return genesUtil.createGeneData({
 	name = "edible",
 	genes = { genes.pickup },
 	state = {
-		eaten = false,
+		edible = {
+			eaten = false,
+		},
 	},
 
 	config = {},

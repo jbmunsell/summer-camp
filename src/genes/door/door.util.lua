@@ -9,12 +9,10 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local genes = env.src.genes
 
 -- modules
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
-local genesUtil = require(genes.util)
 
 -- lib
 local doorUtil = {}
@@ -22,11 +20,11 @@ local doorUtil = {}
 -- Render door
 function doorUtil.renderDoor(instance)
 	local open = instance.state.door.open.Value
-	local config = genesUtil.getConfig(instance).door
+	local config = instance.config.door
 	tableau.from(instance:GetDescendants())
 		:filter(dart.isa("HingeConstraint"))
 		:foreach(function (hinge)
-			hinge.TargetAngle = (open and config.openAngle or config.closedAngle)
+			hinge.TargetAngle = (open and config.openAngle or config.closedAngle).Value
 		end)
 end
 

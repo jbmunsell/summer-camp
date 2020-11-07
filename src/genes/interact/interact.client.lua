@@ -88,8 +88,7 @@ end
 
 -- Is in range
 local function isInRange(characterAttachment, instance, hold)
-	local config = genesUtil.getConfig(instance).interact
-	return getHoldDistance(characterAttachment, hold) <= config.distanceThreshold
+	return getHoldDistance(characterAttachment, hold) <= instance.config.interact.distanceThreshold.Value
 end
 local function isInSight(characterAttachment, instance, hold)
 	local charpos = characterAttachment.WorldPosition
@@ -143,7 +142,7 @@ end
 -- Update interact prompt
 local function updateInteractPrompt(hold, timer)
 	-- Get config
-	local config = (hold and genesUtil.getConfig(getInteractableFromHold(hold)).interact)
+	local config = (hold and getInteractableFromHold(hold).config.interact)
 
 	-- Set enabled and adornee
 	interactPrompt.Enabled = (hold and true or false)
@@ -151,7 +150,7 @@ local function updateInteractPrompt(hold, timer)
 
 	-- Pull proper image from spritesheet
 	local totalCells = (SpritesheetDims.X * SpritesheetDims.Y)
-	local timerFraction = ((hold and timer) and 1 - (timer / config.duration) or 0)
+	local timerFraction = ((hold and timer) and 1 - (timer / config.duration.Value) or 0)
 	local i = math.max(0, math.min(totalCells - 1, math.floor(timerFraction * totalCells)))
 
 	-- Hide if we haven't started
@@ -211,7 +210,7 @@ hotInteractor
 	:merge(advancingInteract:reject())
 	:map(function ()
 		local hot = hotInteractor:getValue()
-		return hot and genesUtil.getConfig(getInteractableFromHold(hot)).interact.duration
+		return hot and getInteractableFromHold(hot).config.interact.duration.Value
 	end)
 	:multicast(interactionTimer)
 

@@ -11,6 +11,7 @@ local TweenService = game:GetService("TweenService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
+local whoopieCushion = genes.whoopieCushion
 
 -- modules
 local rx = require(axis.lib.rx)
@@ -18,6 +19,7 @@ local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
 local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
+local whoopieCushionData = require(whoopieCushion.data)
 
 -- lib
 local whoopieCushionUtil = {}
@@ -34,12 +36,12 @@ end
 function whoopieCushionUtil.renderCushion(cushion)
 	-- Get primed state
 	local filled = cushion.state.whoopieCushion.filled.Value
-	local config = genesUtil.getConfig(cushion).whoopieCushion
+	local config = cushion.config.whoopieCushion
 
 	-- Either way we're going to tween size
-	local info = (filled and config.tweenUpInfo or config.tweenDownInfo)
+	local info = (filled and whoopieCushionData.tweenUpInfo or whoopieCushionData.tweenDownInfo)
 	local targets = {}
-	targets.Size = (filled and config.fullSize or config.emptySize)
+	targets.Size = (filled and config.fullSize or config.emptySize).Value
 
 	-- Tween
 	TweenService:Create(cushion, info, targets):Play()
@@ -48,7 +50,7 @@ function whoopieCushionUtil.renderCushion(cushion)
 	if not filled then
 		local emitter = cushion:FindFirstChild("GustEmitter", true)
 		if emitter then
-			emitter:Emit(config.particleCount)
+			emitter:Emit(config.particleCount.Value)
 		end
 
 		local soundFolder = cushion:FindFirstChild("blowSounds", true) or env.res.genes.whoopieCushion.sounds.blows
@@ -67,7 +69,7 @@ end
 
 -- Remove cushion
 function whoopieCushionUtil.removeCushion(cushion)
-	local duration = genesUtil.getConfig(cushion).whoopieCushion.destroyFadeDuration
+	local duration = cushion.config.whoopieCushion.destroyFadeDuration.Value
 	local sound = cushion:FindFirstChild("Fart", true)
 	rx.Observable.timer(5)
 		:merge(sound and rx.Observable.from(sound.Ended) or rx.Observable.never())

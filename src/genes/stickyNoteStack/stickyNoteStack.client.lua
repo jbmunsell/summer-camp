@@ -51,7 +51,7 @@ local function updatePreview(stack)
 		preview = stack:Clone()
 		stickyNoteStackUtil.removeTags(preview)
 		stickyNoteStackUtil.tagNote(preview)
-		rotation = (math.random() - 0.5) * genesUtil.getConfig(stack).stickyNoteStack.rotationRange
+		rotation = (math.random() - 0.5) * stack.config.stickyNoteStack.rotationRange.Value
 	end
 end
 
@@ -70,7 +70,7 @@ local function placePreview(raycastData, stack)
 	local distance = (raycastData.position and env.LocalPlayer:DistanceFromCharacter(raycastData.position) or 0)
 	if not raycastData.instance
 	or distance == 0
-	or distance >= genesUtil.getConfig(stack).stickyNoteStack.placementDistanceThreshold then
+	or distance >= stack.config.stickyNoteStack.placementDistanceThreshold.Value then
 		preview.Parent = ReplicatedStorage
 		return
 	else
