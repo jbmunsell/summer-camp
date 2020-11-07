@@ -15,31 +15,50 @@ local canvas = genes.canvas
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local tableau = require(axis.lib.tableau)
 local canvasUtil = require(canvas.util)
 local genesUtil = require(genes.util)
 
--- init canvas
-local function initCanvas(instance)
-	-- Create streams
-	rx.Observable.from(instance.state.canvas.owner)
-		:map(function (owner)
-			return owner and string.format("%s's canvas", owner.Name) or ""
-		end)
-		:subscribe(function (text)
-			instance.CanvasPart.NameGui.NameLabel.Text = text
+---------------------------------------------------------------------------------------------------
+-- Functions
+---------------------------------------------------------------------------------------------------
+
+-- Connect name gui
+local function connectOwnerDisplay(instance)
+	-- If we have a name gui then connect to it
+	local nameGui = instance:FindFirstChild("NameGui", true)
+	if nameGui then
+		rx.Observable.from(instance.state.canvas.owner)
+			:map(function (owner)
+				return owner and string.format("%s's canvas", owner.Name) or ""
+			end)
+			:subscribe(function (text)
+				nameGui.NameLabel.Text = text
+			end)
+	end
+end
+
+-- Wipe canvas
+local function wipeCanvas(instance)
+	-- Set all the cells to transparent
+	tableau.fromLayoutContents(canvasUtil.getCanvasFrame(instance))
+		:foreach(function (cell)
+			cell.BackgroundTransparency = 1
 		end)
 end
 
--- Canvas state manipulators
-local function grantCanvasOwnership(client, canvasInstance)
-	canvasInstance.state.canvas.owner.Value = client
-end
+---------------------------------------------------------------------------------------------------
+-- Streams
+---------------------------------------------------------------------------------------------------
 
 -- init all canvases forever
-local canvasStream = genesUtil.initGene(canvas)
-canvasStream:subscribe(initCanvas)
+local canvases = genesUtil.initGene(canvas)
 
--- Connect to client requests
+-- Connect to name gui display and wipe on init
+canvases:subscribe(connectOwnerDisplay)
+canvases:subscribe(wipeCanvas)
+
+-- Connect to client ownership request
 rx.Observable.from(canvas.net.CanvasOwnershipRequested.OnServerEvent)
 	:filter(function (client, canvasInstance)
 		local team = canvasInstance.state.canvas.teamToAcceptFrom.Value
@@ -47,10 +66,13 @@ rx.Observable.from(canvas.net.CanvasOwnershipRequested.OnServerEvent)
 		local hasAlready = canvasUtil.getPlayerCanvas(client)
 		return teamGood and not hasAlready
 	end)
-	:subscribe(grantCanvasOwnership)
+	:subscribe(canvasUtil.setCanvasOwner)
+
+-- Connect to client change request
 rx.Observable.from(canvas.net.CanvasChangeRequested.OnServerEvent)
 	:filter(function (client, canvasInstance, _)
-		return canvasInstance.state.canvas.owner.Value == client
+		return canvasInstance.config.canvas.collaborative.Value
+		or canvasInstance.state.canvas.owner.Value == client
 	end)
 	:map(dart.omitFirst)
 	:subscribe(canvasUtil.changeCanvas)

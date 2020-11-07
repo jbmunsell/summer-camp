@@ -14,6 +14,7 @@ return genesUtil.createGeneData({
 			owner = tableau.null,
 			teamToAcceptFrom = tableau.null,
 			locked = false,
+			editing = false, -- For use on client to connect to tools and such
 		},
 		
 		interact = {
@@ -25,7 +26,9 @@ return genesUtil.createGeneData({
 
 	config = {
 		canvas = {
+			collaborative = false,
 			activeToolHighlightColor = Color3.fromRGB(190, 145, 255),
+			drawingDistance = 20,
 		},
 	},
 })

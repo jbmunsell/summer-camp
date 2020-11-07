@@ -24,100 +24,9 @@ local canvasUtil = require(canvas.util)
 local multiswitchUtil = require(multiswitch.util)
 local inputUtil = require(input.util)
 
--- Consts
-local White = Color3.new(1, 1, 1)
-
--- Streams
-local playerOwnsAnyCanvasStream = genesUtil.getInstanceStream(canvas)
-	:flatMap(function (canvasInstance)
-		return rx.Observable.from(canvasInstance.AncestryChanged)
-			:filter(function () return not canvasInstance:IsDescendantOf(game) end)
-			:merge(rx.Observable.from(canvasInstance.state.canvas.owner))
-	end)
-	:map(dart.bind(canvasUtil.getPlayerCanvas, env.LocalPlayer))
-	:map(dart.boolify)
-	:distinctUntilChanged()
-	:startWith(false)
-
--- Slider functions
-local function setSliderPosition(slider, position)
-	slider.Circle.Position = UDim2.new(position, 0, 0.5, 0)
-end
-
--- Set tool button highlighted
-local function setToolButtonHighlighted(canvasInstance, button, highlighted)
-	button.ImageColor3 = (highlighted
-		and canvasInstance.config.canvas.activeToolHighlightColor.Value
-		or White)
-end
-
--- Set author gui visible
-local function setCanvasAuthorGuiVisible(canvasInstance, visible)
-	canvasInstance.ColorSelector.SurfaceGui.Enabled = visible
-	canvasInstance.Tools.SurfaceGui.Enabled = visible
-end
-
--- Update canvas color display
-local function updateCanvasColorDisplay(canvasInstance, color)
-	-- Set current color display
-	local colorSelectorGui = canvasInstance.ColorSelector.SurfaceGui
-	local sliders = colorSelectorGui.Sliders
-	colorSelectorGui.CurrentColorDisplay.Center.ImageColor3 = color
-
-	-- Set individual slider positions
-	local h, s, v = color:ToHSV()
-	setSliderPosition(sliders.Hue, h)
-	setSliderPosition(sliders.Saturation, s)
-	setSliderPosition(sliders.Brightness, v)
-
-	-- Set each slider's gradient
-	sliders.Saturation.UIGradient.Color = ColorSequence.new(Color3.fromHSV(h, 0, v), Color3.fromHSV(h, 1, v))
-	sliders.Brightness.UIGradient.Color = ColorSequence.new(Color3.fromHSV(h, s, 0), Color3.fromHSV(h, s, 1))
-end
-
--- init canvas
-local function initCanvas(instance)
-	-- Create streams from state values
-	local ownerChanged = rx.Observable.from(instance.state.canvas.owner)
-	local teamChanged = rx.Observable.from(instance.state.canvas.teamToAcceptFrom)
-	local lockedChanged = rx.Observable.from(instance.state.canvas.locked)
-	local interactableStream = ownerChanged:combineLatest(teamChanged, lockedChanged, playerOwnsAnyCanvasStream,
-		function (owner, team, locked, playerOwns)
-			return (not locked)
-			and (not team or team == env.LocalPlayer.Team)
-			and (not owner)
-			and (not playerOwns)
-		end)
-		:map(dart.carry(instance, "interact", "canvas"))
-
-	-- Set interact enabled according to ownership
-	interactableStream:subscribe(multiswitchUtil.setSwitchEnabled)
-	ownerChanged
-		:map(function (player)
-			return instance, (player == env.LocalPlayer)
-		end)
-		:subscribe(setCanvasAuthorGuiVisible)
-end
-
--- Get canvas cell from mouse location
-local function getCanvasCellIndexFromMouse(canvasInstance)
-	-- Assert hit
-	local raycastResult = inputUtil.raycastMouse()
-	if not raycastResult
-	or raycastResult.Instance ~= canvasInstance.CanvasPart
-	then return nil end
-
-	-- Get index from position
-	local canvasPartSize = canvasInstance.CanvasPart.Size
-	local canvasFrame = canvasInstance.CanvasPart.SurfaceGui.CanvasFrame
-	local cellCount = canvasFrame.UIGridLayout.AbsoluteCellCount
-	local offset = canvasInstance.CanvasPart.CFrame:toObjectSpace(CFrame.new(raycastResult.Position)).p + (canvasPartSize * 0.5)
-	local cellCoordinates = Vector2.new(
-		math.floor((offset.X / canvasPartSize.X) * cellCount.X),
-		math.floor((1 - offset.Y / canvasPartSize.Y) * cellCount.Y)
-	)
-	return cellCoordinates.X + cellCoordinates.Y * cellCount.X
-end
+---------------------------------------------------------------------------------------------------
+-- Functions
+---------------------------------------------------------------------------------------------------
 
 -- Paint canvas cell
 -- 	(and submit change request to server)
@@ -128,18 +37,21 @@ end
 
 -- Claim a canvas for ourselves
 local function claimCanvas(canvasInstance)
-	-- instances
-	local toolsContainer = canvasInstance.Tools.SurfaceGui.Container
-
 	-- Set owner to local player
 	canvasInstance.state.canvas.owner.Value = env.LocalPlayer
 	canvas.net.CanvasOwnershipRequested:FireServer(canvasInstance)
+end
+
+-- Connect drawing input
+local function connectDrawingInput(canvasInstance)
+	-- instances
+	local toolsContainer = canvasInstance.Tools.SurfaceGui.Container
 
 	-- Create terminator stream
-	local ownershipLost = rx.Observable.from(canvasInstance.state.canvas.owner.Changed)
-		:reject() -- pass through only falsy values
+	local stoppedEditing = rx.Observable.from(canvasInstance.state.canvas.editing.Changed)
+		:reject()
 	local terminator = rx.Observable.fromInstanceLeftGame(canvasInstance)
-		:merge(ownershipLost)
+		:merge(stoppedEditing)
 
 	-- Stream for adjusting the sliders
 	local function mapInputEventToConstant(event, constant)
@@ -188,7 +100,7 @@ local function claimCanvas(canvasInstance)
 		:filter(function ()
 			return UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
 		end)
-		:map(dart.bind(getCanvasCellIndexFromMouse, canvasInstance))
+		:map(dart.bind(canvasUtil.getCanvasCellIndexFromMouse, canvasInstance))
 		:distinctUntilChanged()
 		:filter()
 
@@ -235,16 +147,21 @@ local function claimCanvas(canvasInstance)
 
 	-- Paint application stream and erase stream
 	-- Erase stream is just a stream that applies white color to target cell
-	local function toCanvasChange(constantColor)
-		return function (cellIndex, color)
-			return canvasInstance, { cellIndex = cellIndex, color = constantColor or color }
-		end
-	end
 	local eraseStream = getToolInteractStream("Eraser")
-		:map(toCanvasChange(White))
+		:map(function (cellIndex)
+			return {
+				cellIndex = cellIndex,
+				transparency = 1,
+			}
+		end)
 	local paintStream = getToolInteractStream("Brush")
 		:withLatestFrom(colorChangedStream)
-		:map(toCanvasChange())
+		:map(function (cellIndex, color)
+			return {
+				cellIndex = cellIndex,
+				color = color,
+			}
+		end)
 
 	-- Subscriptions
 	local function subscribe(stream, f)
@@ -252,20 +169,94 @@ local function claimCanvas(canvasInstance)
 	end
 
 	-- Highlight active tool when changed
-	subscribe(toolButtonActiveStream:map(dart.carry(canvasInstance)), setToolButtonHighlighted)
+	subscribe(toolButtonActiveStream:map(dart.carry(canvasInstance)), canvasUtil.setToolButtonHighlighted)
 
 	-- 	Paint and erase
-	subscribe(paintStream:merge(eraseStream), changeCanvas)
+	subscribe(paintStream:merge(eraseStream):map(dart.carry(canvasInstance)), changeCanvas)
 
 	-- Update color display on color changed
-	subscribe(colorChangedStream, dart.bind(updateCanvasColorDisplay, canvasInstance))
+	subscribe(colorChangedStream, dart.bind(canvasUtil.updateCanvasColorDisplay, canvasInstance))
 end
 
--- Connect to all canvas objects forever
-genesUtil.getInstanceStream(canvas)
-	:subscribe(initCanvas)
+---------------------------------------------------------------------------------------------------
+-- Streams
+---------------------------------------------------------------------------------------------------
 
--- Connect to canvas client interaction
+-- Canvas instance stream
+local canvases = genesUtil.getInstanceStream(canvas)
+
+-- Player owns any
+local playerOwnsAnyCanvas = canvases
+	:flatMap(function (instance)
+		return rx.Observable.from(instance.state.canvas.owner)
+	end)
+	:map(dart.bind(canvasUtil.getPlayerCanvas, env.LocalPlayer))
+	:map(dart.boolify)
+	:distinctUntilChanged()
+
+-- Bind interact switch
+canvases
+	:flatMap(function (instance)
+		local stream
+		if instance.config.canvas.collaborative.Value then
+			stream = rx.Observable.just(false)
+		else
+			local owner = rx.Observable.from(instance.state.canvas.owner)
+			local acceptingTeam = rx.Observable.from(instance.state.canvas.teamToAcceptFrom)
+				:map(function (team)
+					return not team or team == env.LocalPlayer.Team
+				end)
+			stream = owner
+				:map(dart.boolNot)
+				:combineLatest(acceptingTeam, playerOwnsAnyCanvas:map(dart.boolNot), dart.boolAll)
+		end
+		return stream:map(dart.carry(instance, "interact", "canvas"))
+	end)
+	:subscribe(multiswitchUtil.setSwitchEnabled)
+
+-- Bind author gui rendering
+local canvasObtained = canvases
+	:flatMap(function (instance)
+		return rx.Observable.from(instance.state.canvas.owner)
+			:map(dart.equals(env.LocalPlayer))
+			:map(dart.carry(instance))
+	end)
+
+-- Claim ownership on interact (another stream will connect on owner changed)
 rx.Observable.from(interact.interface.ClientInteracted.Event)
 	:filter(dart.follow(genesUtil.hasGene, canvas))
 	:subscribe(claimCanvas)
+
+-- When a noncollaborative canvas sets US as the owner,
+-- 	OR a collaborative canvas comes within range,
+-- 	connect tools
+local collaborativeInRange = canvases
+	:filter(function (instance)
+		return instance.config.canvas.collaborative.Value
+	end)
+	:flatMap(function (instance)
+		return rx.Observable.heartbeat()
+			:map(function ()
+				return env.LocalPlayer:DistanceFromCharacter(instance:FindFirstChild("CanvasPart", true).Position)
+			end)
+			:map(dart.lessThan(instance.config.canvas.drawingDistance.Value))
+			:distinctUntilChanged()
+			:map(dart.carry(instance))
+	end)
+collaborativeInRange
+	:merge(canvasObtained:map(dart.drag(true)))
+	:subscribe(canvasUtil.setEditing)
+
+-- Set tool visibility according to editing value
+local editingCanvas = canvases
+	:flatMap(function (instance)
+		return rx.Observable.from(instance.state.canvas.editing)
+			:map(dart.carry(instance))
+	end)
+editingCanvas:subscribe(canvasUtil.setToolsVisible)
+
+-- Connect drawing input when we are editing
+editingCanvas
+	:filter(dart.select(2))
+	:map(dart.select(1))
+	:subscribe(connectDrawingInput)
