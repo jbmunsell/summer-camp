@@ -8,6 +8,7 @@
 
 -- env
 local CollectionService = game:GetService("CollectionService")
+local TextService = game:GetService("TextService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 
@@ -28,10 +29,14 @@ end
 -- Filter player text
 function stickyNoteStackUtil.filterPlayerText(player, text)
 	local filteredMessage = "Text filtering error :/"
-	pcall(function ()
-		local textObject = env.TextService:FilterStringAsync(text, player.UserId)
+	local success, e = pcall(function ()
+		local textObject = TextService:FilterStringAsync(text, player.UserId)
 		filteredMessage = textObject:GetNonChatStringForBroadcastAsync()
 	end)
+	if not success then
+		warn("Caught error:")
+		warn(e)
+	end
 	return filteredMessage
 end
 
