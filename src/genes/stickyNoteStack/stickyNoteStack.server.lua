@@ -19,6 +19,7 @@ local stickyNoteStack = genes.stickyNoteStack
 local rx = require(axis.lib.rx)
 local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
+local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local pickupUtil = require(pickup.util)
@@ -35,18 +36,17 @@ end
 local function unstickNote(note)
 	-- Destroy weld and place back into default collision group
 	axisUtil.destroyChild(note, "StickWeld")
-	PhysicsService:SetPartCollisionGroup(note, "Default")
+	tableau.from(note:GetDescendants())
+		:append({ note })
+		:filter(dart.isa("BasePart"))
+		:foreach(function (p)
+			PhysicsService:SetPartCollisionGroup(p, "Default")
+		end)
 	fx.fadeOutAndDestroy(note, note.config.stickyNoteStack.destroyAnimationDuration.Value)
 end
 
 -- Place stack note
 local function placePlayerStackNote(player, stack, raycastData, text)
-	-- Decrease stack count
-	stack.state.stickyNoteStack.count.Value = stack.state.stickyNoteStack.count.Value - 1
-	if stack.state.stickyNoteStack.count.Value <= 0 then
-		stack:Destroy()
-	end
-
 	-- Place sticky note object
 	local filteredText = stickyNoteStackUtil.filterPlayerText(player, text)
 	local note = stickyNoteStackUtil.createNote(stack, raycastData, filteredText)
@@ -61,6 +61,9 @@ local function placePlayerStackNote(player, stack, raycastData, text)
 	timer:merge(playerLeft)
 		:first()
 		:subscribe(dart.bind(unstickNote, note))
+
+	-- Decrease stack count
+	stack.state.stickyNoteStack.count.Value = stack.state.stickyNoteStack.count.Value - 1
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -68,8 +71,19 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Init all sticky note stacks
-genesUtil.initGene(stickyNoteStack)
-	:subscribe(setStackCount)
+local stacks = genesUtil.initGene(stickyNoteStack)
+
+-- Set stack count on init
+stacks:subscribe(setStackCount)
+
+-- Destroy stacks that are used up
+stacks
+	:flatMap(function (instance)
+		return rx.Observable.from(instance.state.stickyNoteStack.count)
+			:filter(dart.equals(0))
+			:map(dart.constant(instance))
+	end)
+	:subscribe(dart.destroy)
 
 -- Handle placement requests
 pickupUtil.getPlayerObjectActionRequestStream(

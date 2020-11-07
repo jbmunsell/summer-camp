@@ -20,7 +20,6 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local inputUtil = require(input.util)
 local pickupUtil = require(pickup.util)
-local genesUtil = require(genes.util)
 local stickyNoteStackUtil = require(stickyNoteStack.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -76,8 +75,15 @@ local function placePreview(raycastData, stack)
 	else
 		preview.Parent = workspace
 	end
-	preview.CFrame = stickyNoteStackUtil.getWorldCFrame(stack, raycastData)
-		:toWorldSpace(preview.StickAttachment.CFrame:inverse())
+	local worldCFrame = stickyNoteStackUtil.getWorldCFrame(stack, raycastData)
+	local stickAttachment = stickyNoteStackUtil.getStickAttachment(preview)
+	if preview:IsA("BasePart") then
+		preview.CFrame = worldCFrame:toWorldSpace(stickAttachment.CFrame:inverse())
+	elseif preview:IsA("Model") then
+		preview:SetPrimaryPartCFrame(
+			worldCFrame:toWorldSpace(stickAttachment.WorldCFrame:toObjectSpace(preview:GetPrimaryPartCFrame()))
+		)
+	end
 end
 
 ---------------------------------------------------------------------------------------------------

@@ -10,16 +10,20 @@
 local CollectionService = game:GetService("CollectionService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local genes = env.src.genes
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
-local genesUtil = require(genes.util)
 
 -- lib
 local stickyNoteStackUtil = {}
+
+-- Get stick attachment
+function stickyNoteStackUtil.getStickAttachment(instance)
+	return instance:FindFirstChild("StickAttachment", true)
+end
 
 -- Filter player text
 function stickyNoteStackUtil.filterPlayerText(player, text)
@@ -52,7 +56,7 @@ function stickyNoteStackUtil.stickNote(note, raycastData)
 	local stickAttachment = Instance.new("Attachment", raycastData.instance)
 	stickAttachment.Name = attachmentName
 	stickAttachment.CFrame = stickyNoteStackUtil.getAttachmentCFrame(note, raycastData)
-	note.StickAttachment.Name = attachmentName
+	stickyNoteStackUtil.getStickAttachment(note).Name = attachmentName
 
 	-- Smoothly weld the bitches together
 	local weld = axisUtil.smoothAttach(raycastData.instance, note, attachmentName)
@@ -67,12 +71,11 @@ end
 
 -- Set note text
 function stickyNoteStackUtil.setNoteText(note, text)
-	local textbox = note:FindFirstChildWhichIsA("TextBox", true)
-	if textbox then
-		textbox.Text = text
-	else
-		warn("Could not find TextBox as descendant of StickyNote")
-	end
+	tableau.from(note:GetDescendants())
+		:filter(dart.isa("TextBox"))
+		:foreach(function (box)
+			box.Text = text
+		end)
 end
 
 -- Tag note with FXPart so that it gets ignored by raycasts and stuff
@@ -82,15 +85,23 @@ function stickyNoteStackUtil.removeTags(note)
 	end
 end
 function stickyNoteStackUtil.tagNote(note)
-	CollectionService:AddTag(note, "FXPart")
+	tableau.from(note:GetDescendants())
+		:append({ note })
+		:filter(dart.isa("BasePart"))
+		:foreach(function (part)
+			CollectionService:AddTag(part, "FXPart")
+		end)
 end
 
 -- Create sticky note from raycast data and text
 function stickyNoteStackUtil.createNote(stack, raycastData, text)
 	local note = stack:Clone()
 	stickyNoteStackUtil.removeTags(note)
-	note.Color = stack.Color
-	note.CFrame = stack.CFrame
+	-- if note:IsA("Model") then
+	-- 	note:SetPrimaryPartCFrame()
+	-- else
+	-- 	note.CFrame = stack.CFrame
+	-- end
 	stickyNoteStackUtil.tagNote(note)
 	stickyNoteStackUtil.stickNote(note, raycastData)
 	stickyNoteStackUtil.setNoteText(note, text)
