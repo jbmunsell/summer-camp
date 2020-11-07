@@ -46,9 +46,6 @@ end
 local function isInteractable(instance)
 	return instance:IsDescendantOf(workspace)
 	and multiswitchUtil.all(instance, "interact")
-	-- and    instance.state.interact.enabledServer.Value
-	-- and    instance.state.interact.enabledClient.Value
-	-- and not interactUtil.isLocked(instance)
 end
 
 -- Get interaction holds
@@ -194,6 +191,7 @@ local interactInputDown = keyStateStream
 
 -- Connect to heartbeat to sense interactables and place prompt
 local hotInteractor = rx.Observable.heartbeat()
+	:reject(function () return interactInputDown:getValue() end)
 	:map(getBestHold)
 	:distinctUntilChanged()
 	:multicast(rx.BehaviorSubject.new())
