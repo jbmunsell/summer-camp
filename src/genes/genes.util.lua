@@ -146,14 +146,16 @@ end
 function genesUtil.hasFullState(instance, gene)
 	-- Check primary state
 	if not instance:FindFirstChild("state") then return end
+	if not instance:FindFirstChild("config") then return end
 
 	-- Chase all genes to see if they have the appropriate state folder
 	return genesUtil.getAllSubGenes(gene)
 		:append({ gene })
 		:all(function (g)
 			local data = require(g.data)
-			return not data.state
-			or check(instance.state, data.state)
+			local hasState = not data.state or check(instance.state, data.state)
+			local hasConfig = not data.config or check(instance.config, data.config)
+			return hasState and hasConfig
 		end)
 end
 
