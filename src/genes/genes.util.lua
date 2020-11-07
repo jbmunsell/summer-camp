@@ -107,7 +107,8 @@ local function mergeFolders(src, dest)
 				-- merge folder contents
 				mergeFolders(child, existing)
 			else -- assume value object
-				existing.Value = child.Value
+				-- existing.Value = child.Value
+				-- Trying out removing this because it overwrites custom config settings
 			end
 		end
 	end
