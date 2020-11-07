@@ -20,7 +20,6 @@ local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local tableau = require(axis.lib.tableau)
 local Bin = require(axis.classes.Bin)
-local genesUtil = require(genes.util)
 local pickupStreams = require(pickup.streams)
 local actionsConfig = require(actions.config)
 
@@ -123,7 +122,6 @@ end
 
 -- Set scrolling frame size
 local function setScrollingFrameSize(pixelSize)
-	print("Resizing scrolling frame")
 	actionsContainer.CanvasSize = UDim2.new(0, pixelSize.X, 0, pixelSize.Y)
 end
 

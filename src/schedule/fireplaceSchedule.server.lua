@@ -38,8 +38,7 @@ local function renderFireplace(instance)
 end
 
 -- Set fireplaces enabled
-local function setFireplacesEnabled(enabled)
-	print("Set fireplaces enabled ", enabled)
+local function setFireplacesEnabled()
 	genesUtil.getInstances(fireplace)
 		:foreach(renderFireplace)
 end
