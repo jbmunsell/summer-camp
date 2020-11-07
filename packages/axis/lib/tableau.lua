@@ -107,6 +107,18 @@ function tableau.copy(tb)
 	return new
 end
 
+-- Merge dictionaries
+function tableau.merge(src, dest)
+	for k, v in pairs(src) do
+		if type(v) ~= "table" then
+			dest[k] = v
+		else
+			dest[k] = {}
+			tableau.merge(v, dest[k])
+		end
+	end
+end
+
 -- duplicate
 -- 	deep copy
 function tableau.duplicate(tb)
@@ -223,6 +235,11 @@ function tableau.fromLayoutContents(guiLayoutContainer)
 		:filter(function (instance) return instance:IsA("GuiObject") end)
 end
 
+-- from value objects
+function tableau.fromValueObjects(instance)
+	return tableau.from(tableau.valueObjectsToTable(instance))
+end
+
 -- raw
 function ftable:raw()
 	return self.data
@@ -332,9 +349,6 @@ function ftable:min(getValue)
 
 	if #self.data == 0 then return nil end
 	
-	-- local cmin = self.data[1]
-	-- local cval = getValue(cmin)
-	-- for i = 2, #self.data do
 	local cmin = nil
 	local cval = math.huge
 	for _, v in pairs(self.data) do
@@ -345,6 +359,23 @@ function ftable:min(getValue)
 		end
 	end
 	return cmin, cval
+end
+function ftable:max(getValue)
+	getValue = getValue or identity
+	assert(type(getValue) == "function", "ftable:max requires a function or nil")
+
+	if #self.data == 0 then return nil end
+	
+	local cmax = nil
+	local cval = -math.huge
+	for _, v in pairs(self.data) do
+		local val = getValue(v)
+		if val and val > cval then
+			cmax = v
+			cval = val
+		end
+	end
+	return cmax, cval
 end
 
 -- first

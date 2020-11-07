@@ -131,6 +131,13 @@ function dart.notEquals(val)
 	end
 end
 
+-- less than
+function dart.lessThan(val)
+	return function (x)
+		return x < val
+	end
+end
+
 -- return constant value
 function dart.constant(val)
 	return function ()
