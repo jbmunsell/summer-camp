@@ -289,7 +289,8 @@ end
 
 -- filter
 function ftable:filter(f)
-	assert(type(f) == "function", "ftable:filter requires a function")
+	f = f or identity
+	assert(type(f) == "function", "ftable:filter requires a function or nil")
 	local data = {}
 	for i, v in pairs(self.data) do
 		if f(v, i) then

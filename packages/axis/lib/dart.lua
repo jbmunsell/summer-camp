@@ -159,6 +159,13 @@ function dart.printConstant(v)
 	end
 end
 
+-- pluck
+function dart.select(i)
+	return function (...)
+		return table.pack(...)[i]
+	end
+end
+
 -- index
 function dart.index(...)
 	local keys = {...}
