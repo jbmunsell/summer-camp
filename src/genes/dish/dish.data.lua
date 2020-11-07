@@ -15,6 +15,12 @@ return genesUtil.createGeneData({
 			tray = tableau.null,
 			eaten = false,
 		},
+
+		interact = {
+			switches = {
+				dish = true,
+			},
+		},
 	},
 
 	config = {

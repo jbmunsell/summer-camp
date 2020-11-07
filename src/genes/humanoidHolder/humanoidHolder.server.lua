@@ -11,6 +11,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local interact = genes.interact
+local multiswitch = genes.multiswitch
 local humanoidHolder = genes.humanoidHolder
 
 -- modules
@@ -19,6 +20,7 @@ local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local interactUtil = require(interact.util)
+local multiswitchUtil = require(multiswitch.util)
 local humanoidHolderUtil = require(humanoidHolder.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -27,11 +29,6 @@ local humanoidHolderUtil = require(humanoidHolder.util)
 
 -- Basic init class
 local humanoidHolderStream = genesUtil.initGene(humanoidHolder)
-
--- Create interact locks
-humanoidHolderStream
-	:map(dart.drag("humanoidHolderServer", "humanoidHolderClient"))
-	:subscribe(interactUtil.createLocks)
 
 -- When a humanoid holder owner changes, render it
 humanoidHolderStream
@@ -45,10 +42,10 @@ humanoidHolderStream
 humanoidHolderStream
 	:flatMap(function (holder)
 		return rx.Observable.from(holder.state.humanoidHolder.owner)
-			:map(dart.boolify)
-			:map(dart.carry(holder, "humanoidHolderServer"))
+			:map(dart.boolNot)
+			:map(dart.carry(holder, "interact", "humanoidHolder"))
 	end)
-	:subscribe(interactUtil.setLockEnabled)
+	:subscribe(multiswitchUtil.setSwitchEnabled)
 
 -- Whenever any humanoid dies or leaves the game, clear holder ownership
 local humanoidStream = rx.Observable.from(workspace.DescendantAdded)
@@ -64,15 +61,8 @@ humanoidStream
 	end)
 	:subscribe(humanoidHolderUtil.removeHumanoidOwner)
 
--- Pop out of holders on jump
--- humanoidStream
--- 	:flatMap(function (humanoid)
--- 		return rx.Observable.from(humanoid.Jumping)
--- 			:tap(print)
--- 			:filter()
--- 			:map(dart.constant(humanoid))
--- 	end)
--- 	:subscribe(humanoidHolderUtil.popHumanoid)
+-- Pop humanoid when they wanna jump
+-- 	NOTE: Needs entry point for non-player characters
 rx.Observable.from(humanoidHolder.net.Jumped)
 	:map(axisUtil.getPlayerHumanoid)
 	:filter()

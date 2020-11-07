@@ -14,6 +14,12 @@ local pickupData = genesUtil.createGeneData({
 			holder = tableau.null,
 			owner = tableau.null,
 		},
+
+		interact = {
+			switches = {
+				pickup = true,
+			},
+		},
 	},
 
 	config = {

@@ -12,6 +12,7 @@ local axis = env.packages.axis
 local input = env.src.input
 local genes = env.src.genes
 local interact = genes.interact
+local multiswitch = genes.multiswitch
 
 -- modules
 local rx = require(axis.lib.rx)
@@ -19,7 +20,7 @@ local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local inputUtil = require(input.util)
 local genesUtil = require(genes.util)
-local interactUtil = require(interact.util)
+local multiswitchUtil = require(multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Instances and constants
@@ -44,9 +45,10 @@ end
 -- Is interactable
 local function isInteractable(instance)
 	return instance:IsDescendantOf(workspace)
-	and    instance.state.interact.enabledServer.Value
-	and    instance.state.interact.enabledClient.Value
-	and not interactUtil.isLocked(instance)
+	and multiswitchUtil.all(instance, "interact")
+	-- and    instance.state.interact.enabledServer.Value
+	-- and    instance.state.interact.enabledClient.Value
+	-- and not interactUtil.isLocked(instance)
 end
 
 -- Get interaction holds

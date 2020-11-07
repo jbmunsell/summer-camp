@@ -14,13 +14,14 @@ local axis = env.packages.axis
 local genes = env.src.genes
 local pickup = genes.pickup
 local interact = genes.interact
+local multiswitch = genes.multiswitch
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local pickupUtil = require(pickup.util)
 local genesUtil = require(genes.util)
-local interactUtil = require(interact.util)
+local multiswitchUtil = require(multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -52,11 +53,6 @@ end
 local pickupInstanceStream = genesUtil.initGene(pickup)
 pickupInstanceStream:subscribe(initInstance)
 
--- Create locks
-pickupInstanceStream
-	:map(dart.drag("pickup"))
-	:subscribe(interactUtil.createLocks)
-
 -- We should only be able to interact with an object if it has no holder and is enabled
 pickupInstanceStream
 	:flatMap(function (instance)
@@ -66,10 +62,9 @@ pickupInstanceStream
 			:combineLatest(rx.Observable.from(instance.state.pickup.enabled),
 				rx.Observable.just(interactEnabled),
 				dart.boolAll)
-			:map(dart.boolNot)
-			:map(dart.carry(instance, "pickup"))
+			:map(dart.carry(instance, "interact", "pickup"))
 	end)
-	:subscribe(interactUtil.setLockEnabled)
+	:subscribe(multiswitchUtil.setSwitchEnabled)
 
 -- Connect to pickup objects that have touch enabled
 local touchPickupStream = pickupInstanceStream

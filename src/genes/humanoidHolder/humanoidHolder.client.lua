@@ -10,7 +10,7 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local interact = genes.interact
+local multiswitch = genes.multiswitch
 local humanoidHolder = genes.humanoidHolder
 
 -- modules
@@ -19,19 +19,18 @@ local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local humanoidHolderUtil = require(humanoidHolder.util)
-local interactUtil = require(interact.util)
+local multiswitchUtil = require(multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
 -- Set lock
-local function setLock(locked)
-	local function setObjectLock(object)
-		interactUtil.setLockEnabled(object, "humanoidHolderClient", locked)
-	end
+local function setSwitch(enabled)
 	genesUtil.getInstances(humanoidHolder)
-		:foreach(setObjectLock)
+		:foreach(function (instance)
+			multiswitchUtil.setSwitchEnabled(instance, "interact", "humanoidHolder", enabled)
+		end)
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -45,8 +44,8 @@ genesUtil.getInstanceStream(humanoidHolder)
 	end)
 	:map(axisUtil.getLocalHumanoid)
 	:map(humanoidHolderUtil.getHumanoidHolder)
-	:map(dart.boolify)
-	:subscribe(setLock)
+	:map(dart.boolNot)
+	:subscribe(setSwitch)
 
 -- Local humanoid jumped, pass to server
 rx.Observable.from(env.LocalPlayer.CharacterAdded)

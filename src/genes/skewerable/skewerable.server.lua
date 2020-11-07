@@ -11,7 +11,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local pickup = genes.pickup
-local interact = genes.interact
+local multiswitch = genes.multiswitch
 local skewer = genes.skewer
 local skewerable = genes.skewerable
 
@@ -21,7 +21,7 @@ local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local genesUtil = require(genes.util)
 local pickupUtil = require(pickup.util)
-local interactUtil = require(interact.util)
+local multiswitchUtil = require(multiswitch.util)
 local skewerUtil = require(skewer.util)
 local skewerableUtil = require(skewerable.util)
 
@@ -36,23 +36,18 @@ local skewerables = genesUtil.initGene(skewerable)
 skewerables:map(dart.drag(skewerableUtil.equip))
 	:subscribe(pickupUtil.setEquipOverride)
 
--- Create locks
-skewerables:map(dart.drag("skewerableServer", "skewerableClient"))
-	:subscribe(interactUtil.createLocks)
-
 -- Set server lock according to whether we have a skewer AND that skewer has a holder
 skewerables
 	:flatMap(function (instance)
 		return rx.Observable.from(instance.state.skewerable.skewer)
 			:switchMap(function (skewerInstance)
 				return skewerInstance
-				and rx.Observable.from(skewerInstance.state.pickup.holder)
-				or rx.Observable.just(false)
+				and rx.Observable.from(skewerInstance.state.pickup.holder):map(dart.boolNot)
+				or rx.Observable.just(true)
 			end)
-			:map(dart.boolify)
-			:map(dart.carry(instance, "skewerableServer"))
+			:map(dart.carry(instance, "interact", "skewerable"))
 	end)
-	:subscribe(interactUtil.setLockEnabled)
+	:subscribe(multiswitchUtil.setSwitchEnabled)
 
 -- When a skewerable changes slot index, bump down others and render weld accordingly
 local stateChanged = skewerables

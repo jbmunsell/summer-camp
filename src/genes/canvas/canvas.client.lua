@@ -12,6 +12,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local interact = genes.interact
+local multiswitch = genes.multiswitch
 local canvas = genes.canvas
 local input = env.src.input
 
@@ -20,7 +21,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local canvasUtil = require(canvas.util)
-local interactUtil = require(interact.util)
+local multiswitchUtil = require(multiswitch.util)
 local inputUtil = require(input.util)
 
 -- Consts
@@ -87,10 +88,10 @@ local function initCanvas(instance)
 			and (not owner)
 			and (not playerOwns)
 		end)
-		:map(dart.carry(instance, "canvasClient"))
+		:map(dart.carry(instance, "interact", "canvas"))
 
 	-- Set interact enabled according to ownership
-	interactableStream:subscribe(interactUtil.setLockEnabled)
+	interactableStream:subscribe(multiswitchUtil.setSwitchEnabled)
 	ownerChanged
 		:map(function (player)
 			return instance, (player == env.LocalPlayer)

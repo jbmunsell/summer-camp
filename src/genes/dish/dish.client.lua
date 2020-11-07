@@ -10,7 +10,7 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local interact = genes.interact
+local multiswitch = genes.multiswitch
 local pickup = genes.pickup
 local dish = genes.dish
 local foodTray = genes.foodTray
@@ -19,7 +19,7 @@ local foodTray = genes.foodTray
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local pickupUtil = require(pickup.util)
-local interactUtil = require(interact.util)
+local multiswitchUtil = require(multiswitch.util)
 local genesUtil = require(genes.util)
 local dishUtil = require(dish.util)
 
@@ -28,17 +28,17 @@ local dishUtil = require(dish.util)
 ---------------------------------------------------------------------------------------------------
 
 -- Set lock enabled factory function
-local function setLockEnabled(enabled)
+local function setSwitchEnabled(enabled)
 	return function (dishInstance)
-		interactUtil.setLockEnabled(dishInstance, "dishClient", enabled)
+		multiswitchUtil.setSwitchEnabled(dishInstance, "interact", "dish", enabled)
 	end
 end
 
 -- Update dish locks
-local function updateFoodLocks()
+local function updateFoodSwitches()
 	-- First, go ahead and unlock everything. Then we'll only lock what should be locked
 	local allDishes = genesUtil.getInstances(dish)
-	allDishes:foreach(setLockEnabled(false))
+	allDishes:foreach(setSwitchEnabled(false))
 
 	-- Get tray that local player is holding
 	local tray = env.LocalPlayer.Character
@@ -54,7 +54,7 @@ local function updateFoodLocks()
 	end
 	local function lockDishType(dishType)
 		allDishes:filter(function (f) return dishUtil.getDishType(f) == dishType end)
-			:foreach(setLockEnabled(true))
+			:foreach(setSwitchEnabled(true))
 	end
 
 	-- Lock dish of the same type that we have on our tray
@@ -88,4 +88,4 @@ local trayHolderValueStream = foodTrayStream
 
 foodTrayValueStream:merge(trayHolderValueStream)
 	:throttleFirst(0.1) -- Nice lil throttle to prevent an assload of events hitting at once
-	:subscribe(updateFoodLocks)
+	:subscribe(updateFoodSwitches)

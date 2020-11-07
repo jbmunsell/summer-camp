@@ -12,6 +12,12 @@ return genesUtil.createGeneData({
 			owner = tableau.null,
 			entryOffset = CFrame.new(),
 		},
+
+		interact = {
+			switches = {
+				humanoidHolder = true,
+			},
+		},
 	},
 
 	config = {

@@ -15,6 +15,12 @@ return genesUtil.createGeneData({
 			teamToAcceptFrom = tableau.null,
 			locked = false,
 		},
+		
+		interact = {
+			switches = {
+				canvas = true,
+			},
+		},
 	},
 
 	config = {

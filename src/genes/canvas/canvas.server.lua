@@ -11,20 +11,15 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local canvas = genes.canvas
-local interact = genes.interact
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local canvasUtil = require(canvas.util)
 local genesUtil = require(genes.util)
-local interactUtil = require(interact.util)
 
 -- init canvas
 local function initCanvas(instance)
-	-- Create locks
-	interactUtil.createLock(instance, "canvasClient")
-
 	-- Create streams
 	rx.Observable.from(instance.state.canvas.owner)
 		:map(function (owner)

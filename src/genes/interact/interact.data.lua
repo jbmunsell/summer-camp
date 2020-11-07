@@ -7,9 +7,7 @@ local interactData = genesUtil.createGeneData({
 	name = "interact",
 	state = {
 		interact = {
-			enabledServer = true,
-			enabledClient = true,
-			locks = {},
+			switches = {},
 		},
 	},
 

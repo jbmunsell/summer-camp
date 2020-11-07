@@ -15,6 +15,12 @@ return genesUtil.createGeneData({
 			skewer = tableau.null,
 			skewerSlotIndex = -1,
 		},
+
+		interact = {
+			switches = {
+				skewerable = true,
+			},
+		},
 	},
 
 	config = {},
