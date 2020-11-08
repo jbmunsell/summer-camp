@@ -31,6 +31,9 @@ function dart.identity(...)
 end
 
 -- quick utilities (not factories)
+function dart.increment(v)
+	return v + 1
+end
 function dart.boolOr(a, b)
 	return a or b
 end
@@ -110,11 +113,6 @@ function dart.follow(f, ...)
 		end
 		return f(table.unpack(payload, 1, pcount + back.n))
 	end
-end
-
--- omit first
-function dart.omitFirst(_, ...)
-	return ...
 end
 
 -- equals value
