@@ -52,7 +52,7 @@ function humanoidHolderUtil.renderHumanoidHolder(holder)
 	local owner = holder.state.humanoidHolder.owner.Value
 	if not owner then
 		-- If there is no owner, break weld
-		axisUtil.destroyChild(holder, "HumanoidHoldWeld")
+		-- axisUtil.destroyChild(holder, "HumanoidHoldWeld")
 	else
 		-- Smooth attach owner to this instance
 		local weld, _, attachInfo = axisUtil.smoothAttach(holder, owner.Parent,
@@ -85,8 +85,8 @@ function humanoidHolderUtil.popHumanoid(humanoid)
 	local tween = TweenService:Create(weld, info, goal)
 	tween.Completed:Connect(function ()
 		weld:Destroy()
-		humanoidHolderUtil.removeHumanoidOwner(humanoid)
 	end)
+	humanoidHolderUtil.removeHumanoidOwner(humanoid)
 	tween:Play()
 end
 
