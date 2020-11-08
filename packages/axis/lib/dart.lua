@@ -159,10 +159,19 @@ function dart.printConstant(v)
 	end
 end
 
--- pluck
+-- select a single datum from a data set
 function dart.select(i)
 	return function (...)
 		return table.pack(...)[i]
+	end
+end
+
+-- drop a single datum from a data set
+function dart.drop(i)
+	return function (...)
+		local data = table.pack(...)
+		table.remove(data, i)
+		return table.unpack(data, 1, data.n)
 	end
 end
 

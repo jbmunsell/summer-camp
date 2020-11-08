@@ -235,6 +235,9 @@ end
 function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 	local att_a = a:FindFirstChild(aName, true)
 	local att_b = b:FindFirstChild(bName, true)
+	assert(att_a, string.format("Unable to find attachment named '%s' in instance '%s'", aName, a:GetFullName()))
+	assert(att_b, string.format("Unable to find attachment named '%s' in instance '%s'", bName, b:GetFullName()))
+
 	local info = axisUtil.computeAttachInfo(att_a, att_b)
 	local originalCFrame = info.att_b.Parent.CFrame
 	local function getTargetCFrame()

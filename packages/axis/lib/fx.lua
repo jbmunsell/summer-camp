@@ -202,5 +202,38 @@ function fx.fadeOutAndDestroy(instance, t)
 	end
 end
 
+-- hide
+function fx.hide(instance)
+	local instances = instance:GetDescendants()
+	table.insert(instances, instance)
+
+	for _, v in pairs(instances) do
+		if v:IsA("BasePart") then
+			v.Transparency = 1
+		elseif v:IsA("GuiObject") then
+			v.Visible = false
+		-- elseif v:IsA("Light") then
+		-- 	v.Enabled = false
+		end
+	end
+end
+
+-- smooth destroy
+function fx.smoothDestroy(instance)
+	-- Wait for maximum particle emitter duration
+	local max = 0
+	for _, d in pairs(instance:GetDescendants()) do
+		if d:IsA("ParticleEmitter") then
+			d.Enabled = false
+			if d.Lifetime.Max > max then
+				max = d.Lifetime.Max
+			end
+		end
+	end
+	delay(max, function ()
+		instance:Destroy()
+	end)
+end
+
 -- return library
 return fx
