@@ -81,19 +81,6 @@ local touchPickupStream = pickupInstanceStream
 local serverEquipPlayerStream = rx.Observable.never()
 local serverUnequipPlayerStream = rx.Observable.never()
 
--- Remote streams
-local throwStream = rx.Observable.from(pickup.net.ThrowRequested)
-
--- Throw
-throwStream
-	:map(function (player, target)
-		local throwObject = pickupUtil.getCharacterHeldObjects(player.Character):first()
-		local throwPower = throwObject.config.pickup.throwMagnitude.Value
-		return player.Character, target, throwPower
-	end)
-	:filter(function (a, b, c) return a and b and c end)
-	:subscribe(pickupUtil.throwCharacterObjects)
-
 -- Client pickup stream
 -- 	When a client interacts with a pickup object
 local clientPickupRequestStream = rx.Observable.from(interact.net.ClientInteracted)

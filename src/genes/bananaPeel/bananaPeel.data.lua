@@ -7,7 +7,7 @@ local genesUtil = require(env.src.genes.util)
 return genesUtil.createGeneData({
 	name = "bananaPeel",
 	instanceTag = "gene_bananaPeel",
-	genes = { env.src.genes.pickup },
+	genes = { env.src.genes.throw },
 	state = {
 		bananaPeel = {
 			slips = 3,
@@ -18,8 +18,6 @@ return genesUtil.createGeneData({
 	
 	config = {
 		pickup = {
-			throwOnActivated = true,
-			throwMagnitude = 50,
 			stowable = true,
 			buttonImage = "rbxassetid://5836949301",
 		},

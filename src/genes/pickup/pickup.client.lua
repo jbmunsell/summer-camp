@@ -19,7 +19,6 @@ local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local pickupUtil = require(pickup.util)
 local pickupStreams = require(pickup.streams)
-local genesUtil = require(genes.util)
 local inputUtil = require(input.util)
 local inputStreams = require(input.streams)
 
@@ -44,19 +43,10 @@ rx.Observable.from(pickup.net.ObjectEquipped)
 -- Simple activation pass
 local clickWithHeldStream = inputStreams.click
 	:map(function ()
-		return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character)
-			:first()
+		return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character):first(),
+			inputUtil.getMouseHit()
 	end)
 clickWithHeldStream:subscribe(dart.forward(pickup.net.ObjectActivated))
-
--- Throw on activated
-clickWithHeldStream
-	:filter(function (instance)
-		return instance and instance.config.pickup.throwOnActivated.Value
-	end)
-	:map(dart.constant(nil)) -- This is because getMouseHit takes optional params
-	:map(inputUtil.getMouseHit)
-	:subscribe(dart.forward(pickup.net.ThrowRequested))
 
 -- Drop on backspace
 rx.Observable.from(Enum.KeyCode.Backspace)

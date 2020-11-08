@@ -26,13 +26,11 @@ local pickupData = genesUtil.createGeneData({
 		pickup = {
 			dropDebounce = 1.0,
 			stowable = false,
-			throwOnDrop = false,
-			throwOnActivated = false,
-			throwMagnitude = 50,
 			touchPickupEnabled = false,
 			interactPickupEnabled = true,
 			-- canDrop = true, -- Not currently functional because everything can be dropped
 			buttonImage = "",
+			buttonColor = Color3.new(1, 1, 1)
 		},
 	},
 })

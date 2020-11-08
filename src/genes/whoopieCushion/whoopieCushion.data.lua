@@ -7,7 +7,7 @@ local genesUtil = require(env.src.genes.util)
 return genesUtil.createGeneData({
 	name = "whoopieCushion",
 	instanceTag = "gene_whoopieCushion",
-	genes = { env.src.genes.pickup },
+	genes = { env.src.genes.throw },
 	state = {
 		whoopieCushion = {
 			blows = 3,
@@ -17,9 +17,11 @@ return genesUtil.createGeneData({
 	},
 	
 	config = {
-		pickup = {
-			throwOnActivated = true,
+		throw = {
 			throwMagnitude = 20,
+		},
+
+		pickup = {
 			stowable = true,
 			buttonImage = "rbxassetid://5912747171",
 		},

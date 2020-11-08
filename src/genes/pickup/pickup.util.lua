@@ -45,16 +45,6 @@ end
 local function stowObject(object)
 	object.Parent = ReplicatedStorage
 end
-local function getObjectRoot(object)
-	return (object:IsA("BasePart") and object or object.PrimaryPart)
-end
-local function throwObjectAtTarget(object, target, power)
-	local root = getObjectRoot(object)
-	root.Velocity = (target - root.Position).unit * power
-end
-local function throwObjectInDirection(object, direction, power)
-	getObjectRoot(object).Velocity = direction.unit * power
-end
 
 -- lib
 local pickupUtil = {}
@@ -157,15 +147,8 @@ function pickupUtil.releaseHeldObjects(character)
 		:foreach(dart.destroy)
 
 	-- Clear holder
-	local root = character:FindFirstChild("HumanoidRootPart")
-	local throwOffset = root and root.CFrame.lookVector or Vector3.new(0.01, 0.01, 0.01)
 	pickupUtil.getCharacterHeldObjects(character)
-		:foreach(function (object)
-			clearHolder(object)
-			if object.config.pickup.throwOnDrop.Value then
-				throwObjectInDirection(object, throwOffset)
-			end
-		end)
+		:foreach(clearHolder)
 end
 
 -- Update hold animation
@@ -187,21 +170,6 @@ end
 function pickupUtil.disownHeldObjects(character)
 	pickupUtil.getCharacterHeldObjects(character)
 		:foreach(clearOwner)
-end
-
--- Throw objects
-function pickupUtil.throwCharacterObjects(character, target, power)
-	-- Get held
-	local held = pickupUtil.getCharacterHeldObjects(character)
-
-	-- Break welds
-	pickupUtil.disownHeldObjects(character)
-	pickupUtil.releaseHeldObjects(character)
-
-	-- Apply velocity
-	held:foreach(function (object)
-		throwObjectAtTarget(object, target, power)
-	end)
 end
 
 -- Destroy player owned objects
@@ -271,10 +239,12 @@ function pickupUtil.getActivatedStream(gene)
 		return pickupUtil.getClickWhileHoldingStream(gene)
 	elseif RunService:IsServer() then
 		return rx.Observable.from(pickup.net.ObjectActivated)
-			:map(dart.index("Character"))
+			:map(function (player, ...)
+				return player.Character, ...
+			end)
 			:filter()
-			:map(function (character)
-				return character, pickupUtil.characterHoldsObject(character, gene)
+			:map(function (character, _, ...) -- middle arg is the object they want to throw
+				return character, pickupUtil.characterHoldsObject(character, gene), ...
 			end)
 			:filter(dart.boolAnd)
 	end
