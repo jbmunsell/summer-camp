@@ -30,8 +30,10 @@ function marshmallowUtil.getFireProximity(instance)
 	return genesUtil.getInstances(fireplace)
 		:filter(function (fire) return fire.state.fireplace.enabled.Value end)
 		:map(function (fire)
-			return (axisUtil.getPosition(fire) - axisUtil.getPosition(instance)).magnitude
+			local dist = (axisUtil.getPosition(fire) - axisUtil.getPosition(instance)).magnitude
+			return (dist <= fire.config.fireplace.cookRadius.Value and dist)
 		end)
+		:filter()
 		:min() or math.huge
 end
 
@@ -49,6 +51,7 @@ end
 function marshmallowUtil.updateMarshmallowStage(instance)
 	-- We have to use long form accessing here because of metatable magic
 	-- 	with config tables and folders
+	-- TODO: Change this because we removed metatable magic
 	local config = instance.config.marshmallow
 	local fireTime = instance.state.marshmallow.fireTime.Value / config.fireTimeMax.Value
 	local max = nil
