@@ -25,22 +25,22 @@ local scheduleStreams = require(schedule.streams)
 -- Variables and subjects
 ---------------------------------------------------------------------------------------------------
 
-local firesEnabled = rx.BehaviorSubject.new()
+local firesEnabled = rx.BehaviorSubject.new(true)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
 -- Render fireplace
-local function renderFireplace(instance)
+local function updateFireplace(instance)
 	instance.state.fireplace.enabled.Value = firesEnabled:getValue()
 	-- fx.setFXEnabled(instance, firesEnabled:getValue())
 end
 
 -- Set fireplaces enabled
-local function setFireplacesEnabled()
+local function updateFireplaces()
 	genesUtil.getInstances(fireplace)
-		:foreach(renderFireplace)
+		:foreach(updateFireplace)
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -48,12 +48,12 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Turn off for free time and turn off for lights out
-scheduleStreams.scheduleChunk
-	:map(dart.isNamed("FreeTime"))
-	:multicast(firesEnabled)
+-- scheduleStreams.scheduleChunk
+-- 	:map(dart.isNamed("FreeTime"))
+-- 	:multicast(firesEnabled)
 firesEnabled
-	:subscribe(setFireplacesEnabled)
+	:subscribe(updateFireplaces)
 
 -- Set new fires to enabled when they spawn
 genesUtil.getInstanceStream(fireplace)
-	:subscribe(renderFireplace)
+	:subscribe(updateFireplace)
