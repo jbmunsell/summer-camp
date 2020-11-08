@@ -296,5 +296,23 @@ function axisUtil.smoothAttach(a, b, attachmentName, tweenInfo)
 	return axisUtil.smoothAttachAttachments(a, attachmentName, b, attachmentName, tweenInfo)
 end
 
+-- Tween model cframe
+function axisUtil.tweenModelCFrame(model, info, target)
+	assert(model.PrimaryPart, "Cannot tween model with no PrimaryPart " .. model:GetFullName())
+
+	local proxy = Instance.new("CFrameValue")
+	proxy.Value = model:GetPrimaryPartCFrame()
+	proxy.Changed:Connect(function (value)
+		model:SetPrimaryPartCFrame(value)
+	end)
+	proxy.Parent = ReplicatedStorage
+
+	local tween = TweenService:Create(proxy, info, { Value = target })
+	tween.Completed:Connect(function ()
+		proxy:Destroy()
+	end)
+	tween:Play()
+end
+
 -- return lib
 return axisUtil
