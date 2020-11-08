@@ -28,10 +28,5 @@ function doorUtil.renderDoor(instance)
 		end)
 end
 
--- Toggle door open
-function doorUtil.toggleDoorOpen(instance)
-	instance.state.door.open.Value = not instance.state.door.open.Value
-end
-
 -- return lib
 return doorUtil

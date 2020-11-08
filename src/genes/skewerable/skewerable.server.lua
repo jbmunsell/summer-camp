@@ -37,27 +37,21 @@ skewerables:map(dart.drag(skewerableUtil.equip))
 	:subscribe(pickupUtil.setEquipOverride)
 
 -- Set server lock according to whether we have a skewer AND that skewer has a holder
-skewerables
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.skewerable.skewer)
-			:switchMap(function (skewerInstance)
-				return skewerInstance
-				and rx.Observable.from(skewerInstance.state.pickup.holder):map(dart.boolNot)
-				or rx.Observable.just(true)
-			end)
-			:map(dart.carry(instance, "interact", "skewerable"))
+genesUtil.observeStateValue(skewerable, "skewer", function (o)
+	return o:switchMap(function (_, skewerInstance)
+		local isInteractable = skewerInstance
+			and rx.Observable.from(skewerInstance.state.pickup.holder):map(dart.boolNot)
+			or rx.Observable.just(true)
+		return isInteractable
+			:map(dart.carry("interact", "skewerable"))
 	end)
-	:subscribe(multiswitchUtil.setSwitchEnabled)
+end):subscribe(multiswitchUtil.setSwitchEnabled)
 
 -- When a skewerable changes slot index, bump down others and render weld accordingly
-local stateChanged = skewerables
-	:flatMap(function (instance)
-		local state = instance.state.skewerable
-		return rx.Observable.from(state.skewerSlotIndex)
-			:filter(function () return state.skewer.Value end)
-			:map(dart.constant(instance))
-	end)
-stateChanged
+local slotChanged = genesUtil.observeStateValue(skewerable, "skewerSlotIndex")
+	:filter(genesUtil.getStateValue(skewerable, "skewer"))
+	:map(dart.select(1))
+slotChanged
 	:map(function (instance)
 		local slotIndex = instance.state.skewerable.skewerSlotIndex.Value
 		if slotIndex == 0 then
@@ -65,13 +59,11 @@ stateChanged
 		else
 			return tableau.from(skewerUtil.getSkewered(instance.state.skewerable.skewer.Value))
 				:reject(dart.equals(instance))
-				:first(function (v)
-					return v.state.skewerable.skewerSlotIndex.Value == slotIndex
-				end)
+				:first(genesUtil.stateValueEquals(skewerable, "skewerSlotIndex", slotIndex))
 		end
 	end)
 	:filter()
-	:subscribe(skewerableUtil.bumpSlotIndex)
-stateChanged
-	:reject(function (instance) return instance.state.skewerable.skewerSlotIndex.Value == 0 end)
+	:subscribe(genesUtil.transformStateValue(skewerable, "skewerSlotIndex", dart.increment))
+slotChanged
+	:reject(genesUtil.stateValueEquals(skewerable, "skewerSlotIndex", 0))
 	:subscribe(skewerableUtil.renderSlotWeld)

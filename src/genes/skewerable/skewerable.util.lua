@@ -38,11 +38,6 @@ function skewerableUtil.equip(character, instance)
 	end
 end
 
--- Bump slot index
-function skewerableUtil.bumpSlotIndex(instance)
-	instance.state.skewerable.skewerSlotIndex.Value = instance.state.skewerable.skewerSlotIndex.Value + 1
-end
-
 -- Render slot weld
 function skewerableUtil.renderSlotWeld(instance)
 	-- Destroy skewer weld so that we can recreate it

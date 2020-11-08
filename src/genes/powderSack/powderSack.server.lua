@@ -31,7 +31,7 @@ local sacks = genesUtil.initGene(powderSack)
 sacks:subscribe(powderSackUtil.renderColor)
 
 -- Connect to sack thrown
--- throwUtil.getThrownStream(powderSack)
+-- throwUtil.getThrowStream(powderSack)
 -- 	:map(dart.drag(true))
 -- 	:subscribe(powderSackUtil.setHot)
 

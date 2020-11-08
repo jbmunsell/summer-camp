@@ -34,5 +34,5 @@ multiswitchUtil.getSwitchStream(lightGroup)
 
 -- Light group interacted
 interactUtil.getInteractStream(lightGroup)
-	:map(dart.omitFirst)
+	:map(dart.drop(1))
 	:subscribe(dart.follow(multiswitchUtil.toggleSwitch, "lightGroup", "primary"))

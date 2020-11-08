@@ -77,12 +77,9 @@ local stacks = genesUtil.initGene(stickyNoteStack)
 stacks:subscribe(setStackCount)
 
 -- Destroy stacks that are used up
-stacks
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.stickyNoteStack.count)
-			:filter(dart.equals(0))
-			:map(dart.constant(instance))
-	end)
+genesUtil.observeStateValue(stickyNoteStack, "count")
+	:map(dart.select(1))
+	:filter(genesUtil.stateValueEquals(stickyNoteStack, "count", 0))
 	:subscribe(dart.destroy)
 
 -- Handle placement requests

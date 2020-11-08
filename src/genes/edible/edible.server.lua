@@ -24,6 +24,6 @@ genesUtil.initGene(edible)
 
 -- Eat on click
 pickupUtil.getActivatedStream(edible)
-	:map(dart.omitFirst)
+	:map(dart.drop(1))
 	:reject(edibleUtil.isEaten)
 	:subscribe(edibleUtil.eat)

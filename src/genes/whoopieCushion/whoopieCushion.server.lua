@@ -10,6 +10,7 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
+local pickup = genes.pickup
 local whoopieCushion = genes.whoopieCushion
 
 -- modules
@@ -29,36 +30,27 @@ local cushionStream = genesUtil.initGene(whoopieCushion)
 -- Disable all emitters on startup
 cushionStream:subscribe(dart.follow(fx.setEmittersEnabled, false))
 
--- When a cushion is picked up by a person, prime it
-local function followTrue(cushion)
-	return cushion, true
-end
-local function followFalse(cushion)
-	return cushion, false
-end
-local pickedUp, dropped = cushionStream
-	:flatMap(function (cushion)
-		return rx.Observable.from(cushion.state.pickup.holder.Changed)
-			:map(dart.carry(cushion))
-	end)
-	:partition(function (_, holder) return holder end)
-pickedUp:map(followTrue):subscribe(whoopieCushionUtil.setCushionFilled) -- Cushion fills on pickup
-pickedUp:map(followFalse):subscribe(whoopieCushionUtil.setCushionHot) -- Cushion is NOT hot on pickup
-dropped:map(followTrue):delay(0.2):subscribe(whoopieCushionUtil.setCushionHot) -- Cushion is hot after dropping
+-- Streams of pickup and drop
+local dropped, pickedUp = genesUtil.crossObserveStateValue(whoopieCushion, pickup, "holder")
+	:map(dart.select(1))
+	:partition(genesUtil.stateValueEquals(pickup, "holder", nil))
+
+-- Set hot value to true when dropped (slight delay), and false when picked up
+dropped:delay(0.2):map(dart.drag(true))
+	:merge(pickedUp:map(dart.drag(false)))
+	:subscribe(genesUtil.setStateValue(whoopieCushion, "hot"))
+
+-- Set filled value to true when picked up
+pickedUp:map(dart.drag(true))
+	:subscribe(genesUtil.setStateValue(whoopieCushion, "filled"))
 
 -- When a cushion is primed, render it as such
-cushionStream
-	:flatMap(function (cushion)
-		return rx.Observable.from(cushion.state.whoopieCushion.filled.Changed)
-			:map(dart.constant(cushion))
-	end)
+genesUtil.observeStateValueWithInit(whoopieCushion, "filled")
 	:subscribe(whoopieCushionUtil.renderCushion)
 
 -- When a cushion is touched by a character
 cushionStream
-	:flatMap(function (cushion)
-		return rx.Observable.fromHumanoidTouchedDescendant(cushion)
-	end)
+	:flatMap(rx.Observable.fromHumanoidTouchedDescendant)
 	:reject(function (cushion, _)
 		return cushion.state.pickup.holder.Value
 		or not cushion.state.whoopieCushion.hot.Value
@@ -67,12 +59,6 @@ cushionStream
 	:subscribe(whoopieCushionUtil.fireCushion)
 
 -- Destroy cushions that have run out of blows
-cushionStream
-	:flatMap(function (cushion)
-		return rx.Observable.from(cushion.state.whoopieCushion.blows)
-			:filter(function (x)
-				return x <= 0
-			end)
-			:map(dart.constant(cushion))
-	end)
+genesUtil.observeStateValue(whoopieCushion, "blows")
+	:filter(genesUtil.stateValueEquals(whoopieCushion, "blows", 0))
 	:subscribe(whoopieCushionUtil.removeCushion)

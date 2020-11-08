@@ -8,13 +8,10 @@
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
-local axis = env.packages.axis
 local genes = env.src.genes
 local fireplace = genes.fireplace
 
 -- modules
-local rx = require(axis.lib.rx)
-local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local fireplaceUtil = require(fireplace.util)
 
@@ -39,17 +36,9 @@ local fireplaces = genesUtil.initGene(fireplace)
 fireplaces:subscribe(pullFireColor)
 
 -- Render color changed
-fireplaces
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.fireplace.color)
-			:map(dart.constant(instance))
-	end)
+genesUtil.observeStateValueWithInit(fireplace, "color")
 	:subscribe(fireplaceUtil.renderFireColor)
 
 -- Render enabled
-fireplaces
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.fireplace.enabled)
-			:map(dart.constant(instance))
-	end)
+genesUtil.observeStateValue(fireplace, "enabled")
 	:subscribe(fireplaceUtil.renderFireplaceEnabled)

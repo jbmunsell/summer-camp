@@ -74,5 +74,5 @@ rx.Observable.from(canvas.net.CanvasChangeRequested.OnServerEvent)
 		return canvasInstance.config.canvas.collaborative.Value
 		or canvasInstance.state.canvas.owner.Value == client
 	end)
-	:map(dart.omitFirst)
+	:map(dart.drop(1))
 	:subscribe(canvasUtil.changeCanvas)

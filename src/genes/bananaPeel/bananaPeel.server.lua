@@ -12,12 +12,14 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local bananaPeel = genes.bananaPeel
+local throw = genes.throw
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
+local throwUtil = require(throw.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -54,16 +56,11 @@ local peelInstanceStream = genesUtil.initGene(bananaPeel)
 
 -- Currently the only thing influencing peel's hot value is
 -- 	whether or not it is being held by a person
-peelInstanceStream
-	:flatMap(function (peel)
-		return rx.Observable.from(peel.state.pickup.holder)
-			:map(dart.boolNot)
-			:map(dart.carry(peel))
-	end)
-	:delay(0.2) -- give it some time to get out of the thrower's reach
-	:subscribe(function (peel, hot)
-		peel.state.bananaPeel.hot.Value = hot
-	end)
+throwUtil.getThrowStream(bananaPeel)
+	:map(dart.select(1))
+	:delay(0.2)
+	:map(dart.drag(true))
+	:subscribe(genesUtil.setStateValue(bananaPeel, "hot"))
 
 -- Destroy banana peels after a number of slips
 local peelExpiredStream = peelInstanceStream

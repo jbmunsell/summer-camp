@@ -8,7 +8,7 @@ local interactData = genesUtil.createGeneData({
 	state = {
 		fireplace = {
 			enabled = false,
-			color = Color3.new(236, 139, 70),
+			color = Color3.fromRGB(236, 139, 70),
 		},
 	},
 
@@ -16,7 +16,7 @@ local interactData = genesUtil.createGeneData({
 		fireplace = {
 			cookRadius = 14,
 			powderAffectRadius = 5,
-			color = Color3.new(236, 139, 70),
+			color = Color3.fromRGB(236, 139, 70),
 			colorChangeParticleCount = 20,
 		},
 	},

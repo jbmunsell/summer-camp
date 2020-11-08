@@ -30,13 +30,12 @@ local doorUtil = require(door.util)
 
 -- init class
 genesUtil.initGene(door)
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.door.open)
-			:map(dart.constant(instance))
-	end)
+
+-- Render door state according to value
+genesUtil.observeStateValue(door, "open")
 	:subscribe(doorUtil.renderDoor)
 
 -- Activated
 interactUtil.getInteractStream(door)
-	:map(dart.omitFirst)
-	:subscribe(doorUtil.toggleDoorOpen)
+	:map(dart.select(2)) -- drop the client, keep just the door
+	:subscribe(genesUtil.toggleStateValue(door, "open"))

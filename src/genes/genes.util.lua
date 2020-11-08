@@ -213,5 +213,88 @@ function genesUtil.addInterface(instance, gene)
 	end
 end
 
+---------------------------------------------------------------------------------------------------
+-- Factory functions
+---------------------------------------------------------------------------------------------------
+
+-- Make set state
+-- 	Returns a function that accepts an instance and a value and sets that instance's state value
+function genesUtil.setStateValue(gene, stateValueName)
+	local geneName = require(gene.data).name
+	return function (instance, value)
+		instance.state[geneName][stateValueName].Value = value
+	end
+end
+function genesUtil.getStateValue(gene, stateValueName)
+	local geneName = require(gene.data).name
+	return function (instance)
+		return instance.state[geneName][stateValueName].Value
+	end
+end
+function genesUtil.stateValueEquals(gene, stateValueName, target)
+	local geneName = require(gene.data).name
+	return function (instance)
+		return instance.state[geneName][stateValueName].Value == target
+	end
+end
+
+-- Make transform state
+-- 	Similar to makeSetState, but instead of using a callback value this function runs a transform
+-- 	on the current state value.
+-- 	Useful for toggling booleans or incrementing numbers.
+function genesUtil.transformStateValue(gene, stateValueName, transform)
+	local geneName = require(gene.data).name
+	return function (instance)
+		local valueObject = instance.state[geneName][stateValueName]
+		valueObject.Value = transform(valueObject.Value)
+	end
+end
+function genesUtil.toggleStateValue(gene, stateValueName)
+	return genesUtil.transformStateValue(gene, stateValueName, dart.boolNot)
+end
+
+---------------------------------------------------------------------------------------------------
+-- Stream creation
+---------------------------------------------------------------------------------------------------
+
+-- Observe state
+-- 	Returns a stream of instances from the given gene flatmapped to a specific state value changed,
+-- 	passing the instance and the new state value.
+function genesUtil.observeStateValue(gene, stateValueName, transform)
+	return genesUtil.crossObserveStateValue(gene, gene, stateValueName, transform)
+end
+
+-- Cross observe state
+-- 	Similar to observeStateValue, but this function uses the instance stream of the first gene
+-- 	while observing a state value from another gene.
+-- 	This is useful for having subgenes listen to their parent gene's state changes.
+function genesUtil.crossObserveStateValue(instanceGene, stateGene, stateValueName, transform)
+	transform = transform or dart.identity
+
+	local stateGeneName = require(stateGene.data).name
+	return genesUtil.getInstanceStream(instanceGene)
+		:flatMap(function (instance)
+			return transform(rx.Observable.from(instance.state[stateGeneName][stateValueName]))
+				:map(dart.carry(instance))
+		end)
+end
+
+-- With change count!
+-- 	This is used for state-based transition effects, like playing a sound when a state goes
+-- 	to false, or emitting particles when a state changes. We don't want to do these things
+-- 	on the initial rendering (change count 0, since it's init, not transition), but we still want some
+-- 	of the rendering code, like raw setting values etc.
+-- 	This function will select only the instance and follow it with the change count.
+function genesUtil.observeStateValueWithInit(instanceGene, stateValueName)
+	return genesUtil.observeStateValue(instanceGene, stateValueName, function (o)
+		-- What we do here is we take the FIRST emission from the source observable
+		-- 	and map it to true, and then merge everything BUT the first emission
+		-- 	from the source observable and map it to nil
+		return o:skip(1)
+			:map(dart.constant(nil))
+			:merge(o:first():map(dart.constant(true)))
+	end)
+end
+
 -- return lib
 return genesUtil

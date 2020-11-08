@@ -68,16 +68,14 @@ pickupUtil.getPlayerObjectActionRequestStream(balloon.net.PlacementRequested, ba
 		and attachInstance ~= workspace.Terrain
 		and attachInstance:IsDescendantOf(workspace)
 	end)
-	:map(dart.omitFirst)
+	:map(dart.drop(1))
 	:subscribe(attachBalloon)
 
 -- Update balloon velocity
-balloonObjectStream
-	:flatMap(function (balloonInstance)
-		return rx.Observable.heartbeat()
-			:map(dart.constant(balloonInstance))
-			:takeUntil(rx.Observable.fromInstanceLeftGame(balloonInstance))
-	end)
+rx.Observable.heartbeat()
+	:map(dart.constant(balloon))
+	:map(genesUtil.getInstances)
+	:flatMap(rx.Observable.from)
 	:subscribe(updateBalloonAirResistance)
 
 -- Detach balloons after their life expires
@@ -98,10 +96,6 @@ balloonObjectStream
 	:subscribe(dart.destroy)
 
 -- When a balloon is held by a character, make the handle massless
-balloonObjectStream
-	:flatMap(function (balloonInstance)
-		return rx.Observable.from(balloonInstance.state.pickup.holder)
-			:filter()
-			:map(dart.constant(balloonInstance))
-	end)
+genesUtil.crossObserveStateValue(balloon, pickup, "holder")
+	:filter(dart.select(2))
 	:subscribe(removeHandleMass)

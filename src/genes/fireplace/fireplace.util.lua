@@ -31,7 +31,7 @@ function fireplaceUtil.renderFireplaceEnabled(instance)
 end
 
 -- Update fire color
-function fireplaceUtil.renderFireColor(instance)
+function fireplaceUtil.renderFireColor(instance, init)
 	local color = instance.state.fireplace.color.Value
 	local descendants = tableau.from(instance:GetDescendants())
 	descendants
@@ -46,11 +46,15 @@ function fireplaceUtil.renderFireColor(instance)
 		:foreach(function (child)
 			child.Color = ColorSequence.new(color)
 		end)
-	local fireplaceEmitter = instance:FindFirstChild("SpittingEmbers", true)
-	if fireplaceEmitter then
-		fireplaceEmitter:Emit(instance.config.fireplace.colorChangeParticleCount.Value)
-	else
-		warn("No SpittingEmbers emitter found in fireplace " .. instance:GetFullName())
+
+	-- Show spitting embers if not init render
+	if not init then
+		local fireplaceEmitter = instance:FindFirstChild("SpittingEmbers", true)
+		if fireplaceEmitter then
+			fireplaceEmitter:Emit(instance.config.fireplace.colorChangeParticleCount.Value)
+		else
+			warn("No SpittingEmbers emitter found in fireplace " .. instance:GetFullName())
+		end
 	end
 end
 

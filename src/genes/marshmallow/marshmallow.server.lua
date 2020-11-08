@@ -23,30 +23,21 @@ local marshmallowUtil = require(marshmallow.util)
 ---------------------------------------------------------------------------------------------------
 
 -- Init gene
-local marshmallows = genesUtil.initGene(marshmallow)
+genesUtil.initGene(marshmallow)
 
 -- Render when their fire time changes
-local fireTimeChanged = marshmallows
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.marshmallow.fireTime)
-			:map(dart.carry(instance))
-	end)
+local fireTimeChanged = genesUtil.observeStateValue(marshmallow, "fireTime")
 fireTimeChanged
 	:filter(function (instance, fireTime)
 		return fireTime > instance.config.marshmallow.fireTimeMax.Value
 		and not instance.state.marshmallow.destroyed.Value
 	end)
 	:subscribe(marshmallowUtil.destroyMarshmallow)
-fireTimeChanged
-	:subscribe(marshmallowUtil.updateMarshmallowStage)
+fireTimeChanged:subscribe(marshmallowUtil.updateMarshmallowStage)
 
 -- When the stage changes, render
-marshmallows
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.marshmallow.stage)
-			:map(dart.constant(instance))
-	end)
-	:subscribe(marshmallowUtil.renderMarshmallow)
+genesUtil.observeStateValue(marshmallow, "stage")
+	:subscribe(marshmallowUtil.renderMarshmallowStage)
 
 -- Increase fire time for all marshmallows that are either burning or near fire
 rx.Observable.heartbeat()

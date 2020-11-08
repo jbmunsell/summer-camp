@@ -30,13 +30,12 @@ local flashlightUtil = require(flashlight.util)
 
 -- init class
 genesUtil.initGene(flashlight)
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.flashlight.enabled)
-			:map(dart.constant(instance))
-	end)
+
+-- Render on enabled change
+genesUtil.observeStateValue(flashlight, "enabled")
 	:subscribe(flashlightUtil.renderFlashlight)
 
 -- Activated
 pickupUtil.getActivatedStream(flashlight)
-	:map(dart.omitFirst)
-	:subscribe(flashlightUtil.toggleLightState)
+	:map(dart.select(2))
+	:subscribe(genesUtil.toggleStateValue(flashlight, "enabled"))

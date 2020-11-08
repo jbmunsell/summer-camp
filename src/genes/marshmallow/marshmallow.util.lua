@@ -37,11 +37,6 @@ function marshmallowUtil.getFireProximity(instance)
 		:min() or math.huge
 end
 
--- Is eaten
-function marshmallowUtil.isEaten(instance)
-	return instance.state.marshmallow.eaten.Value
-end
-
 -- Increase fire time
 function marshmallowUtil.increaseFireTime(instance, dt)
 	instance.state.marshmallow.fireTime.Value = instance.state.marshmallow.fireTime.Value + dt
@@ -66,7 +61,7 @@ function marshmallowUtil.updateMarshmallowStage(instance)
 end
 
 -- Render marshmallow
-function marshmallowUtil.renderMarshmallow(instance)
+function marshmallowUtil.renderMarshmallowStage(instance)
 	-- Set texture and size and enable fx if burnt
 	local config = instance.config.marshmallow
 	local stageName = instance.state.marshmallow.stage.Value

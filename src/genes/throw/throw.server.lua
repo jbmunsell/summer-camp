@@ -25,17 +25,14 @@ local throwUtil = require(throw.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init
-local throws = genesUtil.initGene(throw)
+genesUtil.initGene(throw)
 
 -- Connect to throw activated
 pickupUtil.getActivatedStream(throw)
 	:subscribe(throwUtil.throwCharacterObject)
 
 -- Set thrower to nil when it's picked up
-throws
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.pickup.holder)
-			:filter()
-			:map(dart.constant(instance))
-	end)
-	:subscribe(throwUtil.clearThrower)
+genesUtil.crossObserveStateValue(throw, pickup, "holder")
+	:filter(dart.select(2))
+	:map(dart.select(1))
+	:subscribe(genesUtil.setStateValue(throw, "thrower", nil))

@@ -11,6 +11,7 @@ local TweenService = game:GetService("TweenService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
+local multiswitch = genes.multiswitch
 local whoopieCushion = genes.whoopieCushion
 
 -- modules
@@ -18,7 +19,7 @@ local rx = require(axis.lib.rx)
 local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
 local soundUtil = require(axis.lib.soundUtil)
-local genesUtil = require(genes.util)
+local multiswitchUtil = require(multiswitch.util)
 local whoopieCushionData = require(whoopieCushion.data)
 
 -- lib
@@ -33,7 +34,7 @@ function whoopieCushionUtil.setCushionFilled(cushion, filled)
 end
 
 -- Render cushion
-function whoopieCushionUtil.renderCushion(cushion)
+function whoopieCushionUtil.renderCushion(cushion, init)
 	-- Get primed state
 	local filled = cushion.state.whoopieCushion.filled.Value
 	local config = cushion.config.whoopieCushion
@@ -46,17 +47,19 @@ function whoopieCushionUtil.renderCushion(cushion)
 	-- Tween
 	TweenService:Create(cushion, info, targets):Play()
 
-	-- Play sound and blow particles if unprimed
-	if not filled then
-		local emitter = cushion:FindFirstChild("GustEmitter", true)
-		if emitter then
-			emitter:Emit(config.particleCount.Value)
-		end
+	-- Play sound and blow particles if unprimed and NOT init render pass
+	if not init then
+		if not filled then
+			local emitter = cushion:FindFirstChild("GustEmitter", true)
+			if emitter then
+				emitter:Emit(config.particleCount.Value)
+			end
 
-		local soundFolder = cushion:FindFirstChild("blowSounds", true) or env.res.genes.whoopieCushion.sounds.blows
-		soundUtil.playRandom(soundFolder, cushion)
-	else
-		soundUtil.playSound(env.res.genes.whoopieCushion.sounds.Inflate, cushion)
+			local soundFolder = cushion:FindFirstChild("blowSounds", true) or env.res.genes.whoopieCushion.sounds.blows
+			soundUtil.playRandom(soundFolder, cushion)
+		else
+			soundUtil.playSound(env.res.genes.whoopieCushion.sounds.Inflate, cushion)
+		end
 	end
 end
 
@@ -69,6 +72,7 @@ end
 
 -- Remove cushion
 function whoopieCushionUtil.removeCushion(cushion)
+	multiswitchUtil.setSwitchEnabled(cushion, "interact", "destroyed", false)
 	local duration = cushion.config.whoopieCushion.destroyFadeDuration.Value
 	local sound = cushion:FindFirstChild("Fart", true)
 	rx.Observable.timer(5)

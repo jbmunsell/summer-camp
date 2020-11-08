@@ -35,13 +35,12 @@ dishStream
 	:subscribe(pickupUtil.setEquipOverride)
 
 -- Set dish server lock based on whether or not the dish instance has a tray that has a holder
-dishStream
-	:flatMap(function (foodInstance)
-		return rx.Observable.from(foodInstance.state.dish.tray)
-			:switchMap(function (tray)
-				return tray and rx.Observable.from(tray.state.pickup.holder):map(dart.boolNot)
-				or rx.Observable.just(true)
-			end)
-			:map(dart.carry(foodInstance, "interact", "dish"))
+genesUtil.observeStateValue(dish, "tray", function (observable)
+	return observable:switchMap(function (_, tray)
+		local isInteractable = tray
+			and rx.Observable.from(tray.state.pickup.holder):map(dart.boolNot)
+			or rx.Observable.just(true)
+		return isInteractable
+			:map(dart.carry("interact", "dish"))
 	end)
-	:subscribe(multiswitchUtil.setSwitchEnabled)
+end):subscribe(multiswitchUtil.setSwitchEnabled)
