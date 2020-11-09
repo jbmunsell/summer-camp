@@ -257,6 +257,12 @@ end
 -- foreach
 function ftable:foreach(f)
 	assert(type(f) == "function", "ftable:foreach requires a function")
+	for _, v in pairs(self.data) do
+		f(v)
+	end
+end
+function ftable:foreachi(f)
+	assert(type(f) == "function", "ftable:foreach requires a function")
 	for i, v in pairs(self.data) do
 		f(v, i)
 	end

@@ -118,7 +118,7 @@ local function renderLayout(ownedObjects)
 
 	-- Set hotkey text
 	tableau.fromLayoutContents(actionsContainer)
-		:foreach(renderButtonHotkey)
+		:foreachi(renderButtonHotkey)
 end
 
 -- Set scrolling frame size

@@ -77,4 +77,4 @@ local keyNames = {
 	"Zero",
 }
 tableau.from(keyNames)
-	:foreach(bindKey)
+	:foreachi(bindKey)
