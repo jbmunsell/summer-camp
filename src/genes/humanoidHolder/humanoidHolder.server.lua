@@ -31,15 +31,15 @@ local humanoidHolderUtil = require(humanoidHolder.util)
 genesUtil.initGene(humanoidHolder)
 
 -- When a humanoid holder owner changes, render it
-genesUtil.observeStateValue(humanoidHolder, "owner")
-	:subscribe(humanoidHolderUtil.renderHumanoidHolder)
+local ownerStream = genesUtil.observeStateValue(humanoidHolder, "owner")
+ownerStream:subscribe(humanoidHolderUtil.renderHumanoidHolder)
 
 -- When a humanoid holder has an owner, apply interact lock
-genesUtil.observeStateValue(humanoidHolder, "owner", function (o)
-	return o:map(function (_, owner)
-		return "interact", "humanoidHolder", not owner
+ownerStream
+	:map(function (instance, owner)
+		return instance, "interact", "humanoidHolder", not owner
 	end)
-end):subscribe(multiswitchUtil.setSwitchEnabled)
+	:subscribe(multiswitchUtil.setSwitchEnabled)
 
 -- Whenever any humanoid dies or leaves the game, clear holder ownership
 local humanoidStream = rx.Observable.from(workspace.DescendantAdded)
