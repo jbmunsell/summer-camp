@@ -36,7 +36,7 @@ dishStream
 
 -- Set dish server lock based on whether or not the dish instance has a tray that has a holder
 genesUtil.observeStateValue(dish, "tray", function (observable)
-	return observable:switchMap(function (_, tray)
+	return observable:switchMap(function (tray)
 		local isInteractable = tray
 			and rx.Observable.from(tray.state.pickup.holder):map(dart.boolNot)
 			or rx.Observable.just(true)

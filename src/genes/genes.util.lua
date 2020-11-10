@@ -274,7 +274,7 @@ function genesUtil.crossObserveStateValue(instanceGene, stateGene, stateValueNam
 	local stateGeneName = require(stateGene.data).name
 	return genesUtil.getInstanceStream(instanceGene)
 		:flatMap(function (instance)
-			return transform(rx.Observable.from(instance.state[stateGeneName][stateValueName]))
+			return transform(rx.Observable.from(instance.state[stateGeneName][stateValueName]), instance)
 				:map(dart.carry(instance))
 		end)
 end
