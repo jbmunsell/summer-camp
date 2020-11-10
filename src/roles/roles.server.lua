@@ -25,11 +25,6 @@ local rolesUtil = require(roles.util)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
--- is counselor
-local function isCounselor(player)
-	return player.state.roles.isCounselor.Value
-end
-
 -- get session time
 local function getSessionTime(player)
 	return player.state.roles.sessionTime.Value
@@ -44,18 +39,11 @@ local function increaseSessionTimes(dt)
 		:foreach(dart.follow(increasePlayerSessionTime, dt))
 end
 
--- Count team counselors
-local function countCounselors(team)
-	return tableau.from(team:GetPlayers())
-		:filter(isCounselor)
-		:size()
-end
-
 -- Add counselor
 local function addCounselor(team)
 	local players = tableau.from(team:GetPlayers())
 	local target = players
-		:reject(isCounselor)
+		:reject(rolesUtil.isPlayerCounselor)
 		:max(getSessionTime)
 	if target then
 		target.state.roles.isCounselor.Value = true
@@ -67,7 +55,7 @@ end
 local function recalculateCounselors(team)
 	-- Get target counselor count and compare with current counselor count
 	local players = tableau.from(team:GetPlayers())
-	local currentCount = countCounselors(team)
+	local currentCount = rolesUtil.getTeamCounselors(team):size()
 	local desiredCount = math.ceil(players:size() / rolesConfig.campersPerCounselor)
 
 	-- Add new counselors if we need them,
