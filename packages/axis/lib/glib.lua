@@ -6,9 +6,6 @@
 --	Gui library
 --
 
--- services
-local CollectionService = game:GetService("CollectionService")
-
 -- rx module
 local rx = require(script.Parent.rx)
 local dart = require(script.Parent.dart)
@@ -26,6 +23,7 @@ glib.GOLDEN_RATIO = 1.61803398875
 -- 	is at 0.7 transparency and you call glib.SetTransparency(frame, 0.5) then the transparency will be set to
 -- 	half of the way between the original transparency (which is 0.7) and 1, so the resulting transparency will be 0.85
 local TransProps = {
+	BasePart    = {"Transparency"},
 	Frame		= {"BackgroundTransparency"},
 	TextLabel	= {"BackgroundTransparency", "TextTransparency", "TextStrokeTransparency"},
 	TextBox		= {"BackgroundTransparency", "TextTransparency", "TextStrokeTransparency"},
@@ -117,128 +115,6 @@ function glib.FrameHasMouse(frame)
 		frame.AbsolutePosition.X + frame.AbsoluteSize.X >= mouse.X and
 		frame.AbsolutePosition.Y + frame.AbsoluteSize.Y >= mouse.Y
 	)
-end
-
--- --------------------------------------------------------------------------
--- Brightness
--- --------------------------------------------------------------------------
-
--- Remove saturation
-local ColorProps = {
-	Frame		= {"BackgroundColor3", "BorderColor3"},
-	TextLabel	= {"BackgroundColor3", "BorderColor3", "TextColor3", "TextStrokeColor3"},
-	TextBox		= {"BackgroundColor3", "BorderColor3", "TextColor3", "TextStrokeColor3"},
-	TextButton	= {"BackgroundColor3", "BorderColor3", "TextColor3", "TextStrokeColor3"},
-	ImageLabel	= {"BackgroundColor3", "BorderColor3", "ImageColor3"},
-	ImageButton	= {"BackgroundColor3", "BorderColor3", "ImageColor3"},
-	ScrollingFrame	= {"BackgroundColor3", "BorderColor3"},
-}
-function glib.logColorsWithBrightness(guiObject, startingValue)
-	-- Parameters
-	startingValue = startingValue or 1
-	assert(guiObject and type(guiObject) == "userdata", "glib.logColorsWithBrightness requires an instance")
-	assert(startingValue > 0, "glib.logColorsWithBrightness requires a value greater than zero")
-
-	-- Full brightness properties folder
-	local propertiesFolder
-	local function touchFolder()
-		if not propertiesFolder then
-			propertiesFolder = Instance.new("Folder", guiObject)
-			propertiesFolder.Name = "FullBrightnessColorProperties"
-		end
-		return propertiesFolder
-	end
-
-	-- Log all properties for appropriate classes
-	if guiObject:IsA("GuiObject") then
-		for class, properties in pairs(ColorProps) do
-			if guiObject:IsA(class) then
-				local folder = touchFolder()
-				for _, property in pairs(properties) do
-					-- Create value
-					local value = Instance.new("Color3Value", folder)
-					value.Name = property
-
-					-- Extrapolate full brightness from current value
-					local h, s, v = Color3.toHSV(guiObject[property])
-					value.Value = Color3.fromHSV(h, s, (v / startingValue))
-				end
-			end
-		end
-	end
-
-	-- Recurse through children
-	for _, child in pairs(guiObject:GetChildren()) do
-		glib.logColorsWithBrightness(child, startingValue)
-	end
-end
-function glib.setBrightness(guiObject, brightness)
-	-- Parameters
-	assert(guiObject and type(guiObject) == "userdata", "glib.setBrightness requires an instance")
-	assert(brightness, "glib.setBrightness requires a number")
-
-	-- Try color properties
-	if guiObject:IsA("GuiObject") then
-		for class, _ in pairs(ColorProps) do
-			if guiObject:IsA(class) then
-				local folder = guiObject:FindFirstChild("FullBrightnessColorProperties")
-				if folder then
-					for _, valueObject in pairs(folder:GetChildren()) do
-						local h, s, v = Color3.toHSV(valueObject.Value)
-						guiObject[valueObject.Name] = Color3.fromHSV(h, s, v * brightness)
-					end
-				end
-			end
-		end
-	end
-
-	-- Recurse through children
-	for _, child in pairs(guiObject:GetChildren()) do
-		glib.setBrightness(child, brightness)
-	end
-end
-
--- --------------------------------------------------------------------------
--- Gui effects
--- --------------------------------------------------------------------------
-
--- Gui effects list
-local GuiEffects = {
-	GuiBrightnessEffect = {
-		valueType = "NumberValue",
-		init = function (guiObject, effect, value)
-			effect.Value = (value or 1)
-			glib.logColorsWithBrightness(guiObject, effect.Value)
-		end,
-		render = function (guiObject, value)
-			glib.setBrightness(guiObject, value)
-		end,
-	}
-}
-
--- New
-function glib.new(effectClassName, guiObject, startingValue)
-	-- Get effect
-	local effectClass = GuiEffects[effectClassName]
-
-	-- Create it within the gui object
-	local effect = Instance.new(effectClass.valueType, guiObject)
-	effect.Value = startingValue
-	effect.Name = effectClassName
-	effectClass.init(guiObject, effect, startingValue)
-	CollectionService:AddTag(effect, effectClassName)
-end
-
--- Drive gui effects
-function glib.driveGuiEffects()
-	for effectClassName, _ in pairs(GuiEffects) do
-		rx.Observable.fromInstanceTag(effectClassName)
-			:flatMap(function (effect)
-				return rx.Observable.from(effect)
-					:map(dart.carry(effect.Parent))
-			end)
-			:subscribe(GuiEffects[effectClassName].render)
-	end
 end
 
 -- --------------------------------------------------------------------------
@@ -430,7 +306,6 @@ end
 
 function glib.drive()
 	-- glib.driveSprings()
-	glib.driveGuiEffects()
 end
 
 -- return library

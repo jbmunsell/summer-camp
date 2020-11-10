@@ -13,10 +13,6 @@ local axis = env.packages.axis
 -- modules
 local fx = require(axis.lib.fx)
 fx.connectCollisionGroupManagement()
-
-local glib = require(axis.lib.glib)
--- glib.driveGuiEffects()
--- glib.driveSprings()
-glib.drive()
+fx.driveEffects()
 
 require(axis.handlers.PlayerIndicatorHandler)()

@@ -12,6 +12,11 @@ local TweenService = game:GetService("TweenService")
 local PhysicsService = game:GetService("PhysicsService")
 local CollectionService = game:GetService("CollectionService")
 
+-- modules
+local axis = script.Parent.Parent
+local rx = require(axis.lib.rx)
+local dart = require(axis.lib.dart)
+
 -- Consts
 local fxClasses = {
 	"Fire",
@@ -233,6 +238,201 @@ function fx.smoothDestroy(instance)
 	delay(max, function ()
 		instance:Destroy()
 	end)
+end
+
+---------------------------------------------------------------------------------------------------
+-- Transparency setting
+---------------------------------------------------------------------------------------------------
+
+local TransparencyProps = {
+	BasePart    = {"Transparency"},
+	GuiObject   = {"BackgroundTransparency"},
+	TextLabel	= {"TextTransparency", "TextStrokeTransparency"},
+	TextBox	    = {"TextTransparency", "TextStrokeTransparency"},
+	TextButton	= {"TextTransparency", "TextStrokeTransparency"},
+	ImageLabel	= {"ImageTransparency"},
+	ImageButton	= {"ImageTransparency"},
+}
+function fx.logTransparencyWithValue(instance, initValue)
+	-- Parameters
+	initValue = initValue or 0
+	assert(instance and type(instance) == "userdata", "fx.logTransparencyWithValue requires an instance")
+	assert(initValue ~= 1, "fx.logTransparencyWithValue requires a value not equal to 1")
+
+	-- Zero transparency properties folder
+	local propertiesFolder
+	local function touchFolder()
+		if not propertiesFolder then
+			propertiesFolder = Instance.new("Folder", instance)
+			propertiesFolder.Name = "ZeroTransparencyProperties"
+		end
+		return propertiesFolder
+	end
+
+	-- Log all properties for appropriate classes
+	for class, properties in pairs(TransparencyProps) do
+		if instance:IsA(class) then
+			local folder = touchFolder()
+			for _, property in pairs(properties) do
+				-- Create value
+				local value = Instance.new("NumberValue", folder)
+				value.Name = property
+
+				-- Extrapolate zero transparency value from current and init
+				value.Value = instance[property] - ((1 - instance[property]) / (1 - initValue))
+			end
+		end
+	end
+
+	-- Recurse through children
+	for _, child in pairs(instance:GetChildren()) do
+		fx.logTransparencyWithValue(child, initValue)
+	end
+end
+function fx.setTransparency(instance, transparency)
+	-- Parameters
+	assert(instance and type(instance) == "userdata", "fx.setTransparency requires an instance")
+	assert(transparency, "fx.setTransparency requires a number")
+
+	-- Try color properties
+	for class, _ in pairs(TransparencyProps) do
+		if instance:IsA(class) then
+			local folder = instance:FindFirstChild("ZeroTransparencyProperties")
+			if folder then
+				for _, valueObject in pairs(folder:GetChildren()) do
+					instance[valueObject.Name] = valueObject.Value + (1 - valueObject.Value) * transparency
+				end
+			end
+		end
+	end
+
+	-- Recurse through children
+	for _, child in pairs(instance:GetChildren()) do
+		fx.setTransparency(child, transparency)
+	end
+end
+
+---------------------------------------------------------------------------------------------------
+-- Brightness setting
+---------------------------------------------------------------------------------------------------
+
+-- Remove saturation
+local ColorProps = {
+	BasePart    = {"Color"},
+	GuiObject   = {"BackgroundColor3", "BorderColor3"},
+	TextLabel	= {"TextColor3", "TextStrokeColor3"},
+	TextBox		= {"TextColor3", "TextStrokeColor3"},
+	TextButton	= {"TextColor3", "TextStrokeColor3"},
+	ImageLabel	= {"ImageColor3"},
+	ImageButton	= {"ImageColor3"},
+}
+function fx.logColorsWithBrightness(instance, startingValue)
+	-- Parameters
+	startingValue = startingValue or 1
+	assert(instance and type(instance) == "userdata", "fx.logColorsWithBrightness requires an instance")
+	assert(startingValue > 0, "fx.logColorsWithBrightness requires a value greater than zero")
+
+	-- Full brightness properties folder
+	local propertiesFolder
+	local function touchFolder()
+		if not propertiesFolder then
+			propertiesFolder = Instance.new("Folder", instance)
+			propertiesFolder.Name = "FullBrightnessColorProperties"
+		end
+		return propertiesFolder
+	end
+
+	-- Log all properties for appropriate classes
+	for class, properties in pairs(ColorProps) do
+		if instance:IsA(class) then
+			local folder = touchFolder()
+			for _, property in pairs(properties) do
+				-- Create value
+				local value = Instance.new("Color3Value", folder)
+				value.Name = property
+
+				-- Extrapolate full brightness from current value
+				local h, s, v = Color3.toHSV(instance[property])
+				value.Value = Color3.fromHSV(h, s, (v / startingValue))
+			end
+		end
+	end
+
+	-- Recurse through children
+	for _, child in pairs(instance:GetChildren()) do
+		fx.logColorsWithBrightness(child, startingValue)
+	end
+end
+function fx.setBrightness(instance, brightness)
+	-- Parameters
+	assert(instance and type(instance) == "userdata", "fx.setBrightness requires an instance")
+	assert(brightness, "fx.setBrightness requires a number")
+
+	-- Try color properties
+	for class, _ in pairs(ColorProps) do
+		if instance:IsA(class) then
+			local folder = instance:FindFirstChild("FullBrightnessColorProperties")
+			if folder then
+				for _, valueObject in pairs(folder:GetChildren()) do
+					local h, s, v = Color3.toHSV(valueObject.Value)
+					instance[valueObject.Name] = Color3.fromHSV(h, s, v * brightness)
+				end
+			end
+		end
+	end
+
+	-- Recurse through children
+	for _, child in pairs(instance:GetChildren()) do
+		fx.setBrightness(child, brightness)
+	end
+end
+
+---------------------------------------------------------------------------------------------------
+-- Effects
+---------------------------------------------------------------------------------------------------
+
+-- Instance effects list
+local InstanceEffects = {
+	BrightnessEffect = {
+		valueType = "NumberValue",
+		init = function (effect, instance, value)
+			fx.logColorsWithBrightness(instance, value)
+			effect.Value = (value or 1)
+		end,
+		render = fx.setBrightness,
+	},
+	TransparencyEffect = {
+		valueType = "NumberValue",
+		init = function (effect, instance, value)
+			fx.logTransparencyWithValue(instance, value)
+			effect.Value = value or 0
+		end,
+		render = fx.setTransparency,
+	},
+}
+
+-- new effects
+function fx.new(effectType, instance, startingValue)
+	-- Get effect
+	local effectClass = InstanceEffects[effectType]
+
+	-- Create it within instance
+	local effect = Instance.new(effectClass.valueType, instance)
+	effect.Name = effectType
+	effectClass.init(effect, instance, startingValue)
+	CollectionService:AddTag(effect, effectType)
+end
+
+-- drive effects
+function fx.driveEffects()
+	for effectType, effectClass in pairs(InstanceEffects) do
+		rx.Observable.fromInstanceTag(effectType)
+			:flatMap(function (effect)
+				return rx.Observable.from(effect.Changed)
+					:map(dart.carry(effect.Parent))
+			end)
+			:subscribe(effectClass.render)
+	end
 end
 
 -- return library
