@@ -184,7 +184,7 @@ local function integrate(baseGeneData, geneData)
 end
 function genesUtil.createGeneData(raw)
 	-- Start with base gene data to get its own sub genes
-	integrate(raw, raw)
+	-- integrate(raw, raw)
 
 	-- return compiled data table (same variable "raw" because we set metatables)
 	return raw
