@@ -8,6 +8,7 @@
 
 -- env
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local input = env.src.input
@@ -31,6 +32,12 @@ local rotation = 0
 local preview
 local gui = env.PlayerGui:WaitForChild("Core").Container.TextPlacementObject
 local textInput = gui:FindFirstChild("Input", true)
+
+-- Set initial text according to input type
+do
+	local initText = string.format("%s to edit text.", (UserInputService.TouchEnabled and "Touch" or "Click"))
+	gui:FindFirstChildWhichIsA("TextBox", true).Text = initText
+end
 
 -- Sticky note preview
 -- 	Parent is set to show and hide when there is a sticky note equipped
