@@ -68,6 +68,11 @@ function dart.findFirstChild(name, recursive)
 		return instance:FindFirstChild(name, recursive)
 	end
 end
+function dart.isDescendantOf(instance)
+	return function (v)
+		return v:IsDescendantOf(instance)
+	end
+end
 
 -- Parameter manipulation
 function dart.drag(...)

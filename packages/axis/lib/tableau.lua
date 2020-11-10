@@ -161,6 +161,16 @@ local SpecialTypeMappings = {
 local function capitalize(str)
 	return string.gsub(str, "^%l", string.upper)
 end
+function tableau.getValueObjectType(value)
+	local t = (value == tableau.null and "null" or typeof(value))
+	if SpecialTypeMappings[t] then
+		t = SpecialTypeMappings[t]
+	else
+		t = capitalize(t) .. "Value"
+	end
+	
+	return t	
+end
 function tableau.valueObjectsToTable(instance)
 	if instance:IsA("Folder") then
 		local tb = {}
@@ -173,13 +183,7 @@ function tableau.valueObjectsToTable(instance)
 	end
 end
 function tableau.tableToValueObjects(key, value)
-	local t = (value == tableau.null and "null" or typeof(value))
-	if SpecialTypeMappings[t] then
-		t = SpecialTypeMappings[t]
-	else
-		t = capitalize(t) .. "Value"
-	end
-	
+	local t = tableau.getValueObjectType(value)
 	local instance = Instance.new(t)
 	instance.Name = key
 	if t == "Folder" then
