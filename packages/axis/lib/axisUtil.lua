@@ -239,10 +239,6 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 	assert(att_b, string.format("Unable to find attachment named '%s' in instance '%s'", bName, b:GetFullName()))
 
 	local info = axisUtil.computeAttachInfo(att_a, att_b)
-	local originalCFrame = info.att_b.Parent.CFrame
-	local function getTargetCFrame()
-		return info.att_a.WorldCFrame:toWorldSpace(info.att_b.CFrame:inverse())
-	end
 
 	local wasAnchored = info.att_b.Parent.Anchored
 	info.att_b.Parent.Anchored = true
@@ -258,12 +254,35 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 			PhysicsService:SetPartCollisionGroup(d, "FXParts")
 		end
 	end
-	local tween = axisUtil.createDynamicTween(info.att_b.Parent, tweenInfo or SmoothAttachTweenInfo, {
-		CFrame = function (d)
-			return originalCFrame:lerp(getTargetCFrame(), d)
-		end,
-	})
+
+	-- If B is a part, then tween the part. If it's a model, tween entire model
+	local originalCFrame
+	local tween, proxy
+	if b:IsA("Model") then
+		assert(b.PrimaryPart, "Cannot smoothAttach a model with no assigned PrimaryPart")
+
+		originalCFrame = b:GetPrimaryPartCFrame()
+		local primaryPartOffset = info.att_b.WorldCFrame:toObjectSpace(originalCFrame)
+		proxy = Instance.new("NumberValue", ReplicatedStorage)
+		proxy.Value = 0
+		proxy.Changed:Connect(function (d)
+			local cf = originalCFrame:lerp(info.att_a.WorldCFrame:toWorldSpace(primaryPartOffset), d)
+			b:SetPrimaryPartCFrame(cf)
+		end)
+		tween = TweenService:Create(proxy, tweenInfo or SmoothAttachTweenInfo, { Value = 1 })
+
+	elseif b:IsA("BasePart") then
+		originalCFrame = info.att_b.Parent.CFrame
+		tween = axisUtil.createDynamicTween(b, tweenInfo or SmoothAttachTweenInfo, {
+			CFrame = function (d)
+				return originalCFrame:lerp(info.att_a.WorldCFrame:toWorldSpace(info.att_b.CFrame), d)
+			end,
+		})
+	end
+
 	tween.Completed:Connect(function ()
+		if proxy then proxy:Destroy() end
+
 		info.att_b.Parent.Anchored = wasAnchored
 
 		for part, group in pairs(collisionGroups) do
