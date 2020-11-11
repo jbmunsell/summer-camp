@@ -101,14 +101,33 @@ rx.Observable.from(roles.net.TeamChangeRequested)
 	end)
 	:subscribe(changePlayerTeam)
 
--- Render counselor images
-rolesStateStream
+-- TODO: Add stream for CHARACTERS to render them as counselors
+-- 	and change current renderCounselor function to be like "announceCounselor"
+
+-- Counselor appointment stream
+local counselorAppointed = rolesStateStream
 	:flatMap(function (player)
 		return rx.Observable.from(player.state.roles.isCounselor)
 			:filter()
 			:map(dart.constant(player))
 	end)
-	:subscribe(rolesUtil.renderCounselor)
+
+-- Announce counselor to the cabin when they're appointed
+counselorAppointed:subscribe(rolesUtil.announceCounselor)
+
+-- All characters of counselors simply must have a billboard gui!
+rx.Observable.from(Players.PlayerAdded)
+	:startWithTable(Players:GetPlayers())
+	:flatMap(function (player)
+		return rx.Observable.from(player.CharacterAdded)
+			:startWith(0)
+			:map(dart.constant(player))
+			:filter(rolesUtil.isPlayerCounselor)
+	end)
+	:merge(counselorAppointed)
+	:map(dart.index("Character"))
+	:filter()
+	:subscribe(rolesUtil.renderCounselorCharacter)
 
 -- Destroy counselor images when they leave the game or are unmarked
 rolesStateStream
@@ -118,4 +137,6 @@ rolesStateStream
 			:merge(rx.Observable.from(Players.PlayerRemoving):first(dart.equals(player)))
 			:map(dart.constant(player))
 	end)
+	:map(dart.index("Character"))
+	:filter()
 	:subscribe(rolesUtil.destroyCounselorRendering)

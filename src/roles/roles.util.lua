@@ -15,6 +15,7 @@ local axis = env.packages.axis
 
 -- modules
 local tableau = require(axis.lib.tableau)
+local axisUtil = require(axis.lib.axisUtil)
 
 -- lib
 local rolesUtil = {}
@@ -36,10 +37,25 @@ function rolesUtil.getTeamCounselors(team)
 		:filter(rolesUtil.isPlayerCounselor)
 end
 
--- Render counselor
-function rolesUtil.renderCounselor(player)
-	-- TODO: Create gui objects
+-- Render counselor character
+function rolesUtil.renderCounselorCharacter(character)
+	-- Destroy old
+	rolesUtil.destroyCounselorRendering(character)
 
+	-- Get stuff
+	local player = Players:GetPlayerFromCharacter(character)
+	local head = character:FindFirstChild("Head")
+	if not player or not head then return end
+
+	-- Create gui
+	local team = player.Team
+	local gui = env.res.roles.TeamGui:Clone()
+	gui.Parent = character.Head
+	gui.TeamImage.Image = env.config.cabins[team.Name].image.Value
+end
+
+-- Render counselor
+function rolesUtil.announceCounselor(player)
 	-- Send a chat message
 	local actionMessage = string.format("been appointed counselor of Cabin %s!", player.Team.Name)
 	local generalMessage = string.format("%s has %s", player.Name, actionMessage)
@@ -56,8 +72,8 @@ function rolesUtil.renderCounselor(player)
 end
 
 -- Destroy counselor rendering
-function rolesUtil.destroyCounselorRendering(player)
-	-- TODO: Find and destroy gui objects
+function rolesUtil.destroyCounselorRendering(character)
+	axisUtil.destroyChild(character.Head, "TeamGui")
 end
 
 -- return lib
