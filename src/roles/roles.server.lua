@@ -47,7 +47,6 @@ local function addCounselor(team)
 		:max(getSessionTime)
 	if target then
 		target.state.roles.isCounselor.Value = true
-		print(string.format("Made %s a counselor", target.Name))
 	end
 end
 

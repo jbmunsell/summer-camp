@@ -9,7 +9,6 @@
 -- env
 local ChatService = require(game:GetService("ServerScriptService")
 	:WaitForChild("ChatServiceRunner").ChatService)
-print("Required chat service")
 local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis

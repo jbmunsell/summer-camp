@@ -39,14 +39,13 @@ skewerables:map(dart.drag(skewerableUtil.equip))
 -- Set server lock according to whether we have a skewer AND that skewer has a holder
 genesUtil.observeStateValue(skewerable, "skewer", function (o)
 	return o:switchMap(function (skewerInstance)
-		print("skewerInstance: ", skewerInstance)
 		local isInteractable = skewerInstance
-			and rx.Observable.from(skewerInstance.state.pickup.holder):map(dart.boolNot):tap(print)
+			and rx.Observable.from(skewerInstance.state.pickup.holder):map(dart.boolNot)
 			or rx.Observable.just(true)
 		return isInteractable
 			:map(dart.carry("interact", "skewerable"))
 	end)
-end):tap(print):subscribe(multiswitchUtil.setSwitchEnabled)
+end):subscribe(multiswitchUtil.setSwitchEnabled)
 
 -- When a skewerable changes slot index, bump down others and render weld accordingly
 local slotChanged = genesUtil.observeStateValue(skewerable, "skewerSlotIndex")
