@@ -44,6 +44,7 @@ local function startSession(activityInstance)
 	activityInstance.state.activity.inSession.Value = true
 end
 local function stopSession(activityInstance)
+	collection.clear(activityInstance.state.activity.enrolledTeams)
 	activityInstance.state.activity.inSession.Value = false
 end
 
