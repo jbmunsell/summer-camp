@@ -17,6 +17,7 @@ local StarterPlayerScripts = game:GetService("StarterPlayer").StarterPlayerScrip
 local env = {}
 env.res = ReplicatedStorage:FindFirstChild("res")
 env.packages = ReplicatedStorage.packages
+env.config = ReplicatedStorage.config
 
 -- Distribute on server startup
 if RunService:IsServer() then
