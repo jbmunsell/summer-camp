@@ -276,6 +276,12 @@ end
 -- Transforming observables
 ---------------------------------------------------------------------------------------------------
 
+-- Pipe
+-- 	Runs a custom transform on an observable. Useful for applying multiple operators at once
+function Observable:pipe(transform)
+	return transform(self)
+end
+
 -- Tap
 -- 	Runs a function and then passes as normal
 function Observable:tap(pushTap, failTap, completeTap)
