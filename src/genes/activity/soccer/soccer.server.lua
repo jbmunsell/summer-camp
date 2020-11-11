@@ -91,7 +91,6 @@ local function updateScoreboardTeams(soccerInstance)
 end
 local function updateScoreboardScore(soccerInstance)
 	local score = tableau.valueObjectsToTable(soccerInstance.state.soccer.score)
-	tableau.log(score)
 	scoreboardUtil.setScore(soccerInstance.Scoreboard, score)
 end
 local function updateScoreboardTime(soccerInstance, secondsRemaining)
