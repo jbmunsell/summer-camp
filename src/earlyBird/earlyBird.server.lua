@@ -28,7 +28,9 @@ local BadgeId = 0
 
 -- Award badge
 local function awardBadge(player)
-	BadgeService:AwardBadge(player.UserId, BadgeId)
+	pcall(function ()
+		BadgeService:AwardBadge(player.UserId, BadgeId)
+	end)
 end
 
 ---------------------------------------------------------------------------------------------------
