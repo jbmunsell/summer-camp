@@ -19,6 +19,7 @@ local dart = require(axis.lib.dart)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
+local scheduleStreams = require(env.src.schedule.streams)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -41,6 +42,9 @@ local function startSession(activityInstance)
 
 	-- Set state value to trigger action
 	activityInstance.state.activity.inSession.Value = true
+end
+local function stopSession(activityInstance)
+	activityInstance.state.activity.inSession.Value = false
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -81,3 +85,10 @@ activities
 	:map(dart.carry(startSession))
 	:map(dart.bind)
 	:subscribe(spawn)
+
+-- Stop session when activity chunk ends
+scheduleStreams.scheduleChunk
+	:reject(activityUtil.isActivityChunk)
+	:map(dart.bind(genesUtil.getInstances, activity))
+	:flatMap(rx.Observable.from)
+	:subscribe(stopSession)
