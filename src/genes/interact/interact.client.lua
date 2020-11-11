@@ -7,6 +7,7 @@
 --
 
 -- env
+local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local input = env.src.input
@@ -28,6 +29,11 @@ local multiswitchUtil = require(multiswitch.util)
 
 -- instances
 local interactPrompt = env.PlayerGui:WaitForChild("InteractPrompt")
+do
+	local touch = UserInputService.TouchEnabled
+	interactPrompt.InteractButton.TouchImage.Visible = touch
+	interactPrompt.InteractButton.KeyLabel.Visible = not touch
+end
 
 -- constants
 local SpritesheetDims = Vector2.new(4, 4)
