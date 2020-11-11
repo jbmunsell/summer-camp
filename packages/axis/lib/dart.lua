@@ -220,14 +220,9 @@ function dart.getPlayerFromCharacterChild(child)
 end
 
 -- set value
-function dart.setValue(valueObject)
-	return function (value)
+function dart.setValue(value)
+	return function (valueObject)
 		valueObject.Value = value
-	end
-end
-function dart.getValue(valueObject)
-	return function ()
-		return valueObject.Value
 	end
 end
 
