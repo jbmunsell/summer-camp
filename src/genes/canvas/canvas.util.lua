@@ -28,7 +28,7 @@ local canvasUtil = {}
 local White = Color3.new(1, 1, 1)
 
 -- Set canvas owner
-function canvasUtil.setCanvasOwner(instance, owner)
+function canvasUtil.setCanvasOwner(owner, instance)
 	instance.state.canvas.owner.Value = owner
 end
 

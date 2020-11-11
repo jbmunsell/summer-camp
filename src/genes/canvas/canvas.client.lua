@@ -50,6 +50,7 @@ local function connectDrawingInput(canvasInstance)
 	-- Create terminator stream
 	local stoppedEditing = rx.Observable.from(canvasInstance.state.canvas.editing.Changed)
 		:reject()
+		:merge(rx.Observable.from(canvasInstance.state.canvas.owner.Changed))
 	local terminator = rx.Observable.fromInstanceLeftGame(canvasInstance)
 		:merge(stoppedEditing)
 
