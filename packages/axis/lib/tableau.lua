@@ -175,7 +175,8 @@ function tableau.valueObjectsToTable(instance)
 	if instance:IsA("Folder") then
 		local tb = {}
 		for _, child in pairs(instance:GetChildren()) do
-			tb[child.Name] = tableau.valueObjectsToTable(child)
+			local key = tonumber(child.Name) or child.Name
+			tb[key] = tableau.valueObjectsToTable(child)
 		end
 		return tb
 	elseif instance:IsA("ValueBase") then
