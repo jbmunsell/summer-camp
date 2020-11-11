@@ -29,6 +29,14 @@ function multiswitchUtil.toggleSwitch(instance, setName, switchName)
 	switch.Value = not switch.Value
 end
 
+-- Create switch
+function multiswitchUtil.createSwitch(instance, setName, switchName)
+	local switch = Instance.new("BoolValue")
+	switch.Name = switchName
+	switch.Value = true
+	switch.Parent = instance.state[setName].switches
+end
+
 -- Queries
 function multiswitchUtil.all(instance, setName, f)
 	return tableau.fromValueObjects(instance.state[setName].switches):all(f)
