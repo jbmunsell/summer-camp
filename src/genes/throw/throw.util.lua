@@ -14,7 +14,6 @@ local pickup = genes.pickup
 local throw = genes.throw
 
 -- modules
-local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local pickupUtil = require(pickup.util)
