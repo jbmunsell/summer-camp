@@ -13,12 +13,20 @@ local genes = env.src.genes
 local activity = genes.activity
 
 -- modules
+local dart = require(axis.lib.dart)
+local tableau = require(axis.lib.tableau)
+local axisUtil = require(axis.lib.axisUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local scheduleStreams = require(env.src.schedule.streams)
 
 -- lib
 local activityUtil = {}
+
+-- Is in session
+function activityUtil.isInSession(activityInstance)
+	return activityInstance.state.activity.inSession.Value
+end
 
 -- Current chunk is activity chunk
 function activityUtil.isActivityChunk()
@@ -34,6 +42,18 @@ function activityUtil.getCabinActivity(team)
 		:first(function (activityInstance)
 			return collection.getValue(activityInstance.state.activity.sessionTeams, team)
 		end)
+end
+
+-- Spawn players in plane
+function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
+	local function place(character)
+		character:SetPrimaryPartCFrame(CFrame.new(axisUtil.getRandomPointInPart(plane), lookAtPosition))
+	end
+
+	tableau.from(players)
+		:map(dart.index("Character"))
+		:filter()
+		:foreach(place)
 end
 
 -- return lib

@@ -35,12 +35,12 @@ local function enrollCabin(activityInstance, cabin)
 	collection.addValue(activityInstance.state.activity.enrolledTeams, cabin)
 end
 local function startSession(activityInstance)
-	-- Set state value
-	activityInstance.state.activity.inSession.Value = true
+	for _, value in pairs(activityInstance.state.activity.enrolledTeams:GetChildren()) do
+		value.Parent = activityInstance.state.activity.sessionTeams
+	end
 
-	-- We have to spawn this because it is subscribes to the collection's ChildRemoved event
-	-- 	and will create an infinite loop if single-threaded
-	spawn(dart.bind(collection.clear, activityInstance.state.activity.enrolledTeams))
+	-- Set state value to trigger action
+	activityInstance.state.activity.inSession.Value = true
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -66,6 +66,8 @@ activities
 	:subscribe(enrollCabin)
 
 -- Listen to enrolled list changed and begin activity when it's full
+-- We have to spawn the subscription to this because it is subscribes to the collection's ChildRemoved event
+-- 	and will create an infinite loop if single-threaded
 activities
 	:flatMap(function (activityInstance)
 		local enrolled = activityInstance.state.activity.enrolledTeams
@@ -76,8 +78,6 @@ activities
 			:filter(dart.equals(activityInstance.config.activity.teamCount.Value))
 			:map(dart.constant(activityInstance))
 	end)
-	:subscribe(startSession)
-
--- lil test to see if things are working
-genesUtil.observeStateValue(activity, "inSession")
-	:subscribe(print)
+	:map(dart.carry(startSession))
+	:map(dart.bind)
+	:subscribe(spawn)

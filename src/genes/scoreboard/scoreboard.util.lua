@@ -7,7 +7,10 @@
 --
 
 -- env
--- local env = require(game:GetService("ReplicatedStorage").src.env)
+local env = require(game:GetService("ReplicatedStorage").src.env)
+
+-- lib
+local scoreboardUtil = {}
 
 -- Easy getters
 local function getTeamLabels(instance, teamIndex)
@@ -23,25 +26,23 @@ local function getClockLabels(instance)
 	}
 end
 
--- Easy setters
-local function loadTeamAppearance(instance, teamIndex, teamConfig)
-	local labels = getTeamLabels(instance, teamIndex)
-	for _, label in pairs(labels) do
-		label.TextColor3 = teamConfig.Color
-	end
-	labels.nameLabel.Text = teamConfig.DisplayName
-end
-local function setAppearanceFromConfig(instance, teamsConfig)
+-- Exported setters
+function scoreboardUtil.setTeams(instance, teamsFolder)
 	for i = 1, 2 do
-		loadTeamAppearance(instance, i, teamsConfig[i])
+		local teamName = teamsFolder[i].Value.Name
+		local labels = getTeamLabels(instance, i)
+		for _, label in pairs(labels) do
+			label.TextColor3 = env.config.cabins[teamName].color.Value
+		end
+		labels.nameLabel.Text = teamName
 	end
 end
-local function setScore(instance, score)
+function scoreboardUtil.setScore(instance, score)
 	for i = 1, 2 do
 		getTeamLabels(instance, i).scoreLabel.Text = tostring(score[i])
 	end
 end
-local function setTime(instance, secondsRemaining)
+function scoreboardUtil.setTime(instance, secondsRemaining)
 	local minutes = math.floor(secondsRemaining / 60)
 	local seconds = math.floor(secondsRemaining % 60)
 	local labels = getClockLabels(instance)
@@ -50,8 +51,4 @@ local function setTime(instance, secondsRemaining)
 end
 
 -- return lib
-return {
-	setAppearanceFromConfig = setAppearanceFromConfig,
-	setScore = setScore,
-	setTime = setTime,
-}
+return scoreboardUtil

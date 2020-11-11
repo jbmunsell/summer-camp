@@ -63,7 +63,7 @@ pickupUtil.getPlayerObjectActionRequestStream(dodgeball.net.ThrowRequested, dodg
 dodgeballStream
 	:flatMap(function (dodgeballInstance)
 		return rx.Observable.from(dodgeballInstance.Touched)
-			:filter(dart.getValue(dodgeballInstance.state.dodgeball.hot))
+			:filter(function () return dodgeballInstance.state.dodgeball.hot.Value end)
 			:map(dart.carry(dodgeballInstance))
 	end)
 	:subscribe(handleHotBallTouched)

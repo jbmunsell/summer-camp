@@ -11,5 +11,21 @@ return genesUtil.createGeneData({
 	name = "soccer",
 	genes = { activity },
 	state = {
+		soccer = {
+			score = { 0, 0 },
+			volleyActive = false,
+			matchActive = false,
+		},
+	},
+
+	config = {
+		activity = {
+			teamCount = 2,
+		},
+
+		soccer = {
+			ball = env.res.activities.SoccerBall,
+			goalsToWin = 3,
+		},
 	},
 })
