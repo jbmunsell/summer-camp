@@ -20,6 +20,7 @@ return genesUtil.createGeneData({
 
 	config = {
 		activity = {
+			trophy = env.res.activities.SoccerTrophy,
 			analyticsName = "soccer",
 			teamCount = 2,
 		},

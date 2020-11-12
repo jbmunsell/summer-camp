@@ -43,6 +43,20 @@ local stopMatch = makeSetStateValue("matchActive", false)
 local startVolley = makeSetStateValue("volleyActive", true)
 local stopVolley = makeSetStateValue("volleyActive", false)
 
+-- Cannon firing
+local function fireCannonsForTeam(soccerInstance, teamIndex)
+	local team = soccerInstance.state.activity.sessionTeams[teamIndex].Value
+	local descendants = tableau.from(soccerInstance:GetDescendants())
+	descendants:filter(dart.isNamed("ConfettiiTeam")):foreach(function (emitter)
+		emitter.Color = ColorSequence.new(env.config.cabins[team.Name].color.Value)
+		emitter:Emit(50)
+	end)
+	descendants:filter(dart.isNamed("ConfettiiGold"))
+		:foreach(function (emitter)
+			emitter:Emit(50)
+		end)
+end
+
 -- Score manipulation
 local function resetScore(instance)
 	tableau.from(instance.state.soccer.score:GetChildren())
@@ -199,12 +213,13 @@ sessionEndStream:subscribe(destroyBall)
 -----------------------------------
 -- Score manipulation subscriptions
 -- Increase score when ball is in goal
-volleyActivePulse
+local teamScoredStream = volleyActivePulse
 	:map(function (soccerInstance)
 		return soccerInstance, getBallInGoalScoringTeam(soccerInstance)
 	end)
 	:filter(dart.select(2))
-	:subscribe(increaseScore)
+teamScoredStream:subscribe(increaseScore)
+teamScoredStream:subscribe(fireCannonsForTeam)
 
 -- Reset score when match begins
 matchStartStream:subscribe(resetScore)

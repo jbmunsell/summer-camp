@@ -29,7 +29,7 @@ local actionsConfig = require(actions.config)
 
 -- Tag instances and seeds
 local Core = env.PlayerGui:WaitForChild("Core")
-local actionsContainer = Core.Container.Actions
+local actionsContainer = Core.Container.ActionContainer.Actions
 local diveFrame = Core.Container.Dive
 local seeds = Core.seeds
 
