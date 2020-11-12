@@ -16,6 +16,7 @@ local playerIndicator = genes.playerIndicator
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -47,6 +48,10 @@ local function updateColor(indicator)
 	state.color.Value = env.config.cabins[state.player.Value.Team.Name].color.Value
 end
 
+local function setEnabled(instance, enabled)
+	instance.state.playerIndicator.enabled.Value = enabled
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
@@ -74,3 +79,24 @@ players:flatMap(function (player)
 		:map(dart.constant(player))
 end):map(getPlayerIndicator)
 	:subscribe(updateColor)
+
+-- Indicator should only be enabled if we're in a competitive activity
+genesUtil.observeStateValue(playerIndicator, "player")
+	:filter(dart.select(2))
+	:flatMap(function (instance)
+		return genesUtil.getInstanceStream(genes.activity)
+			:map(dart.carry(instance))
+	end)
+	:flatMap(function (instance, activityInstance)
+		return collection.observeChanged(activityInstance.state.activity.sessionTeams)
+			:map(dart.constant(instance))
+	end)
+	:map(function (instance)
+		return instance, genesUtil.getInstances(genes.activity)
+			:first(function (activityInstance)
+				local teams = activityInstance.state.activity.sessionTeams
+				local playerTeam = instance.state.playerIndicator.player.Value.Team
+				return collection.getValue(teams, playerTeam)
+			end)
+	end)
+	:subscribe(setEnabled)

@@ -11,7 +11,7 @@ return genesUtil.createGeneData({
 	genes = {},
 	state = {
 		playerIndicator = {
-			enabled = true,
+			enabled = false,
 			color = Color3.new(1, 1, 1),
 			player = tableau.null,
 		},
