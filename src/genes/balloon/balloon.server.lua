@@ -20,6 +20,7 @@ local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local pickupUtil = require(pickup.util)
 local genesUtil = require(genes.util)
+local multiswitchUtil = require(genes.multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -29,6 +30,9 @@ local genesUtil = require(genes.util)
 local function attachBalloon(balloonInstance, attachInstance, position)
 	-- Strip balloonInstance
 	pickupUtil.stripObject(balloonInstance)
+
+	-- Flip switch
+	multiswitchUtil.setSwitchEnabled(balloonInstance, "interact", "balloon", false)
 
 	-- Smooth attach balloonInstance to a new attachment
 	local stickAttachment = Instance.new("Attachment", attachInstance)

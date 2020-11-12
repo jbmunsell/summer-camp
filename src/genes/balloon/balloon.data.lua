@@ -12,6 +12,12 @@ return genesUtil.createGeneData({
 		balloon = {
 
 		},
+
+		interact = {
+			switches = {
+				balloon = true,
+			},
+		},
 	},
 
 	config = {

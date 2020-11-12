@@ -44,7 +44,9 @@ end
 -- Special cases
 local SpawnHandlers = {
 	[objects.Balloon] = function (attachment, balloonInstance)
-		axisUtil.snapAttachAttachments(attachment.Parent, attachment, balloonInstance, "StickAttachment")
+		local weld = axisUtil.snapAttachAttachments(attachment.Parent, attachment, balloonInstance, "StickAttachment")
+		weld.Parent = balloonInstance
+		weld.Name = "StationaryWeld"
 	end,
 
 	[objects.Ball] = function (_, ball)
