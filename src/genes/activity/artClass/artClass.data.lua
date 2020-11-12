@@ -14,5 +14,8 @@ return genesUtil.createGeneData({
 	},
 
 	config = {
+		activity = {
+			analyticsName = "artClass",
+		},
 	},
 })

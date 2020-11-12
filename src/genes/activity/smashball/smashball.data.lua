@@ -20,6 +20,7 @@ return genesUtil.createGeneData({
 
 	config = {
 		activity = {
+			analyticsName = "smashball",
 			teamCount = 2,
 		},
 

@@ -8,6 +8,7 @@
 --
 
 -- env
+local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -38,8 +39,15 @@ end
 -- Subtract a slip and tell client to send character flying
 local function tripCharacter(peel, player)
 	peel.state.bananaPeel.slips.Value = peel.state.bananaPeel.slips.Value - 1
-	peel.PrimaryPart:SetNetworkOwner(player)
+	pcall(function ()
+		peel.PrimaryPart:SetNetworkOwner(player)
+	end)
 	bananaPeel.net.Slipped:FireClient(player, peel)
+
+	-- Send event
+	AnalyticsService:FireEvent("bananaPeelSlipped", {
+		playerId = player.UserId,
+	})
 end
 
 -- Restore ownership to auto assignment

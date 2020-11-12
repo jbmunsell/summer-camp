@@ -8,6 +8,7 @@
 
 -- env
 local TweenService = game:GetService("TweenService")
+local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -68,6 +69,9 @@ function whoopieCushionUtil.fireCushion(cushion)
 	whoopieCushionUtil.setCushionHot(cushion, false)
 	whoopieCushionUtil.setCushionFilled(cushion, false)
 	cushion.state.whoopieCushion.blows.Value = cushion.state.whoopieCushion.blows.Value - 1
+
+	-- Fire analytics event
+	AnalyticsService:FireEvent("whoopieCushionFired", {})
 end
 
 -- Remove cushion

@@ -9,6 +9,7 @@
 -- env
 local Teams = game:GetService("Teams")
 local Players = game:GetService("Players")
+local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local roles = env.src.roles
@@ -49,6 +50,11 @@ local function addCounselor(team)
 		:max(getSessionTime)
 	if target then
 		rolesUtil.setCounselor(target, true)
+		AnalyticsService:FireEvent("counselorAppointed", {
+			playerId = target.UserId,
+			sessionTime = target.state.roles.sessionTime.Value,
+			numCabinPlayers = #team:GetPlayers(),
+		})
 	end
 end
 
@@ -70,8 +76,25 @@ end
 -- 	Here we set their conuselor value to false before changing team
 -- 	so that recounts can work appropriately
 local function changePlayerTeam(player, team)
+	local oldTeam = player.Team
 	rolesUtil.setCounselor(player, false)
 	player.Team = team
+
+	-- Fire analytics event
+	local playerCounts = {}
+	for _, t in pairs(Teams:GetTeams()) do
+		table.insert(playerCounts, { team = t, count = #t:GetPlayers() })
+	end
+	table.sort(playerCounts, function (a, b)
+		return a.count < b.count
+	end)
+	local _, newTeamIndex = tableau.from(playerCounts):first(function (v) return v.team == team end)
+	AnalyticsService:FireEvent("teamChanged", {
+		playerId = player.UserId,
+		oldTeam = oldTeam.Name,
+		newTeam = team.Name,
+		teamRelativePlayers = newTeamIndex,
+	})
 end
 
 ---------------------------------------------------------------------------------------------------

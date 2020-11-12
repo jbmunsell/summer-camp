@@ -9,6 +9,8 @@
 
 -- env
 local Players = game:GetService("Players")
+local AnalyticsService = game:GetService("AnalyticsService")
+local CollectionService = game:GetService("CollectionService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -46,6 +48,31 @@ local function initInstance(instance)
 		end)
 end
 
+-- Fire drop event
+local function fireDropEvent(character)
+	local instance = pickupUtil.getCharacterHeldObjects(character):first()
+	local player = Players:GetPlayerFromCharacter(character)
+	if not player or not instance then return end
+	AnalyticsService:FireEvent("objectDropped", {
+		instanceName = instance.Name,
+		instanceTags = CollectionService:GetTags(instance),
+		playerId = player.UserId,
+	})
+end
+
+-- Fire activated event
+local function fireActivatedEvent(character, instance)
+	local player = Players:GetPlayerFromCharacter(character)
+	print("pre player")
+	if not player then return end
+	print("Firing activated event")
+	AnalyticsService:FireEvent("objectActivated", {
+		instanceName = instance.Name,
+		instanceTags = CollectionService:GetTags(instance),
+		playerId = player.UserId,
+	})
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
@@ -53,6 +80,9 @@ end
 -- Pickup object stream
 local pickupInstanceStream = genesUtil.initGene(pickup)
 pickupInstanceStream:subscribe(initInstance)
+
+-- Activated event
+-- pickupUtil.getActivatedStream(pickup):tap(print):subscribe(fireActivatedEvent)
 
 -- We should only be able to interact with an object if it has no holder and is enabled
 pickupInstanceStream
@@ -147,13 +177,14 @@ local characterDiedStream = axisUtil.getHumanoidDiedStream()
 characterDiedStream:subscribe(pickupUtil.releaseHeldObjects)
 
 -- Disown and drop items on request
-rx.Observable.from(pickup.net.DropRequested)
+local dropStream = rx.Observable.from(pickup.net.DropRequested)
 	:map(dart.index("Character"))
 	:filter()
-	:subscribe(function (character)
-		pickupUtil.disownHeldObjects(character)
-		pickupUtil.releaseHeldObjects(character)
-	end)
+dropStream:subscribe(function (character)
+	fireDropEvent(character)
+	pickupUtil.disownHeldObjects(character)
+	pickupUtil.releaseHeldObjects(character)
+end)
 
 -- Destroy all of a player's stowed items when they leave the server
 -- TODO: Some sort of save data hook here

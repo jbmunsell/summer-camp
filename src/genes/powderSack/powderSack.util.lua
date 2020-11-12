@@ -7,6 +7,7 @@
 --
 
 -- env
+local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -63,6 +64,12 @@ function powderSackUtil.poofSackInFire(sackInstance, fireplaceInstance)
 	-- Emit particles from both objects
 	local sackEmitter = sackInstance:FindFirstChild("PoofEmitter", true)
 	sackEmitter:Emit(sackInstance.config.powderSack.firePoofParticleCount.Value)
+
+	-- Fire event
+	local color = sackInstance.config.powderSack.color.Value
+	AnalyticsService:FireEvent("powderSackPoofedInFire", {
+		color = { color.R, color.G, color.B },
+	})
 end
 
 -- return lib

@@ -7,6 +7,7 @@
 --
 
 -- env
+local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -42,6 +43,16 @@ local function startSession(activityInstance)
 
 	-- Set state value to trigger action
 	activityInstance.state.activity.inSession.Value = true
+
+	-- Fire analytics event
+	local teamsData = {}
+	for _, team in pairs(activityInstance.state.activity.sessionTeams:GetChildren()) do
+		table.insert(teamsData, team.Value.Name)
+	end
+	AnalyticsService:FireEvent("activityStarted", {
+		activityName = activityInstance.config.activity.analyticsName.Value,
+		teams = teamsData,
+	})
 end
 local function stopSession(activityInstance)
 	collection.clear(activityInstance.state.activity.enrolledTeams)
