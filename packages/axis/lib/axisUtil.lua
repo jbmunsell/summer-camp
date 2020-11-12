@@ -77,6 +77,17 @@ function axisUtil.getPosition(instance)
 	end
 end
 
+-- Set CFrame
+function axisUtil.setCFrame(instance, cframe)
+	if instance:IsA("Model") then
+		local primary = instance.PrimaryPart
+		assert(primary, "Attempt to call setCFrame on a model with no PrimaryPart: " .. instance:GetFullName())
+		instance:SetPrimaryPartCFrame(cframe)
+	elseif instance:IsA("BasePart") then
+		instance.CFrame = cframe
+	end
+end
+
 -- Get local humanoid
 function axisUtil.getLocalHumanoid()
 	if not RunService:IsClient() then
@@ -312,18 +323,24 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 
 	return weld, tween, info
 end
+function axisUtil.snapAttachAttachments(a, aName, b, bName)
+	local att_a = (type(aName == "string") and a:FindFirstChild(aName, true) or aName)
+	local att_b = (type(bName == "string") and b:FindFirstChild(bName, true) or bName)
 
--- This function will align the parents of two attachments so that B matches A's CFrame,
--- 	doing so using a weld.
-function axisUtil.snapAttach(a, b, attachmentName)
-	local info = axisUtil.computeAttachInfo(axisUtil.findAttachments(a, b, attachmentName))
+	local info = axisUtil.computeAttachInfo(att_a, att_b)
 	local weld = Instance.new("Weld")
-	weld.Part0 = info.att_a.Parent
-	weld.Part1 = info.att_b.Parent
+	weld.Part0 = att_a.Parent
+	weld.Part1 = att_b.Parent
 	weld.C0 = info.target
 	weld.Parent = a
 
 	return weld
+end
+
+-- This function will align the parents of two attachments so that B matches A's CFrame,
+-- 	doing so using a weld.
+function axisUtil.snapAttach(a, b, attachmentName)
+	return axisUtil.snapAttachAttachments(a, attachmentName, b, attachmentName)
 end
 function axisUtil.smoothAttach(a, b, attachmentName, tweenInfo)
 	return axisUtil.smoothAttachAttachments(a, attachmentName, b, attachmentName, tweenInfo)
