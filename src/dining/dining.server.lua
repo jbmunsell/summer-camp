@@ -64,6 +64,11 @@ local function fillFreshTrolleyTrays()
 			tray.CFrame = spawnPoint.WorldCFrame + Vector3.new(0, 0.1 * (i - 1), 0)
 			tray.Parent = trolley
 			genesUtil.addGene(tray, foodTray)
+			local weld = Instance.new("WeldConstraint")
+			weld.Name = "StationaryWeld"
+			weld.Part0 = spawnPoint.Parent
+			weld.Part1 = tray
+			weld.Parent = tray
 		end
 	end)
 end
@@ -83,6 +88,13 @@ local function fillServingTables(mealKey)
 			dishInstance.Parent = servingTable.Dishes
 			genesUtil.addGene(dishInstance, dish)
 			axisUtil.snapAttachments(dishAttachment, dishUtil.getBottomAttachment(dishInstance))
+
+			local weld = Instance.new("WeldConstraint")
+			weld.Name = "StationaryWeld"
+			weld.Part0 = dishAttachment.Parent
+			weld.Part1 = dishInstance.PrimaryPart
+			weld.Parent = dishInstance
+
 		end)
 end
 
