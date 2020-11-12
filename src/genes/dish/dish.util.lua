@@ -42,6 +42,8 @@ end
 function dishUtil.equip(character, instance)
 	local tray = pickupUtil.characterHoldsObject(character, foodTray)
 	if tray then
+		axisUtil.destroyChild(instance, "StationaryWeld")
+
 		instance.state.dish.tray.Value = tray
 		local attachment = dishUtil.getBottomAttachment(instance)
 		assert(attachment, "Unable to find bottom attachment in dish instance " .. instance:GetFullName())

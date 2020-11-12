@@ -90,7 +90,6 @@ local function getDistanceModifier(characterAttachment, instance, hold)
 	end
 	local max = instance.config.interact.distanceThreshold.Value
 	local dmod = 1 - (getHoldDistance(characterAttachment, hold) / max)
-	-- print(instance.Name, dot, dmod)
 	return (dmod * 0.5) + (dot * 0.5)
 end
 
@@ -103,8 +102,6 @@ local function isInSight(characterAttachment, instance, hold)
 	local params = inputUtil.getBasicRaycastParams()
 	local pos = (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
 	local result = workspace:Raycast(charpos, (pos - charpos), params)
-
-	print(result and result.Instance)
 
 	return not result
 	or not result.Instance

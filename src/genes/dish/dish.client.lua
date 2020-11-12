@@ -38,7 +38,7 @@ end
 local function updateFoodSwitches()
 	-- First, go ahead and unlock everything. Then we'll only lock what should be locked
 	local allDishes = genesUtil.getInstances(dish)
-	allDishes:foreach(setSwitchEnabled(false))
+	allDishes:foreach(setSwitchEnabled(true))
 
 	-- Get tray that local player is holding
 	local tray = env.LocalPlayer.Character
@@ -54,7 +54,7 @@ local function updateFoodSwitches()
 	end
 	local function lockDishType(dishType)
 		allDishes:filter(function (f) return dishUtil.getDishType(f) == dishType end)
-			:foreach(setSwitchEnabled(true))
+			:foreach(setSwitchEnabled(false))
 	end
 
 	-- Lock dish of the same type that we have on our tray

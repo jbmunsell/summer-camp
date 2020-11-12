@@ -16,7 +16,6 @@ local skewer = genes.skewer
 -- modules
 local axisUtil = require(axis.lib.axisUtil)
 local pickupUtil = require(pickup.util)
-local genesUtil = require(genes.util)
 
 -- lib
 local skewerableUtil = {}
@@ -26,6 +25,7 @@ function skewerableUtil.equip(character, instance)
 	-- If they have a skewer, then skewer the skewer
 	local skewerInstance = pickupUtil.characterHoldsObject(character, skewer)
 	if skewerInstance then
+		axisUtil.destroyChild(instance, "StationaryWeld")
 		instance.state.skewerable.skewer.Value = skewerInstance
 		instance.state.skewerable.skewerSlotIndex.Value = 0
 	else
