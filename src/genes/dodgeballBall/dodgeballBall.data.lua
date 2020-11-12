@@ -8,7 +8,7 @@ local genesUtil = require(env.src.genes.util)
 return genesUtil.createGeneData({
 	instanceTag = "gene_dodgeballBall",
 	name = "dodgeballBall",
-	genes = { env.src.genes.pickup },
+	genes = { env.src.genes.pickup, env.src.genes.color },
 	state = {
 		dodgeballBall = {
 			hot = false,

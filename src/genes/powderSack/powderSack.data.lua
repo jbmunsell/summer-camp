@@ -7,7 +7,7 @@ local genesUtil = require(env.src.genes.util)
 return genesUtil.createGeneData({
 	name = "powderSack",
 	instanceTag = "gene_powderSack",
-	genes = { env.src.genes.throw },
+	genes = { env.src.genes.throw, env.src.genes.color },
 	state = {
 		powderSack = {
 			poofed = false,
@@ -27,7 +27,6 @@ return genesUtil.createGeneData({
 		powderSack = {
 			basicPoofParticleCount = 5,
 			firePoofParticleCount = 20,
-			color = Color3.fromRGB(69, 103, 165),
 		},
 	},
 })

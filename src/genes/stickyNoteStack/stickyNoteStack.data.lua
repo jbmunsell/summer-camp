@@ -8,10 +8,10 @@ local genesUtil = require(genes.util)
 return genesUtil.createGeneData({
 	instanceTag = "gene_stickyNoteStack",
 	name = "stickyNoteStack",
-	genes = { genes.pickup },
+	genes = { genes.pickup, genes.color },
 	state = {
 		stickyNoteStack = {
-			count = 0,
+			count = 10,
 		},
 	},
 

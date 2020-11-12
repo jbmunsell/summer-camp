@@ -54,6 +54,14 @@ function stickyNoteStackUtil.getWorldCFrame(note, raycastData)
 		* CFrame.Angles(0, 0, math.rad(raycastData.rotation or 0))
 end
 
+-- Render color
+function stickyNoteStackUtil.renderColor(stack, color)
+	if stack:IsA("BasePart") then
+		stack.Color = color
+		stack.SurfaceGui.Frame.BackgroundColor3 = color
+	end
+end
+
 -- Stick a note according to raycast data
 function stickyNoteStackUtil.stickNote(note, raycastData)
 	-- Create attachment in target object and bind it to the lifetime of note

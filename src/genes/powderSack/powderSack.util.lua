@@ -46,7 +46,7 @@ end
 
 -- Render color
 function powderSackUtil.renderColor(instance)
-	local color = instance.config.powderSack.color.Value
+	local color = instance.state.color.color.Value
 	instance.Sack.Color = color
 	instance.Sack.PoofEmitter.Color = ColorSequence.new(color)
 	instance.config.pickup.buttonColor.Value = color
@@ -55,8 +55,9 @@ end
 -- Poof sack in fire
 function powderSackUtil.poofSackInFire(sackInstance, fireplaceInstance)
 	-- Set poofed, hide, and set fire color
+	local color = sackInstance.state.color.color.Value
 	powderSackUtil.setPoofed(sackInstance, true)
-	fireplaceUtil.setFireColor(fireplaceInstance, sackInstance.config.powderSack.color.Value)
+	fireplaceUtil.setFireColor(fireplaceInstance, color)
 	fx.hide(sackInstance)
 	fx.smoothDestroy(sackInstance)
 	multiswitchUtil.setSwitchEnabled(sackInstance, "interact", "destroyed", false)
@@ -66,7 +67,6 @@ function powderSackUtil.poofSackInFire(sackInstance, fireplaceInstance)
 	sackEmitter:Emit(sackInstance.config.powderSack.firePoofParticleCount.Value)
 
 	-- Fire event
-	local color = sackInstance.config.powderSack.color.Value
 	AnalyticsService:FireEvent("powderSackPoofedInFire", {
 		color = { color.R, color.G, color.B },
 	})

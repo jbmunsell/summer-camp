@@ -25,10 +25,11 @@ local powderSackUtil = require(powderSack.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init
-local sacks = genesUtil.initGene(powderSack)
+genesUtil.initGene(powderSack)
 
 -- Render color on init
-sacks:subscribe(powderSackUtil.renderColor)
+genesUtil.crossObserveStateValue(powderSack, genes.color, "color")
+	:subscribe(powderSackUtil.renderColor)
 
 -- Connect to sack thrown
 -- throwUtil.getThrowStream(powderSack)
