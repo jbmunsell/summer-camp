@@ -38,8 +38,6 @@ end
 local function isVolleyActive(soccerInstance)
 	return soccerInstance.state.soccer.volleyActive.Value
 end
-local startMatch = makeSetStateValue("matchActive", true)
-local stopMatch = makeSetStateValue("matchActive", false)
 local startVolley = makeSetStateValue("volleyActive", true)
 local stopVolley = makeSetStateValue("volleyActive", false)
 
@@ -65,6 +63,9 @@ end
 local function increaseScore(soccerInstance, scoringTeam)
 	local valueObject = soccerInstance.state.soccer.score[scoringTeam]
 	valueObject.Value = valueObject.Value + 1
+end
+local function declareWinner(soccerInstance, team)
+	soccerInstance.state.activity.winningTeam.Value = team
 end
 
 -- Ball manipulation
@@ -155,10 +156,6 @@ local plainGoalStream, winningGoalStream = teamScoredStream
 local sessionStartStream, sessionEndStream = genesUtil.crossObserveStateValue(soccer, activity, "inSession")
 	:pipe(splitAndSelect)
 
--- Match state streams
-local matchStartStream, matchEndStream = genesUtil.observeStateValue(soccer, "matchActive")
-	:pipe(splitAndSelect)
-
 -- Volley state streams
 local volleyStartStream, _ = genesUtil.observeStateValue(soccer, "volleyActive")
 	:pipe(splitAndSelect)
@@ -174,26 +171,12 @@ local ballEscapedStream = volleyActivePulse
 	:reject(isBallInBounds)
 
 -----------------------------------
--- Match state subscriptions
--- START MATCH when old match ends OR when new activity session begins
-matchEndStream
-	:delay(3)
-	:filter(activityUtil.isInSession)
-	:merge(sessionStartStream)
-	:subscribe(startMatch)
-
--- STOP MATCH after winning goal is scored OR session terminates
-winningGoalStream
-	:merge(sessionEndStream)
-	:subscribe(stopMatch)
-
------------------------------------
 -- Volley state subscriptions
--- START VOLLEY when match starts OR on plain goal delay finished
+-- START VOLLEY when session starts OR on plain goal delay finished
 plainGoalStream
 	:delay(3)
 	:filter(activityUtil.isInSession)
-	:merge(matchStartStream)
+	:merge(sessionStartStream)
 	:subscribe(startVolley)
 
 -- STOP VOLLEY when any goal is scored OR session terminates
@@ -213,21 +196,28 @@ sessionEndStream:subscribe(destroyBall)
 -----------------------------------
 -- Score manipulation subscriptions
 -- Increase score when ball is in goal
-local teamScoredStream = volleyActivePulse
+local ballInGoalStream = volleyActivePulse
 	:map(function (soccerInstance)
 		return soccerInstance, getBallInGoalScoringTeam(soccerInstance)
 	end)
 	:filter(dart.select(2))
-teamScoredStream:subscribe(increaseScore)
-teamScoredStream:subscribe(fireCannonsForTeam)
+ballInGoalStream:subscribe(increaseScore)
+ballInGoalStream:subscribe(fireCannonsForTeam)
 
 -- Reset score when match begins
-matchStartStream:subscribe(resetScore)
+sessionStartStream:subscribe(resetScore)
+
+-- Declare winner on winning goal
+winningGoalStream
+	:map(function (soccerInstance, teamIndex)
+		return soccerInstance, soccerInstance.state.activity.sessionTeams[teamIndex].Value
+	end)
+	:subscribe(declareWinner)
 
 -----------------------------------
 -- Scoreboard subscriptions
 -- Set teams on match start
-matchStartStream:subscribe(updateScoreboardTeams)
+sessionStartStream:subscribe(updateScoreboardTeams)
 
 -- Update scoreboard when score changes
 baseScoreStream:map(dart.select(1)):subscribe(updateScoreboardScore)

@@ -78,6 +78,8 @@ players:flatMap(function (player)
 		:startWith(0)
 		:map(dart.constant(player))
 end):map(getPlayerIndicator)
+	:filter()
+	:merge(genesUtil.observeStateValue(playerIndicator, "player"):filter(dart.select(2)))
 	:subscribe(updateColor)
 
 -- Indicator should only be enabled if we're in a competitive activity
@@ -92,11 +94,12 @@ genesUtil.observeStateValue(playerIndicator, "player")
 			:map(dart.constant(instance))
 	end)
 	:map(function (instance)
-		return instance, genesUtil.getInstances(genes.activity)
+		local activityInstance = genesUtil.getInstances(genes.activity)
 			:first(function (activityInstance)
 				local teams = activityInstance.state.activity.sessionTeams
 				local playerTeam = instance.state.playerIndicator.player.Value.Team
 				return collection.getValue(teams, playerTeam)
 			end)
+		return instance, (activityInstance and activityInstance.config.activity.teamCount.Value > 1)
 	end)
 	:subscribe(setEnabled)

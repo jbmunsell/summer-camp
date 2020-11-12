@@ -38,7 +38,13 @@ local function attachBalloon(balloonInstance, attachInstance, position)
 	local stickAttachment = Instance.new("Attachment", attachInstance)
 	stickAttachment.Name = "StickAttachment"
 	stickAttachment.CFrame = attachInstance.CFrame:toObjectSpace(CFrame.new(position))
-	axisUtil.smoothAttach(attachInstance, balloonInstance, "StickAttachment")
+	local weld = axisUtil.smoothAttach(attachInstance, balloonInstance, "StickAttachment")
+	weld.Name = "BalloonAttachWeld"
+	weld.Parent = balloonInstance
+
+	-- Detach after time
+	rx.Observable.timer(balloonInstance.config.balloon.lifetime.Value)
+		:subscribe(dart.bind(axisUtil.destroyChild, balloonInstance, "BalloonAttachWeld"))
 end
 
 -- Remove handle mass
@@ -87,12 +93,6 @@ rx.Observable.heartbeat()
 	:map(genesUtil.getInstances)
 	:flatMap(rx.Observable.from)
 	:subscribe(updateBalloonAirResistance)
-
--- Detach balloons after their life expires
--- balloonAddedStream
--- 	:delay(balloonConfig.MaxLife)
--- 	:reject(function (balloon) return balloon:FindFirstChild("NoDetach") end)
--- 	:subscribe(balloonUtil.detachBalloon)
 
 -- When a balloon is moved, destroy it if it's too high
 balloonObjectStream

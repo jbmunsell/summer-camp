@@ -12,11 +12,12 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local activity = genes.activity
--- local activityEnrollment = genes.activity.activityEnrollment
 
 -- modules
+local fx = require(axis.lib.fx)
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local tableau = require(axis.lib.tableau)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
@@ -30,12 +31,6 @@ local scheduleStreams = require(env.src.schedule.streams)
 local function isInSession(activityInstance)
 	return activityInstance.state.activity.inSession.Value
 end
--- local function isEnrolled(activityInstance, cabin)
--- 	return collection.getValue(activityInstance.state.activity.enrolledTeams, cabin)
--- end
--- local function enrollCabin(activityInstance, cabin)
--- 	collection.addValue(activityInstance.state.activity.enrolledTeams, cabin)
--- end
 local function startSession(activityInstance)
 	for _, value in pairs(activityInstance.state.activity.enrolledTeams:GetChildren()) do
 		value.Parent = activityInstance.state.activity.sessionTeams
@@ -57,6 +52,7 @@ end
 local function stopSession(activityInstance)
 	collection.clear(activityInstance.state.activity.enrolledTeams)
 	activityInstance.state.activity.inSession.Value = false
+	collection.clear(activityInstance.state.activity.sessionTeams)
 end
 local function clearWinner(activityInstance)
 	activityInstance.state.activity.winningTeam.Value = nil
@@ -84,27 +80,39 @@ local function createTrophy(activityInstance, cabin)
 		:subscribe(setTeam)
 end
 
+-- Render gates
+local function setGatePartVisible(part, visible)
+	part.CanCollide = visible
+end
+local function initGates(activityInstance)
+	tableau.from(activityInstance:GetDescendants())
+		:filter(function (m)
+			return m.Name == "GateOpen" or m.Name == "GateClosed"
+		end)
+		:foreach(dart.bind(fx.new, "TransparencyEffect"))
+end
+local function renderGates(activityInstance)
+	local inSession = activityInstance.state.activity.inSession.Value
+	local function work(modelName, visible)
+		local models = tableau.from(activityInstance:GetDescendants())
+			:filter(dart.isNamed(modelName))
+		models:foreach(function (m)
+			m:WaitForChild("TransparencyEffect").Value = (visible and 0 or 1)
+		end)
+		models:flatMap(dart.getDescendants)
+			:filter(dart.isa("BasePart"))
+			:foreach(dart.follow(setGatePartVisible, visible))
+	end
+	work("GateOpen", not inSession)
+	work("GateClosed", inSession)
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
 -- init gene
 local activities = genesUtil.initGene(activity)
-
--- Listen to activityEnrollment requests from child with gene
--- activities
--- 	:flatMap(function (activityInstance)
--- 		return genesUtil.getInstanceStream(activityEnrollment)
--- 			:filter(dart.isDescendantOf(activityInstance))
--- 			:flatMap(function (enrollmentInstance)
--- 				return rx.Observable.from(enrollmentInstance.interface.activityEnrollment.cabinCounselorTriggered)
--- 			end)
--- 			:reject(dart.bind(isEnrolled, activityInstance))
--- 			:reject(activityUtil.getCabinActivity)
--- 			:reject(dart.bind(isInSession, activityInstance))
--- 			:map(dart.carry(activityInstance))
--- 	end)
--- 	:subscribe(enrollCabin)
 
 -- Listen to enrolled list changed and begin activity when it's full
 -- We have to spawn the subscription to this because it is subscribes to the collection's ChildRemoved event
@@ -141,3 +149,8 @@ winnerDeclared
 	:map(dart.carry(clearWinner))
 	:map(dart.bind)
 	:subscribe(spawn)
+
+-- Hard switch gates on activity session
+activities:subscribe(initGates)
+genesUtil.observeStateValue(activity, "inSession")
+	:subscribe(renderGates)

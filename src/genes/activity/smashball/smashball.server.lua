@@ -22,6 +22,7 @@ local tableau = require(axis.lib.tableau)
 local collection = require(axis.lib.collection)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
+local activityUtil = require(activity.util)
 local rolesUtil = require(env.src.roles.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -179,7 +180,9 @@ baseRosterStream
 	:subscribe(declareWinner)
 
 -- Drop player when touched by a ball OR character reset
-playerDied:merge(playerHitByBall):subscribe(dropPlayer)
+playerDied:merge(playerHitByBall)
+	:filter(activityUtil.isInSession)
+	:subscribe(dropPlayer)
 
 -- Respawn ball on match start AND ball escaped
 ballEscaped:merge(sessionStart):subscribe(function (instance)

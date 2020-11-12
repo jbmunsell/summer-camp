@@ -29,7 +29,6 @@ local activityUtil = require(activity.util)
 
 local CounselorJoinText = "Join"
 local CamperJoinText = "Ask your counselor to join."
-local InSessionText = "Match in progress."
 local ReturnLaterText = "Come back later."
 
 ---------------------------------------------------------------------------------------------------
@@ -55,9 +54,17 @@ end
 
 -- Get status text
 local function getStatusText(activityInstance)
-	local enrolled = activityInstance.state.activity.enrolledTeams
-	local desiredCount = activityInstance.config.activity.teamCount.Value
-	return string.format("%d/%d Teams Ready", #enrolled:GetChildren(), desiredCount)
+	if activityInstance.state.activity.inSession.Value then
+		return (activityInstance.config.activity.teamCount.Value > 1 and "Match" or "Activity")
+			.. " in progress."
+	elseif activityUtil.isActivityChunk() then
+		local enrolled = activityInstance.state.activity.enrolledTeams
+		local desiredCount = activityInstance.config.activity.teamCount.Value
+		return string.format("%d/%d Teams Ready", #enrolled:GetChildren(), desiredCount)
+	else
+		return ReturnLaterText
+	end
+
 end
 
 -- Display teams
@@ -151,15 +158,7 @@ enrollments:flatMap(function (enrollmentInstance, activityInstance)
 	local isInSession = getSessionStream(activityInstance)
 	local enrolledStream = getEnrolledTeamsStream(activityInstance):startWith(0)
 	return isInSession:combineLatest(isActivityChunkStream, enrolledStream,
-		function (inSession, isActivityChunk)
-			if inSession then
-				return InSessionText
-			elseif isActivityChunk then
-				return getStatusText(activityInstance)
-			else
-				return ReturnLaterText
-			end
-		end)
+		dart.bind(getStatusText, activityInstance))
 		:map(dart.carry(enrollmentInstance))
 end):subscribe(setStatusText)
 

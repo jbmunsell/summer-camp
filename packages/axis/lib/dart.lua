@@ -21,7 +21,7 @@ function dart.getChildren(c)
 	return c:GetChildren()
 end
 function dart.clearAllChildren(c)
-	return c:GetChildren()
+	c:ClearAllChildren()
 end
 function dart.getPlayerFromCharacter(c)
 	return game:GetService("Players"):GetPlayerFromCharacter(c)

@@ -10,6 +10,7 @@ local StartMessages = {
 }
 
 local scheduleConfig = {
+	-- DaytimeScale = 0.2,
 	DaytimeScale = 0.01,
 	NightScaleFlat = 0.1,
 	NightScaleFull = 0.2, 	-- This number is conversion from GAME HOURS to REAL LIFE SECONDS. i.e. if the number is .01,

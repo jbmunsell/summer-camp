@@ -246,6 +246,7 @@ end
 
 local TransparencyProps = {
 	BasePart    = {"Transparency"},
+	Texture     = {"Transparency"},
 	GuiObject   = {"BackgroundTransparency"},
 	TextLabel	= {"TextTransparency", "TextStrokeTransparency"},
 	TextBox	    = {"TextTransparency", "TextStrokeTransparency"},

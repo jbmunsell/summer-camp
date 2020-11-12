@@ -26,7 +26,7 @@ return genesUtil.createGeneData({
 		},
 
 		balloon = {
-			maxLife = 10,
+			lifetime = 30,
 			destroyHeight = 500,
 		},
 	},

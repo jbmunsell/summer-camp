@@ -28,7 +28,7 @@ end)
 
 -- Play track
 local function fade(sound, up)
-	TweenService:Create(sound, VolumeTweenInfo, { Volume = (up and 1 or 0) }):Play()
+	TweenService:Create(sound, VolumeTweenInfo, { Volume = (up and 0.6 or 0) }):Play()
 end
 local function playTrack(track)
 	tableau.from(workspace.audio:GetChildren())

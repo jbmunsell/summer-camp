@@ -58,11 +58,12 @@ local function fillFreshTrolleyTrays()
 		:flatMap(dart.getDescendants)
 		:filter(dart.isNamed("TrayStartLocation"))
 	spawnPoints:foreach(function (spawnPoint)
+		wait()
 		local trolley = dart.getNamedAncestor(spawnPoint, "FreshTrayTrolley")
 		for i = 1, (diningConfig.numFreshTrays / spawnPoints:size()) do
 			local tray = env.res.dining.Tray:Clone()
 			tray.CFrame = spawnPoint.WorldCFrame + Vector3.new(0, 0.1 * (i - 1), 0)
-			tray.Parent = trolley
+			tray.Parent = trolley.Trays
 			genesUtil.addGene(tray, foodTray)
 			local weld = Instance.new("WeldConstraint")
 			weld.Name = "StationaryWeld"
@@ -81,6 +82,7 @@ local function fillServingTables(mealKey)
 		:flatMap(dart.getDescendants)
 		:filter(dart.isNamed("DishAttachment"))
 		:foreach(function (dishAttachment)
+			wait()
 			local servingTable = dart.getNamedAncestor(dishAttachment, "ServingTable")
 			local dishName = tableau.from(diningConfig[mealKey][servingTable.config.dishType.Value .. "List"])
 				:random()
