@@ -45,12 +45,9 @@ local function fireChunkChanged(chunk)
 end
 
 -- Update lighting according to game time
-local function updateLighting(gameTimeHours)
-	-- Adjust lighting
-	Lighting:SetMinutesAfterMidnight(gameTimeHours * 60)
-
-	-- Export game time to a replicated value
-	schedule.interface.GameTimeHours.Value = gameTimeHours
+local function setGameTimeValue(t)
+	Lighting:SetMinutesAfterMidnight(t * 60)
+	schedule.interface.GameTimeHours.Value = t
 end
 
 -- Get players in bed
@@ -96,9 +93,14 @@ end
 scheduleStreams.scheduleChunk
 	:subscribe(fireChunkChanged)
 
--- Adjust lighting settings when game clock changes
-scheduleStreams.gameTime
-	:subscribe(updateLighting)
+-- 	Game time changed
+-- 	(float gameTime)
+-- 		gameTime - the current time of day (hours since midnight) in the game; 0 thru 24
+rx.Observable.heartbeat()
+	:scan(function (t, dt)
+		return (t + dt * schedule.interface.GameTimeScale.Value) % 24
+	end, scheduleConfig.StartingGameTime)
+	:subscribe(setGameTimeValue)
 
 -- Adjust game time scale according to whether or not we're a night chunk
 -- 	and according to the number of players in their beds

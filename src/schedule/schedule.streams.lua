@@ -15,14 +15,8 @@ local schedule = env.src.schedule
 local rx = require(axis.lib.rx)
 local scheduleConfig = require(schedule.config)
 
--- 	Game time changed
--- 	(float gameTime)
--- 		gameTime - the current time of day (hours since midnight) in the game; 0 thru 24
-local gameTime = rx.Observable.heartbeat()
-	:scan(function (t, dt)
-		return (t + dt * schedule.interface.GameTimeScale.Value) % 24
-	end, scheduleConfig.StartingGameTime)
-	:multicast(rx.BehaviorSubject.new(scheduleConfig.StartingGameTime))
+-- Game time
+local gameTime = rx.Observable.from(schedule.interface.GameTimeHours)
 
 -- 	Current chunk tracker stream
 local currentChunkTracker = gameTime
