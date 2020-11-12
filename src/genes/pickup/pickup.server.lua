@@ -19,6 +19,7 @@ local multiswitch = genes.multiswitch
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local axisUtil = require(axis.lib.axisUtil)
 local pickupUtil = require(pickup.util)
 local genesUtil = require(genes.util)
 local multiswitchUtil = require(multiswitch.util)
@@ -140,13 +141,9 @@ unequipStream:subscribe(pickupUtil.unequipCharacter)
 -- Drop stream
 -- 	Composed of humanoid died events. Drops an item back
 -- 	into the world instead of stowing in inventory.
-local characterDiedStream = rx.Observable.from(workspace.DescendantAdded)
-	:startWithTable(workspace:GetDescendants())
-	:filter(dart.isa("Humanoid"))
-	:flatMap(function (h)
-		return rx.Observable.from(h.Died)
-			:map(function () return h.Parent end)
-	end)
+local characterDiedStream = axisUtil.getHumanoidDiedStream()
+	:map(dart.index("Parent"))
+	:filter()
 characterDiedStream:subscribe(pickupUtil.releaseHeldObjects)
 
 -- Disown and drop items on request

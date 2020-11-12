@@ -27,11 +27,13 @@ local rolesUtil = require(roles.util)
 
 -- get session time
 local function getSessionTime(player)
+	dataUtil.waitForState(player, "roles")
 	return player.state.roles.sessionTime.Value
 end
 
 -- Increase session times for all players
 local function increasePlayerSessionTime(player, dt)
+	dataUtil.waitForState(player, "roles")
 	player.state.roles.sessionTime.Value = player.state.roles.sessionTime.Value + dt
 end
 local function increaseSessionTimes(dt)
@@ -46,7 +48,7 @@ local function addCounselor(team)
 		:reject(rolesUtil.isPlayerCounselor)
 		:max(getSessionTime)
 	if target then
-		target.state.roles.isCounselor.Value = true
+		rolesUtil.setCounselor(target, true)
 	end
 end
 
@@ -59,7 +61,7 @@ local function recalculateCounselors(team)
 
 	-- Add new counselors if we need them,
 	-- 	but do not remove people who are already counselors if we dip below count
-	for _ = currentCount, desiredCount do
+	for _ = currentCount + 1, desiredCount do
 		addCounselor(team)
 	end
 end
@@ -68,7 +70,7 @@ end
 -- 	Here we set their conuselor value to false before changing team
 -- 	so that recounts can work appropriately
 local function changePlayerTeam(player, team)
-	player.state.roles.isCounselor.Value = false
+	rolesUtil.setCounselor(player, false)
 	player.Team = team
 end
 
@@ -91,8 +93,7 @@ rx.Observable.from(Teams:GetTeams())
 	:subscribe(recalculateCounselors)
 
 -- Update session times
-rx.Observable.heartbeat()
-	:subscribe(increaseSessionTimes)
+rx.Observable.heartbeat():subscribe(increaseSessionTimes)
 
 -- Handle team change requests
 rx.Observable.from(roles.net.TeamChangeRequested)
@@ -100,9 +101,6 @@ rx.Observable.from(roles.net.TeamChangeRequested)
 		return player.Team == team
 	end)
 	:subscribe(changePlayerTeam)
-
--- TODO: Add stream for CHARACTERS to render them as counselors
--- 	and change current renderCounselor function to be like "announceCounselor"
 
 -- Counselor appointment stream
 local counselorAppointed = rolesStateStream
@@ -116,8 +114,7 @@ local counselorAppointed = rolesStateStream
 counselorAppointed:subscribe(rolesUtil.announceCounselor)
 
 -- All characters of counselors simply must have a billboard gui!
-rx.Observable.from(Players.PlayerAdded)
-	:startWithTable(Players:GetPlayers())
+rolesStateStream
 	:flatMap(function (player)
 		return rx.Observable.from(player.CharacterAdded)
 			:startWith(0)

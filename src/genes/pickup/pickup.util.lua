@@ -30,7 +30,9 @@ end
 local function pushDropDebounce(object)
 	object.state.pickup.dropDebounce.Value = true
 	delay(object.config.pickup.dropDebounce.Value, function ()
-		object.state.pickup.dropDebounce.Value = false
+		if object:IsDescendantOf(game) then
+			object.state.pickup.dropDebounce.Value = false
+		end
 	end)
 end
 local function clearHolder(object)

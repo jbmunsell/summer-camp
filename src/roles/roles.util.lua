@@ -16,13 +16,21 @@ local axis = env.packages.axis
 -- modules
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
+local dataUtil = require(env.src.data.util)
 
 -- lib
 local rolesUtil = {}
 
 -- is counselor
 function rolesUtil.isPlayerCounselor(player)
+	dataUtil.waitForState(player, "roles")
 	return player.state.roles.isCounselor.Value
+end
+
+-- Set counselor
+function rolesUtil.setCounselor(player, counselor)
+	dataUtil.waitForState(player, "roles")
+	player.state.roles.isCounselor.Value = counselor
 end
 
 -- Get all counselors
