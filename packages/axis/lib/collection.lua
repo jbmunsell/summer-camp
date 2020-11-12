@@ -23,6 +23,14 @@ function collection.addValue(folder, entry)
 	value.Parent = folder
 end
 
+-- Remove entry
+function collection.removeValue(folder, value)
+	local entry = collection.getValue(folder, value)
+	if entry then
+		entry:Destroy()
+	end
+end
+
 -- get entry
 function collection.getValue(folder, value)
 	return tableau.from(folder:GetChildren())

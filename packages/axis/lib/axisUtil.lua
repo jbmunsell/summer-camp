@@ -14,6 +14,11 @@ local PhysicsService = game:GetService("PhysicsService")
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- modules
+local axis = script.Parent.Parent
+local rx = require(axis.lib.rx)
+local dart = require(axis.lib.dart)
+
 -- lib
 local axisUtil = {}
 
@@ -43,6 +48,15 @@ function axisUtil.destroyChild(instance, childName)
 end
 
 -- Get player humanoid
+function axisUtil.getHumanoidDiedStream()
+	return rx.Observable.from(workspace.DescendantAdded)
+		:startWithTable(workspace:GetDescendants())
+		:filter(dart.isa("Humanoid"))
+		:flatMap(function (h)
+			return rx.Observable.from(h.Died)
+				:map(dart.constant(h))
+		end)
+end
 function axisUtil.getPlayerHumanoid(player)
 	return player.Character and player.Character:FindFirstChildWhichIsA("Humanoid")
 end
