@@ -47,6 +47,13 @@ local function stopSession(activityInstance)
 	collection.clear(activityInstance.state.activity.enrolledTeams)
 	activityInstance.state.activity.inSession.Value = false
 end
+local function clearWinner(activityInstance)
+	activityInstance.state.activity.winningTeam.Value = nil
+end
+
+-- Create trophy for activity instance and team, place it at the spawn
+local function createTrophy(activityInstance, cabin)
+end
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
@@ -87,9 +94,21 @@ activities
 	:map(dart.bind)
 	:subscribe(spawn)
 
--- Stop session when activity chunk ends
+-- Stop session when activity chunk ends OR when a winner is declared from the inside
+local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")
+	:filter(dart.select(2))
 scheduleStreams.scheduleChunk
 	:reject(activityUtil.isActivityChunk)
 	:map(dart.bind(genesUtil.getInstances, activity))
 	:flatMap(rx.Observable.from)
+	:merge(winnerDeclared:map(dart.select(1)))
 	:subscribe(stopSession)
+
+-- Create trophy when a winner is declared
+winnerDeclared:subscribe(createTrophy)
+
+-- Clear winner after a moment
+winnerDeclared
+	:map(dart.carry(clearWinner))
+	:map(dart.bind)
+	:subscribe(spawn)
