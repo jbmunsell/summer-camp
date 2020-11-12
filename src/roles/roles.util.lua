@@ -45,6 +45,18 @@ function rolesUtil.getTeamCounselors(team)
 		:filter(rolesUtil.isPlayerCounselor)
 end
 
+-- Render character size
+function rolesUtil.renderCharacterSize(character, isCounselor)
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then return end
+	tableau.from(env.config.roles.camperSizeModifiers:GetChildren())
+		:foreach(function (m)
+			if humanoid:FindFirstChild(m.Name) then
+				humanoid[m.Name].Value = (isCounselor and 1 or m.Value)
+			end
+		end)
+end
+
 -- Render counselor character
 function rolesUtil.renderCounselorCharacter(character)
 	-- Destroy old
@@ -60,6 +72,9 @@ function rolesUtil.renderCounselorCharacter(character)
 	local gui = env.res.roles.TeamGui:Clone()
 	gui.Parent = character.Head
 	gui.TeamImage.Image = env.config.cabins[team.Name].image.Value
+
+	-- Set size modifiers
+	rolesUtil.renderCharacterSize(character, true)
 end
 
 -- Render counselor
@@ -81,7 +96,11 @@ end
 
 -- Destroy counselor rendering
 function rolesUtil.destroyCounselorRendering(character)
+	-- Destroy gui
 	axisUtil.destroyChild(character.Head, "TeamGui")
+
+	-- Set size modifiers
+	rolesUtil.renderCharacterSize(character, false)
 end
 
 -- return lib
