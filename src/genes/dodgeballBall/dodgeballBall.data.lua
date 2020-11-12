@@ -6,11 +6,11 @@ local tableau = require(env.packages.axis.lib.tableau)
 local genesUtil = require(env.src.genes.util)
 
 return genesUtil.createGeneData({
-	instanceTag = "gene_dodgeball",
-	name = "dodgeball",
+	instanceTag = "gene_dodgeballBall",
+	name = "dodgeballBall",
 	genes = { env.src.genes.pickup },
 	state = {
-		dodgeball = {
+		dodgeballBall = {
 			hot = false,
 			thrower = tableau.null,
 		},
@@ -27,7 +27,7 @@ return genesUtil.createGeneData({
 			buttonImage = "rbxassetid://5649977250",
 		},
 
-		dodgeball = {
+		dodgeballBall = {
 			throwMagnitude = 80,
 		},
 	},
