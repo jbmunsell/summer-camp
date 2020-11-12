@@ -27,6 +27,16 @@ function dataUtil.addPlayerState(player, stateName, state)
 	tableau.tableToValueObjects(stateName, state).Parent = player.state
 end
 
+-- Player has state
+function dataUtil.playerHasState(player, stateName)
+	return player:FindFirstChild("state") and player.state:FindFirstChild(stateName)
+end
+
+-- Wait for state
+function dataUtil.waitForState(player, stateName)
+	return player:WaitForChild("state"):WaitForChild(stateName)
+end
+
 -- Register player state
 -- 	This will subscribe to an observable that creates such state for all
 -- 	players, and returns a stream of players with the state added
@@ -36,22 +46,11 @@ function dataUtil.registerPlayerState(stateName, state)
 		:startWithTable(Players:GetPlayers())
 	playerStream:subscribe(dart.follow(dataUtil.addPlayerState, stateName, state))
 
-	-- Has state
-	local function hasState(player)
-		return function ()
-			return player:FindFirstChild("state")
-			and player.state:FindFirstChild(stateName)
-		end
-	end
-
 	-- Create stream where state has been registered
 	return playerStream
-		:flatMap(function (player)
-			return hasState
-			and rx.Observable.just(player)
-			or rx.Observable.from(player.DescendantAdded)
-				:first(hasState)
-				:map(dart.constant(player))
+		:map(function (player)
+			dataUtil.waitForState(player, stateName)
+			return player
 		end)
 end
 
