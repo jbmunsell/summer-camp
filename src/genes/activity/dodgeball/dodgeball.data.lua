@@ -12,7 +12,6 @@ return genesUtil.createGeneData({
 	genes = { activity },
 	state = {
 		dodgeball = {
-			matchActive = false,
 			roster = { {}, {} },
 			ragdolls = {},
 			rosterReady = false,

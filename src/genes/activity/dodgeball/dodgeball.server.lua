@@ -67,11 +67,16 @@ local function fillRoster(dodgeballInstance)
 end
 local function dropPlayer(dodgeballInstance, player)
 	-- Push ragdoll and remove from roster
-	ragdoll.net.Push:FireClient(player)
 	local state = dodgeballInstance.state.dodgeball
+	local value
 	for i = 1, 2 do
-		collection.removeValue(state.roster[i], player)
+		value = collection.getValue(state.roster[i], player)
+		if value then break end
 	end
+	if not value then return end
+
+	value:Destroy()
+	ragdoll.net.Push:FireClient(player)
 	collection.addValue(state.ragdolls, player.Character)
 end
 local function spawnPlayers(dodgeballInstance)
@@ -203,7 +208,6 @@ scheduleStreams.chunkTimeLeft
 			:map(dart.drag(t))
 	end)
 	:subscribe(updateScoreboardTime)
-
 
 -- Declare a winner when one team has zero players
 baseRosterStream

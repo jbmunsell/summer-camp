@@ -72,10 +72,12 @@ local function getBallInGoalScoringTeam(soccerInstance)
 	end
 	return nil
 end
-local function respawnBall(soccerInstance)
+local function destroyBall(soccerInstance)
+	axisUtil.destroyChild(soccerInstance.functional, "Ball")
+end
+local function spawnBall(soccerInstance)
 	-- Clear old
 	local functional = soccerInstance.functional
-	axisUtil.destroyChild(functional, "Ball")
 
 	-- Create new
 	local ball = soccerInstance.config.soccer.ball.Value:Clone()
@@ -188,8 +190,11 @@ teamScoredStream
 -----------------------------------
 -- Ball subscriptions
 -- Respawn ball when it escapes OR volley starts
-ballEscapedStream:merge(volleyStartStream)
-	:subscribe(respawnBall)
+ballEscapedStream:merge(volleyStartStream):subscribe(function (instance)
+	destroyBall(instance)
+	spawnBall(instance)
+end)
+sessionEndStream:subscribe(destroyBall)
 
 -----------------------------------
 -- Score manipulation subscriptions
