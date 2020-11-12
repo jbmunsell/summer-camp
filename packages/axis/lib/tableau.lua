@@ -396,9 +396,9 @@ function ftable:first(f)
 
 	f = f or identity
 
-	for _, v in pairs(self.data) do
+	for k, v in pairs(self.data) do
 		if not f or f(v) then
-			return v
+			return v, k
 		end
 	end
 end

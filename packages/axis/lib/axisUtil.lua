@@ -289,7 +289,7 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 		originalCFrame = info.att_b.Parent.CFrame
 		tween = axisUtil.createDynamicTween(b, tweenInfo or SmoothAttachTweenInfo, {
 			CFrame = function (d)
-				return originalCFrame:lerp(info.att_a.WorldCFrame:toWorldSpace(info.att_b.CFrame), d)
+				return originalCFrame:lerp(info.att_a.WorldCFrame:toWorldSpace(info.att_b.CFrame:inverse()), d)
 			end,
 		})
 	end
