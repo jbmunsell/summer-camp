@@ -14,5 +14,3 @@ local axis = env.packages.axis
 local fx = require(axis.lib.fx)
 fx.connectCollisionGroupManagement()
 fx.driveEffects()
-
-require(axis.handlers.PlayerIndicatorHandler)()

@@ -202,6 +202,11 @@ function dart.hasTag(tag)
 		return game:GetService("CollectionService"):HasTag(instance, tag)
 	end
 end
+function dart.addTag(tag)
+	return function (instance)
+		game:GetService("CollectionService"):AddTag(instance, tag)
+	end
+end
 
 -- get name ancestor
 function dart.getNamedAncestor(instance, name)
