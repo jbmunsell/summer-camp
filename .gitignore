@@ -2,3 +2,4 @@
 *.DS_Store
 _assembled/*
 packages/Ragdoll.rbxmx
+res/*
