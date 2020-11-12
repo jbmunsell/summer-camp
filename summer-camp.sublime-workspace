@@ -4,16 +4,244 @@
 		"selected_items":
 		[
 			[
+				"isAc",
+				"isActivityChunkStream"
+			],
+			[
+				"rendin",
+				"renderIndicatorEnabled"
+			],
+			[
+				"Player",
+				"playerIndicator"
+			],
+			[
+				"dodg",
+				"dodgeballBall"
+			],
+			[
+				"destroyC",
+				"destroyCounselorRendering"
+			],
+			[
+				"Text",
+				"TextColor3"
+			],
+			[
+				"scote",
+				"setScoreboardTeams"
+			],
+			[
+				"multi",
+				"multiswitch"
+			],
+			[
+				"counse",
+				"counselorOnly"
+			],
+			[
+				"Backgru",
+				"BackgroundTransparency"
+			],
+			[
+				"pull",
+				"pulloutChair"
+			],
+			[
+				"multis",
+				"multiswitch"
+			],
+			[
+				"whoh",
+				"whoopieCushionUtil"
+			],
+			[
+				"pick",
+				"pickup"
+			],
+			[
+				"trans",
+				"transformStateValue"
+			],
+			[
+				"getI",
+				"getInstanceStream"
+			],
+			[
+				"marsh",
+				"marshmallow"
+			],
+			[
+				"fireplace",
+				"fireplaceInstance"
+			],
+			[
+				"stick",
+				"stickyNoteStackUtil"
+			],
+			[
+				"inpu",
+				"textInput"
+			],
+			[
+				"stickyno",
+				"stickyNoteText"
+			],
+			[
+				"connect",
+				"connectDrawingInput"
+			],
+			[
+				"hoho",
+				"humanoidHolderUtil"
+			],
+			[
+				"whoo",
+				"whoopieCushionUtil"
+			],
+			[
+				"tds",
+				"timeOfDaySwitch"
+			],
+			[
+				"switchO",
+				"switchOffTime"
+			],
+			[
+				"value",
+				"Value"
+			],
+			[
+				"skewu",
+				"skewerableUtil"
+			],
+			[
+				"skew",
+				"skewerable"
+			],
+			[
+				"skews",
+				"skewerables"
+			],
+			[
+				"skewer",
+				"skewerable"
+			],
+			[
+				"rbx",
+				"rbxmodule-lib\trbxmodule-lib"
+			],
+			[
+				"wcus",
+				"whoopieCushionUtil"
+			],
+			[
+				"pickup",
+				"pickedUp"
+			],
+			[
+				"advan",
+				"advancingInteract"
+			],
+			[
+				"adva",
+				"advancingInteract"
+			],
+			[
+				"getin",
+				"getInteractableFromHold"
+			],
+			[
+				"getint",
+				"getInteractableFromHold"
+			],
+			[
+				"genes",
+				"genesUtil"
+			],
+			[
+				"local",
+				"localCharacterHoldsObject"
+			],
+			[
+				"charac",
+				"Character"
+			],
+			[
+				"inter",
+				"createInterface"
+			],
+			[
+				"getInst",
+				"getInstanceStream"
+			],
+			[
+				"instate",
+				"interactState"
+			],
+			[
+				"ServerS",
+				"ServerScriptService"
+			],
+			[
+				"main",
+				"maintainedRaycastParams"
+			],
+			[
+				"Raya",
+				"RaycastParams"
+			],
+			[
+				"charat",
+				"characterAttachments"
+			],
+			[
+				"getDish",
+				"getDishTypeAttachment"
+			],
+			[
+				"finc",
+				"foodInstanceConfig"
+			],
+			[
+				"Stick",
+				"StickAttachment"
+			],
+			[
+				"sticknote",
+				"stickyNoteText"
+			],
+			[
+				"raya",
+				"raycastData"
+			],
+			[
+				"stik",
+				"stickyNoteStack"
+			],
+			[
+				"stackon",
+				"stickyNoteStackConfig"
+			],
+			[
+				"pickp",
+				"pickupConfig"
+			],
+			[
+				"valu",
+				"Value"
+			],
+			[
+				"notifi",
+				"notifications"
+			],
+			[
 				"Starter",
 				"StarterPlayerScripts"
 			],
 			[
 				"player",
 				"Players"
-			],
-			[
-				"rbx",
-				"rbxmodule-driver\trbxmodule-driver"
 			],
 			[
 				"touchPI",
@@ -220,14 +448,6 @@
 				"createSpringMap"
 			],
 			[
-				"notifi",
-				"notification"
-			],
-			[
-				"local",
-				"LocalPlayer"
-			],
-			[
 				"enble",
 				"enableRagdoll"
 			],
@@ -294,263 +514,43 @@
 			[
 				"matchsta",
 				"matchStateSubject"
-			],
-			[
-				"dropDod",
-				"dropDodgerFromRoster"
-			],
-			[
-				"creat",
-				"createPlayerIndicators"
-			],
-			[
-				"subs",
-				"subscribeCarrying"
-			],
-			[
-				"rost",
-				"rosterStream"
-			],
-			[
-				"obser",
-				"winObservanceFinished"
-			],
-			[
-				"ros",
-				"roster"
-			],
-			[
-				"min",
-				"minutesLabel"
-			],
-			[
-				"int",
-				"interactor"
-			],
-			[
-				"aix",
-				"axisUtil"
-			],
-			[
-				"cnv",
-				"canvasUtil"
-			],
-			[
-				"flatma",
-				"flatMapCanvases"
-			],
-			[
-				"sesst",
-				"sessionStartCanvasStream"
-			],
-			[
-				"consta",
-				"constantColor"
-			],
-			[
-				"colsel",
-				"ColorSelector"
-			],
-			[
-				"colserl",
-				"ColorSelector"
-			],
-			[
-				"rayc",
-				"raycastMouse"
-			],
-			[
-				"with",
-				"withLatestFrom"
-			],
-			[
-				"UserI",
-				"UserInputService"
-			],
-			[
-				"hotint",
-				"hotInteractable"
-			],
-			[
-				"sprit",
-				"SpritesheetDims"
-			],
-			[
-				"hotin",
-				"hotInteractableStream"
-			],
-			[
-				"adva",
-				"advancing"
-			],
-			[
-				"advanc",
-				"advancingInteractionStateStream"
-			],
-			[
-				"advan",
-				"advancingInteractionStateStream"
-			],
-			[
-				"from",
-				"fromHeartbeat"
-			],
-			[
-				"state",
-				"StateName"
-			],
-			[
-				"axi",
-				"axisUtil"
-			],
-			[
-				"createC",
-				"createCanvasFromMarker"
-			],
-			[
-				"createc",
-				"createCanvasFromMarker"
-			],
-			[
-				"setActiv",
-				"setActivityName"
-			],
-			[
-				"createa",
-				"createActivitySessionStreams"
-			],
-			[
-				"create",
-				"createBallEventStream"
-			],
-			[
-				"spawnpl",
-				"spawnPlayersInPlane"
-			],
-			[
-				"opera",
-				"operateState"
-			],
-			[
-				"destr",
-				"Destroy"
-			],
-			[
-				"Dodgeb",
-				"DodgeballVerticalForce"
-			],
-			[
-				"lbs",
-				"liveBallTouchedActiveOpponentStream"
-			],
-			[
-				"distin",
-				"distinctUntilChanged"
-			],
-			[
-				"CharacterTag",
-				"CharacterTagService"
-			],
-			[
-				"indica",
-				"indicator"
-			],
-			[
-				"Char",
-				"CharacterTag"
-			],
-			[
-				"isPoint",
-				"isPointInPart"
-			],
-			[
-				"engagem",
-				"EngagementPortal"
-			],
-			[
-				"insta",
-				"instance"
-			],
-			[
-				"engageme",
-				"engagementPortalStream"
-			],
-			[
-				"sesss",
-				"sessionStartStream"
-			],
-			[
-				"sesssta",
-				"sessionStateStream"
-			],
-			[
-				"Instace",
-				"InstanceTags"
-			],
-			[
-				"sessin",
-				"sessionInstance"
-			],
-			[
-				"Instance",
-				"InstanceTags"
-			],
-			[
-				"portal",
-				"engagementPortalCreated"
-			],
-			[
-				"activ",
-				"Activity"
-			],
-			[
-				"open",
-				"openChunk"
-			],
-			[
-				"serviceN",
-				"serviceNames"
-			],
-			[
-				"curren",
-				"currentChunk"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "src/pickup/pickup.client.lua",
+			"file": "src/genes/activity/activityEnrollment/activityEnrollment.server.lua",
 			"settings":
 			{
-				"buffer_size": 1523,
-				"encoding": "UTF-8",
+				"buffer_size": 2855,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/env.lua",
+			"file": "src/genes/activity/activity.util.lua",
 			"settings":
 			{
-				"buffer_size": 1567,
-				"encoding": "UTF-8",
+				"buffer_size": 1584,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/pickup/pickup.server.lua",
+			"file": "src/schedule/schedule.streams.lua",
 			"settings":
 			{
-				"buffer_size": 6633,
-				"encoding": "UTF-8",
+				"buffer_size": 1673,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/pickup/pickup.util.lua",
+			"contents": "--\n--\tJackson Munsell\n--\t12 Nov 2020\n--\tactivityEnrollment.client.lua\n--\n--\tactivityEnrollment gene client driver\n--\n\n-- env\nlocal env = require(game:GetService(\"ReplicatedStorage\").src.env)\nlocal axis = env.packages.axis\nlocal genes = env.src.genes\nlocal activity = genes.activity\nlocal activityEnrollment = activity.activityEnrollment\n\n-- modules\nlocal rx = require(axis.lib.rx)\nlocal dart = require(axis.lib.dart)\nlocal collection = require(axis.lib.collection)\nlocal dataUtil = require(env.src.data.util)\nlocal genesUtil = require(genes.util)\n\n---------------------------------------------------------------------------------------------------\n-- Variables\n---------------------------------------------------------------------------------------------------\n\nlocal CounselorJoinText = \"Join\"\nlocal CamperJoinText = \"Ask your counselor to join.\"\nlocal InSessionText = \"Match in progress.\"\nlocal ReturnLaterText = \"Come back later.\"\n\n---------------------------------------------------------------------------------------------------\n-- Functions\n---------------------------------------------------------------------------------------------------\n\n-- Basic setters\nlocal function setLeaveButtonVisible(enrollmentInstance, visible)\n\tenrollmentInstance:FindFirstChild(\"LeaveButton\", true).Visible = visible\nend\nlocal function setJoinButtonVisible(enrollmentInstance, visible)\n\tenrollmentInstance:FindFirstChild(\"JoinButton\", true).Visible = visible\nend\nlocal function setJoinButtonText(enrollmentInstance, text)\n\tenrollmentInstance:FindFirstChild(\"JoinButton\", true).TextLabel.Text = text\nend\nlocal function setStatusText(enrollmentInstance, text)\n\tenrollmentInstance:FindFirstChild(\"StatusDisplay\", true).TextLabel.Text = text\nend\n\n-- Get status text\nlocal function getStatusText(activityInstance)\n\tlocal desiredCount = activityInstance.config.activity.teamsCount\n\treturn string.format(\"%d/%d Teams Ready\", #enrolled:GetChildren(), desiredCount)\nend\n\n---------------------------------------------------------------------------------------------------\n-- Streams\n---------------------------------------------------------------------------------------------------\n\n-- All enrollments\nlocal enrollments = genesUtil.getInstanceStream(activityEnrollment)\n\t:flatMap(function (enrollmentInstance)\n\t\treturn genesUtil.getInstanceStream(activity)\n\t\t\t:first(function (activityInstance)\n\t\t\t\treturn enrollmentInstance:IsDescendantOf(activityInstance)\n\t\t\tend)\n\t\t\t:map(dart.carry(enrollmentInstance))\n\tend)\n\n-- Activity chunk stream\nlocal isActivityChunkStream = activityUtil.isActivityChunkStream\n\n-- Is local player counselor\ndataUtil.waitForState(env.LocalPlayer, \"roles\")\nlocal isCounselor = rx.Observable.from(env.LocalPlayer.state.roles.isCounselor)\n\n-- Get a stream from an activity's inSession value\nlocal function getSessionStream(activityInstance)\n\treturn rx.Observable.from(activityInstance.state.activity.inSession)\nend\nlocal function getEnrolledTeamsStream(activityInstance)\n\treturn collection.observeChanged(activityInstance.state.activity.enrolledTeams)\nend\n\n-- Get a stream that will fire with whether or not the local player's team is enrolled\n-- \tin a specific activity instance\nlocal function getLocalTeamEnrolledStream(activityInstance)\n\tlocal enrolledTeams = activityInstance.state.activity.enrolledTeams\n\tlocal enrolledStream = getEnrolledTeamsStream(activityInstance)\n\treturn rx.Observable.fromProperty(env.LocalPlayer, \"Team\")\n\t\t:startWith(env.LocalPlayer.Team)\n\t\t:combineLatest(enrolledStream:startWith(0), function ()\n\t\t\treturn collection.getValue(enrolledTeams, env.LocalPlayer.Team)\n\t\tend)\n\t\t:map(dart.boolify)\nend\n\n-- Leave button should be shown when this player is a counselor\n-- \tAND this player's team is enrolled in the activity\nenrollments:flatMap(function (enrollmentInstance, activityInstance)\n\treturn isCounselor:combineLatest(getLocalTeamEnrolledStream(activityInstance), dart.boolAnd)\n\t\t:map(dart.carry(enrollmentInstance))\nend):subscribe(setLeaveButtonVisible)\n\n-- Join button should be shown when it's an activity chunk\n-- \tAND this activity is not in session\nenrollments:flatMap(function (enrollmentInstance, activityInstance)\n\tlocal isInSession = getSessionStream(activityInstance)\n\treturn isActivityChunkStream:combineLatest(isInSession, dart.boolAnd)\n\t\t:map(dart.carry(enrollmentInstance))\nend):subscribe(setJoinButtonVisible)\n\n-- Join button text should be \"Join\" if counselor and \"Ask your counselor to sign up!\"\n-- \tif not a counselor\nenrollments:flatMap(function (enrollmentInstance, _)\n\treturn isCounselor\n\t\t:map(function (c) return c and CounselorJoinText or CamperJoinText end)\n\t\t:map(dart.carry(enrollmentInstance))\nend):subscribe(setJoinButtonText)\n\n-- Status text should be \"Match in progress\" if inSession\n-- \telse \"x/x Teams Ready\" if activity chunk\n-- \telse \"Come back later\" if not activity chunk\nenrollments:flatMap(function (enrollmentInstance, activityInstance)\n\tlocal isInSession = getSessionStream(activityInstance)\n\tlocal enrolledStream = getEnrolledTeamsStream(activityInstance)\n\treturn isInSession:combineLatest(isActivityChunkStream, enrolledStream,\n\t\tfunction (inSession, isActivityChunk)\n\t\t\tif inSession then\n\t\t\t\treturn InSessionText\n\t\t\telseif isActivityChunk then\n\t\t\t\treturn getStatusText(activityInstance)\n\t\t\telse\n\t\t\t\treturn ReturnLaterText\n\t\t\tend\n\t\tend)\n\t\t:map(dart.carry(enrollmentInstance))\nend):subscribe(setStatusText)\n\n-- Team list should show sessionTeams if inSession\n-- \tand enrolledTeams if is activity chunk and not inSession\n\n-- Team list visible should be (is activity chunk)\n",
+			"file": "src/genes/activity/activityEnrollment/activityEnrollment.client.lua",
+			"file_size": 5328,
+			"file_write_time": 132496648452694883,
 			"settings":
 			{
-				"buffer_size": 9076,
+				"buffer_size": 5547,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -576,16 +576,32 @@
 				"Terminal: Open in project folder"
 			],
 			[
+				"sslu",
+				"Set Syntax: LuaExtended"
+			],
+			[
 				"ter",
 				"Terminal: Open in project folder"
 			],
 			[
-				"ssl",
-				"Set Syntax: LuaExtended"
-			],
-			[
 				"termi",
 				"Terminal: Open in project folder"
+			],
+			[
+				"pack in",
+				"Package Control: Install Package"
+			],
+			[
+				"pack up",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"pack ",
+				"Package Control: List Packages"
+			],
+			[
+				"ssl",
+				"Set Syntax: LuaExtended"
 			],
 			[
 				"sslua",
@@ -608,20 +624,12 @@
 				"Package Control: Remove Package"
 			],
 			[
-				"pack ",
-				"Package Control: List Packages"
-			],
-			[
 				"terminn",
 				"Terminal: Open in project folder"
 			],
 			[
 				"theme",
 				"Material Theme: Configuration"
-			],
-			[
-				"sslu",
-				"Set Syntax: LuaExtended"
 			],
 			[
 				"pack li",
@@ -739,141 +747,143 @@
 	"expanded_folders":
 	[
 		"/Users/jackson/projects/roblox/summer-camp",
-		"/Users/jackson/projects/roblox/summer-camp/_assembled",
-		"/Users/jackson/projects/roblox/summer-camp/_assembled/shared",
 		"/Users/jackson/projects/roblox/summer-camp/src",
-		"/Users/jackson/projects/roblox/summer-camp/src/boot"
+		"/Users/jackson/projects/roblox/summer-camp/src/genes",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/activityEnrollment",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/playerIndicator"
 	],
 	"file_history":
 	[
-		"/Users/jackson/projects/roblox/summer-camp/summer-camp.sublime-project",
-		"/Users/jackson/Library/Application Support/Sublime Text 3/Packages/User/Bundled Rojo Distribute.sublime-build",
-		"/Users/jackson/Library/Application Support/Sublime Text 3/Packages/User/bundled_rojo_distribute.py",
-		"/Users/jackson/projects/roblox/summer-camp/src/boot/env.lua",
-		"/Users/jackson/Library/Application Support/Sublime Text 3/Packages/User/bundled-rojo-distribute.sublime-build",
-		"/Users/jackson/Library/Application Support/Sublime Text 3/Packages/User/bundled-rojo-distribute",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/system.interface.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/ragdoll/ragdoll.interface.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/ragdoll/ragdoll.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/summer-camp.sublime-project",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/default.project.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/schedule/schedule.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/schedule/schedule.interface.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/system.net.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/default.project.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/--default.project.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/system.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/system.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/system.config.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/system.util.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/system/system.streams.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/.gitignore",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/balloon/balloonConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/stickyNote/stickyNoteConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/stickyNoteStack/stickyNoteStackConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/mattress/mattressConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/foodTray/foodTrayConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/dodgeball/dodgeballConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/balloon/balloon.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/objectUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/bananaPeel/bananaPeelConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/objects/canvas/canvasConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/data/data.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/pickup/pickupConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/ragdoll/ragdollConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/schedule/scheduleConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/interact/interactConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/dining/diningConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/gui/displayConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/data/dataConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/activities/activityConfig.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/pickup/pickupUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/--shared/utils/toolUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/old/stickyNoteTool.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/dodgeball.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/objects/dodgeball.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/pickup.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/utils/pickupUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/objects/balloon.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/stickyNoteStack.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/objects/stickyNoteStack.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/guis/core/actions.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/rx/Observable.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/tools/stickyNoteTool.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/streams/pickupStreams.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/balloon.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/interact.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/enum/InstanceTags.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/tools/balloonTool.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/net/objects/balloon.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/activities/dodgeball.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/objects/bananaPeel.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/utils/objects/balloonUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/foodTray.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/lib/axisUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/streams/inputStreams.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/utils/objectUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/lib/fx.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/bananaPeel.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/lib/dart.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/mattress.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/canvas.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/activities/artClass.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/activities/smashball.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/activities/soccer.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/objects/canvas.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/tools/bananaPeelTool.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/tools/dodgeballTool.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/pickup.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/dodgeball.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/components/activities/EngagementPortal.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/lib/tableau.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/utils/interactUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/interact.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/net/pickup.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/classes/Spring.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/objects/mattress.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/ragdoll.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/data.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/services/CharacterTagService.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/rx/rxUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/stickyNote.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/ragdoll.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/guis/travel.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/guis/core/notifications.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/components/activities/dodgeballBall.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/utils/activityUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/classes/Lens.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/lib/glib.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/lightGroup.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/guis/schedule.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/streams/activityStreams.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/objects/--bananaPeel.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/dining.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/drivers/schedule.server.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/streams/scheduleStreams.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/summer-camp.rbxlx",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/utils/objects/canvasUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/utils/scheduleUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/guis/core/clock.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/net/objects/bananaPeel.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/utils/toolUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/axisboot.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/lib/rx.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/lib/--rx.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/net/objects/mattress.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/rx/Observer.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/env.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/classes/Bin.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/net/objects/stickyNote.model.json",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/client/drivers/objects/stickyNote.client.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/rx/BehaviorSubject.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/axis/rx/ConnectableObservable.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/server/utils/scoreboardUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/shared/utils/objects/stickyNoteUtil.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/studio/lenses/engagementPortals.lua",
-		"/Users/jackson/Documents/projects/roblox/summer-camp/src/studio/lenses/travelLocations.lua",
-		"/Users/jackson/Documents/Roblox/plugins/Lens.lua"
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/interact/interact.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/activityEnrollment/activityEnrollment.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pickup/pickup.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/.gitignore",
+		"/Users/jackson/projects/roblox/summer-camp/src/roles/roles.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pickup/pickup.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/powderSack/powderSack.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/activity.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/throw/throw.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/throw/throw.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/powderSack/powderSack.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pickup/pickup.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/interact/interact.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/lib/tableau.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/balloon/balloon.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/whoopieCushion/whoopieCushion.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/bananaPeel/bananaPeel.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/whoopieCushion/whoopieCushion.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/activity.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/dodgeball/dodgeball.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/soccer/soccer.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/artClass/artClass.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/smashball/smashball.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/playerIndicator/playerIndicator.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/playerIndicator/playerIndicator.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/playerIndicator/playerIndicator.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/stickyNoteStack/stickyNoteStack.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/lib/axisUtil.lua",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/lib/dart.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/timeOfDaySwitch/daytimeSwitch/daytimeSwitch.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/flashlight/flashlight.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/axisboot/axisboot.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/genes.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/dodgeball/dodgeball.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/soccer/soccer.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/smashball/smashball.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/activities/--smashball/smashball.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/artClass/artClass.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/canvas/canvas.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/canvas/canvas.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/canvas/canvas.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dodgeballBall/dodgeballBall.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dodgeballBall/dodgeballBall.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/data/data.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/roles/roles.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/roles/roles.config.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/ragdoll/ragdoll.net.model.json",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/lib/collection.lua",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/rx/Observable.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/activities/--dodgeballActivity/dodgeballActivity.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dodgeballBall/dodgeballBall.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dodgeballBall/dodgeballBall.net.model.json",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dodgeballBall/dodgeball.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/teamOnly/teamOnly.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/counselorOnly/counselorOnly.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/teamOnly/teamOnly.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/counselorOnly/counselorOnly.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/teamOnly/teamOnly.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/counselorOnly/counselorOnly.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/earlyBird/earlyBird.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/plantInGround/plantInGround.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/plantInGround/plantInGround.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/input/input.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/throw/throw.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/activity.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/multiswitch.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/activities/--artClass/artClass.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/schedule/schedule.streams.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/canvas/canvas.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/scoreboard/scoreboard.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/env.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/activities/--soccer/soccer.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/activities/activities.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dodgeball/dodgeball.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/skewerable/skewerable.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/interact/interact.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dish/dish.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/stickyNoteStack/stickyNoteStack.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/schedule/schedule.config.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/powderSack/powderSack.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/fireplace/fireplace.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/fireplace/fireplace.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pulloutChair/pulloutChair.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/activityEnrollment/activityEnrollment.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/timeOfDaySwitch/daytimeSwitch/daytimeSwitch.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/humanoidHolder/humanoidHolder.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/lib/glib.lua",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/lib/fx.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/axisboot/axisboot.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dodgeball/dodgeball.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/activity/playground.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/schedule/schedule.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/lightGroup/lightGroup.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/gui/core/actions/actions.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pickup/pickup.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/roles/roles.net.model.json",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pulloutChair/pulloutChair.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/humanoidHolder/humanoidHolder.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pulloutChair/pulloutChair.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/seat/seat.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/bananaPeel/bananaPeel.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/fireplace/fireplace.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/edible/edible.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/skewer/skewer.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/door/door.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/flashlight/flashlight.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/marshmallow/marshmallow.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/stickyNoteStack/stickyNoteStack.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/skewerable/skewerable.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/mattress/mattress.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/marshmallow/marshmallow.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/lightGroup/lightGroup.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/foodTray/foodTray.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/door/door.util.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/balloon/balloon.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/schedule/fireplaceSchedule.server.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/interact/interact.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/whoopieCushion/whoopieCushion.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/bananaPeel/bananaPeel.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/packages/axis/lib/rx.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/pickup/pickup.streams.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/schedule/schedule.interface.model.json",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/humanoidHolder/humanoidHolder.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dish/dish.client.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/skewerable/skewerable.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/humanoidHolder/humanoidHolder.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/dish/dish.data.lua",
+		"/Users/jackson/projects/roblox/summer-camp/src/genes/multiswitch/timeOfDaySwitch/timeOfDaySwitch.server.lua"
 	],
 	"find":
 	{
@@ -881,7 +891,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 158.0,
+		"height": 161.0,
 		"where_history":
 		[
 			""
@@ -892,21 +902,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"getpickupconfig",
-			"objects",
-			"env.axis",
+			".Text",
+			"JoinButton",
+			"InSessionText",
+			"activityUtil.",
+			"visible",
+			"Visible",
+			"activityInstance",
+			"setJoinButtonVisible",
+			"getSessionStream",
+			"dart",
+			"dataUtil",
+			"genes",
+			"instance",
+			"and",
+			":\"",
+			"fire",
+			"subscribe",
 			"pickup",
-			"streams",
-			"interact",
+			"analy",
+			"objectTags",
+			"objectName",
+			"object",
+			"),",
+			"objectTags",
+			"object",
+			"objectName",
+			"object",
+			"Players",
+			"CollectionService",
+			"team",
+			"Players",
+			"TweenService",
+			"collection",
+			"Activity",
+			"activity",
+			"res",
+			".res",
+			"indicator",
+			"rx",
+			"destroyIndicator",
+			"CollectionService",
+			"Character",
+			"character",
+			"CollectionService",
+			"PlayerIndicator",
+			"FXPart",
+			"rx",
+			"daytimeSwitch",
+			"06",
+			"false",
+			"flashlight",
+			"genes.teamOnly",
+			"teamOnly",
+			"filter",
+			"teamOnly",
 			"pickup",
-			"env.axis",
-			"src",
-			"env.axis",
-			"pickupStreams",
-			"di",
-			"file_path",
-			"a",
-			"working_dir"
+			"print",
+			"dodgeball",
+			"dodgeballInstance",
+			"players",
+			"respawnBall",
+			"destroyBall",
+			"spawnBall",
+			"dodgeball",
+			"25",
+			"spawnradius",
+			"PlayerSpawnRadius",
+			"soccerInstance",
+			"soccer",
+			"soccerInstance",
+			"dart",
+			"ballEscapedStream",
+			"dodgeball",
+			"dodgeballInstances",
+			"collection",
+			"dodgeball",
+			"dodgeballInstance",
+			"genes",
+			"tableau",
+			"dart",
+			"dodgeball",
+			"dodgeballInstance",
+			"respawnBall",
+			"dodgeball",
+			"teamtoaccept",
+			"acceptingTeam",
+			"workspace",
+			"soccer",
+			"updateScoreboardTime",
+			"false",
+			"return",
+			"resetRosterReady",
+			"state.roles",
+			"roles",
+			"recalculate",
+			"team",
+			"declareWinner",
+			"character",
+			"value",
+			"dart",
+			"genes",
+			"dodgeballInstance.functional",
+			"dodgeballInstance",
+			"clearWinner",
+			"second",
+			"balls",
+			"dodgeball",
+			"activity",
+			"= ",
+			"dodgeball",
+			"dart",
+			"updateScoreboardTeams",
+			"ballTouchedPart",
+			"return",
+			"map",
+			"rx",
+			"dart",
+			"genes",
+			"come",
+			"soccer",
+			"dodgeball",
+			"Dodgeball",
+			"dodgeball",
+			"soccer",
+			"teamchanged",
+			"counselorOnly",
+			"originalCFrame",
+			"tableau"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -914,6 +1037,25 @@
 		"regex": false,
 		"replace_history":
 		[
+			"Value",
+			"crossObserveStateValue",
+			"observeStateValue",
+			"getThrowStream",
+			"dart.select",
+			"getInstanceStream",
+			"name =",
+			"Gene_",
+			"createGeneData",
+			"initGene",
+			"genesUtil.getInstanceStream",
+			"genesUtil.getInstances",
+			"genes.",
+			"local genes =",
+			"env.src.genes",
+			"genes.util",
+			"genesUtil",
+			"env.src.objects.pickup",
+			"env.src.objects.interact"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -924,24 +1066,23 @@
 	"groups":
 	[
 		{
-			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/pickup/pickup.client.lua",
+					"file": "src/genes/activity/activityEnrollment/activityEnrollment.server.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1523,
+						"buffer_size": 2855,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								424,
-								424
+								744,
+								744
 							]
 						],
 						"settings":
@@ -950,56 +1091,56 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/env.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1567,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								978,
-								978
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/LuaExtended/LuaExtended.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 166.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "src/pickup/pickup.server.lua",
+					"buffer": 1,
+					"file": "src/genes/activity/activity.util.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6633,
+						"buffer_size": 1584,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								178,
-								178
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/LuaExtended/LuaExtended.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/schedule/schedule.streams.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1673,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								554,
+								554
 							]
 						],
 						"settings":
@@ -1013,31 +1154,70 @@
 					},
 					"stack_index": 1,
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
 				{
 					"buffer": 3,
-					"file": "src/pickup/pickup.util.lua",
+					"file": "src/genes/activity/activityEnrollment/activityEnrollment.client.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9076,
+						"buffer_size": 5547,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1954,
-								1954
+								1863,
+								1863
 							]
 						],
 						"settings":
 						{
+							"always_show_minimap_viewport": false,
+							"auto_indent": true,
+							"color_scheme": "Packages/Material Theme/schemes/Material-Theme.tmTheme",
+							"detect_indentation": true,
+							"draw_centered": false,
+							"draw_minimap_border": false,
+							"draw_white_space": "selection",
+							"font_face": "Fira Code",
+							"font_options":
+							[
+							],
+							"gutter": true,
+							"highlight_line": false,
+							"indent_subsequent_lines": true,
+							"line_numbers": true,
+							"line_padding_bottom": 0,
+							"line_padding_top": 0,
+							"match_brackets": true,
+							"match_brackets_angle": false,
+							"match_brackets_braces": true,
+							"match_brackets_content": true,
+							"match_brackets_square": true,
+							"open_with_edit": true,
+							"rulers":
+							[
+							],
+							"scroll_past_end": true,
 							"syntax": "Packages/LuaExtended/LuaExtended.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false,
+							"trim_automatic_white_space": true,
+							"trim_trailing_white_space_on_save": false,
+							"use_tab_stops": true,
+							"word_wrap": false,
+							"wrap_width": 0
 						},
 						"translation.x": 0.0,
-						"translation.y": 762.0,
+						"translation.y": 221.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -1052,7 +1232,7 @@
 	},
 	"input":
 	{
-		"height": 69.0
+		"height": 71.0
 	},
 	"layout":
 	{
@@ -1063,11 +1243,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":
@@ -1083,13 +1270,13 @@
 	},
 	"output.exec":
 	{
-		"height": 108.0
+		"height": 272.0
 	},
 	"output.find_results":
 	{
 		"height": 0.0
 	},
-	"pinned_build_system": "Packages/User/Bundled Rojo Distribute.sublime-build",
+	"pinned_build_system": "Packages/LuaExtended/LuaExtended.sublime-build",
 	"project": "summer-camp.sublime-project",
 	"replace":
 	{
@@ -1103,516 +1290,516 @@
 		"selected_items":
 		[
 			[
-				"projec",
-				"summer-camp.sublime-project"
+				"schedule.stream",
+				"src/schedule/schedule.streams.lua"
 			],
 			[
-				"pickutil",
-				"src/pickup/pickup.util.lua"
+				"activity.util",
+				"src/genes/activity/activity.util.lua"
 			],
 			[
-				"env",
-				"src/boot/env.lua"
+				"act.util",
+				"src/genes/interact/interact.util.lua"
 			],
 			[
-				"defaul",
-				"default.project.json"
+				"acen.ser",
+				"src/genes/activity/activityEnrollment/activityEnrollment.server.lua"
 			],
 			[
-				"defa",
-				"--default.project.json"
+				"acten.ser",
+				"src/genes/activity/activityEnrollment/activityEnrollment.server.lua"
 			],
 			[
-				"balloo",
-				"src/objects/balloon/balloon.server.lua"
-			],
-			[
-				"outil",
-				"src/objects/objectUtil.lua"
-			],
-			[
-				".serv",
-				"src/data/data.server.lua"
+				"giti",
+				".gitignore"
 			],
 			[
 				"pick.ser",
-				"src/server/drivers/pickup.server.lua"
+				"src/genes/pickup/pickup.server.lua"
 			],
 			[
-				"interac.ser",
-				"src/server/drivers/interact.server.lua"
+				"roles.ser",
+				"src/roles/roles.server.lua"
 			],
 			[
-				"pickser",
-				"src/server/drivers/pickup.server.lua"
+				"throwutil",
+				"src/genes/throw/throw.util.lua"
 			],
 			[
-				"pickupser",
-				"src/client/streams/pickupStreams.lua"
+				"throw.ser",
+				"src/genes/throw/throw.server.lua"
 			],
 			[
-				"pickstre",
-				"src/client/streams/pickupStreams.lua"
+				"powsa.ser",
+				"src/genes/powderSack/powderSack.server.lua"
 			],
 			[
-				"action",
-				"src/client/drivers/guis/core/actions.client.lua"
+				"powdsa.util",
+				"src/genes/powderSack/powderSack.util.lua"
 			],
 			[
-				"obser",
-				"src/shared/axis/rx/Observable.lua"
+				"activ.ser",
+				"src/genes/activity/activity.server.lua"
 			],
 			[
-				"stickntoo",
-				"src/client/drivers/tools/stickyNoteTool.client.lua"
+				"pick.da",
+				"src/genes/pickup/pickup.data.lua"
 			],
 			[
-				"instgs",
-				"src/shared/enum/InstanceTags.lua"
-			],
-			[
-				"ballmo",
-				"net/objects/balloon.model.json"
-			],
-			[
-				"pickut",
-				"src/shared/utils/pickupUtil.lua"
-			],
-			[
-				"balloo.mode",
-				"net/objects/balloon.model.json"
-			],
-			[
-				"dodgeb.ser",
-				"src/server/drivers/objects/dodgeball.server.lua"
-			],
-			[
-				"dodgeb",
-				"src/server/drivers/activities/dodgeball.server.lua"
-			],
-			[
-				"balloocli",
-				"src/client/drivers/tools/balloonTool.client.lua"
-			],
-			[
-				"bal.cli",
-				"src/client/drivers/objects/bananaPeel.client.lua"
-			],
-			[
-				"balser",
-				"src/server/drivers/objects/balloon.server.lua"
-			],
-			[
-				"ballu",
-				"src/shared/utils/objects/balloonUtil.lua"
-			],
-			[
-				"instag",
-				"src/shared/enum/InstanceTags.lua"
-			],
-			[
-				"fx",
-				"src/shared/axis/lib/fx.lua"
-			],
-			[
-				"axisut",
-				"src/shared/axis/lib/axisUtil.lua"
-			],
-			[
-				"balse",
-				"src/server/drivers/objects/balloon.server.lua"
-			],
-			[
-				"inputst",
-				"src/client/streams/inputStreams.lua"
-			],
-			[
-				"matt.ser",
-				"src/server/drivers/objects/mattress.server.lua"
-			],
-			[
-				"canser",
-				"src/server/drivers/objects/canvas.server.lua"
-			],
-			[
-				"obutil",
-				"src/shared/utils/objectUtil.lua"
-			],
-			[
-				"bpclie",
-				"src/client/drivers/objects/bananaPeel.client.lua"
-			],
-			[
-				"pick.clie",
-				"src/client/drivers/pickup.client.lua"
-			],
-			[
-				"bp.cli",
-				"src/client/drivers/objects/bananaPeel.client.lua"
-			],
-			[
-				"instags",
-				"src/shared/enum/InstanceTags.lua"
-			],
-			[
-				"banpee",
-				"src/server/drivers/objects/bananaPeel.server.lua"
-			],
-			[
-				"dart",
-				"src/shared/axis/lib/dart.lua"
-			],
-			[
-				"axisu",
-				"src/shared/axis/lib/axisUtil.lua"
-			],
-			[
-				"bpee.ser",
-				"src/server/drivers/objects/bananaPeel.server.lua"
-			],
-			[
-				"bpeel.ser",
-				"src/server/drivers/objects/bananaPeel.server.lua"
-			],
-			[
-				"banpee.ser",
-				"src/server/drivers/objects/bananaPeel.server.lua"
-			],
-			[
-				"tabl",
-				"src/shared/axis/lib/tableau.lua"
+				"pick.ut",
+				"src/genes/pickup/pickup.util.lua"
 			],
 			[
 				"inter.ser",
-				"src/server/drivers/interact.server.lua"
+				"src/genes/interact/interact.server.lua"
 			],
 			[
-				"interautil",
-				"src/shared/utils/interactUtil.lua"
+				"tabl",
+				"packages/axis/lib/tableau.lua"
 			],
 			[
-				"ballo.ser",
-				"src/server/drivers/objects/balloon.server.lua"
+				"balloo.ser",
+				"src/genes/balloon/balloon.server.lua"
 			],
 			[
-				"ball.cli",
-				"src/client/drivers/tools/balloonTool.client.lua"
+				"powutil",
+				"src/genes/powderSack/powderSack.util.lua"
 			],
 			[
-				"balloonu",
-				"src/shared/utils/objects/balloonUtil.lua"
+				"pod",
+				"src/genes/powderSack/powderSack.server.lua"
 			],
 			[
-				"socc",
-				"src/server/drivers/activities/soccer.server.lua"
+				"banpee.ser",
+				"src/genes/bananaPeel/bananaPeel.server.lua"
 			],
 			[
-				"pickst",
-				"src/client/streams/pickupStreams.lua"
+				"whoput",
+				"src/genes/whoopieCushion/whoopieCushion.util.lua"
 			],
 			[
-				"pick",
-				"net/pickup.model.json"
+				"whoopcush.ser",
+				"src/genes/whoopieCushion/whoopieCushion.server.lua"
 			],
 			[
-				"intercli",
-				"src/client/drivers/interact.client.lua"
+				"bpee.ser",
+				"src/genes/bananaPeel/bananaPeel.server.lua"
 			],
 			[
-				"actionscl",
-				"src/client/drivers/guis/core/actions.client.lua"
+				"smashb.da",
+				"src/genes/activity/smashball/smashball.data.lua"
 			],
 			[
-				"bpee.cli",
-				"src/client/drivers/objects/bananaPeel.client.lua"
+				"artcl.da",
+				"src/genes/activity/artClass/artClass.data.lua"
 			],
 			[
-				"sprin",
-				"src/shared/axis/classes/Spring.lua"
+				"socc.da",
+				"src/genes/activity/soccer/soccer.data.lua"
 			],
 			[
-				"pickclie",
-				"src/client/drivers/pickup.client.lua"
+				"dodgeb.da",
+				"src/genes/activity/dodgeball/dodgeball.data.lua"
 			],
 			[
-				"pickup",
-				"net/pickup.model.json"
+				"activ.da",
+				"src/genes/activity/activity.data.lua"
 			],
 			[
-				"pickup.",
-				"net/pickup.model.json"
+				"activ",
+				"src/genes/activity/activity.server.lua"
 			],
 			[
-				"ragdo.ser",
-				"src/server/drivers/ragdoll.server.lua"
+				"axisut",
+				"packages/axis/lib/axisUtil.lua"
 			],
 			[
-				"dat",
-				"src/server/drivers/data.server.lua"
+				"sticknou",
+				"src/genes/stickyNoteStack/stickyNoteStack.util.lua"
 			],
 			[
-				"charta",
-				"src/shared/axis/services/CharacterTagService.lua"
+				"dart",
+				"packages/axis/lib/dart.lua"
 			],
 			[
-				"balu",
-				"src/shared/utils/objects/balloonUtil.lua"
+				"daysw",
+				"src/genes/multiswitch/timeOfDaySwitch/daytimeSwitch/daytimeSwitch.server.lua"
 			],
 			[
-				"balloon.ser",
-				"src/server/drivers/objects/balloon.server.lua"
+				"flash.da",
+				"src/genes/flashlight/flashlight.data.lua"
 			],
 			[
-				"rxu",
-				"src/shared/axis/rx/rxUtil.lua"
+				"axisbo.",
+				"src/axisboot/axisboot.client.lua"
 			],
 			[
-				"rxut",
-				"src/shared/axis/rx/rxUtil.lua"
+				"genesu",
+				"src/genes/genes.util.lua"
 			],
 			[
-				"matt.cli",
-				"src/client/drivers/objects/mattress.client.lua"
+				"soccerser",
+				"src/genes/activity/soccer/soccer.server.lua"
 			],
 			[
-				"matt",
-				"src/client/drivers/objects/mattress.client.lua"
+				"dodgeball.data",
+				"src/genes/activity/dodgeball/dodgeball.data.lua"
 			],
 			[
-				"inclie",
-				"src/client/drivers/interact.client.lua"
+				"dodgeball.ser",
+				"src/genes/activity/dodgeball/dodgeball.server.lua"
 			],
 			[
-				"intera",
-				"src/shared/utils/interactUtil.lua"
+				"can.cli",
+				"src/genes/canvas/canvas.client.lua"
 			],
 			[
-				"-bpe",
-				"src/server/drivers/objects/--bananaPeel.server.lua"
+				"canv.ser",
+				"src/genes/canvas/canvas.server.lua"
 			],
 			[
-				"sched",
-				"src/server/drivers/schedule.server.lua"
+				"artcla.ser",
+				"src/genes/activity/artClass/artClass.server.lua"
 			],
 			[
-				"schest",
-				"src/server/streams/scheduleStreams.lua"
+				"canvas.da",
+				"src/genes/canvas/canvas.data.lua"
 			],
 			[
-				"tablea",
-				"src/shared/axis/lib/tableau.lua"
+				"pick.util",
+				"src/genes/pickup/pickup.util.lua"
 			],
 			[
-				"inter.cli",
-				"src/client/drivers/interact.client.lua"
+				"dbb.ser",
+				"src/genes/dodgeballBall/dodgeballBall.server.lua"
 			],
 			[
-				"canva",
-				"src/client/drivers/objects/canvas.client.lua"
+				"roles.util",
+				"src/roles/roles.util.lua"
 			],
 			[
-				"table",
-				"src/shared/axis/lib/tableau.lua"
+				"datautl",
+				"src/data/data.util.lua"
 			],
 			[
-				"dar",
-				"src/shared/axis/lib/dart.lua"
+				"role",
+				"src/roles/roles.config.lua"
 			],
 			[
-				"tool",
-				"src/client/drivers/tools/balloonTool.client.lua"
+				"acenro.ser",
+				"src/genes/activity/activityEnrollment/activityEnrollment.server.lua"
 			],
 			[
-				"schedu",
-				"src/server/drivers/schedule.server.lua"
+				"cole",
+				"packages/axis/lib/collection.lua"
 			],
 			[
-				"schedst",
-				"src/server/streams/scheduleStreams.lua"
+				"acti.ser",
+				"src/genes/activity/activity.server.lua"
 			],
 			[
-				"schedutil",
-				"src/shared/utils/scheduleUtil.lua"
+				"genes",
+				"src/genes/genes.util.lua"
 			],
 			[
-				"cloc",
-				"src/client/drivers/guis/core/clock.client.lua"
+				"obser",
+				"packages/axis/rx/Observable.lua"
 			],
 			[
-				"canvutil",
-				"src/shared/utils/objects/canvasUtil.lua"
+				"soccer.ser",
+				"src/genes/activity/soccer/soccer.server.lua"
 			],
 			[
-				"canvas.clie",
-				"src/client/drivers/objects/canvas.client.lua"
+				"dodge.ser",
+				"src/activities/--dodgeballActivity/dodgeballActivity.server.lua"
+			],
+			[
+				"axisu",
+				"packages/axis/lib/axisUtil.lua"
+			],
+			[
+				"dodgebb.ser",
+				"src/genes/dodgeballBall/dodgeballBall.server.lua"
+			],
+			[
+				"pickutl",
+				"src/genes/pickup/pickup.util.lua"
+			],
+			[
+				"pic.ser",
+				"src/genes/pickup/pickup.server.lua"
+			],
+			[
+				"dodgeba.da",
+				"src/genes/dodgeball/dodgeball.data.lua"
+			],
+			[
+				"soccer.da",
+				"src/genes/activity/soccer/soccer.data.lua"
+			],
+			[
+				"counse.ser",
+				"src/genes/multiswitch/counselorOnly/counselorOnly.server.lua"
+			],
+			[
+				"counso",
+				"src/genes/multiswitch/counselorOnly/counselorOnly.client.lua"
+			],
+			[
+				"counse",
+				"src/genes/multiswitch/counselorOnly/counselorOnly.data.lua"
+			],
+			[
+				"activda",
+				"src/genes/activity/activity.data.lua"
+			],
+			[
+				"canva.da",
+				"src/genes/canvas/canvas.data.lua"
+			],
+			[
+				"socceda",
+				"src/genes/activity/soccer/soccer.data.lua"
+			],
+			[
+				"stick.util",
+				"src/genes/stickyNoteStack/stickyNoteStack.util.lua"
+			],
+			[
+				"earl",
+				"src/earlyBird/earlyBird.server.lua"
+			],
+			[
+				"roles.ut",
+				"src/roles/roles.util.lua"
+			],
+			[
+				"throw.util",
+				"src/genes/throw/throw.util.lua"
+			],
+			[
+				"inpu.ut",
+				"src/input/input.util.lua"
+			],
+			[
+				"thro.ser",
+				"src/genes/throw/throw.server.lua"
+			],
+			[
+				"thro.da",
+				"src/genes/throw/throw.data.lua"
+			],
+			[
+				"multi",
+				"src/genes/multiswitch/multiswitch.util.lua"
+			],
+			[
+				"multu",
+				"src/genes/multiswitch/multiswitch.util.lua"
 			],
 			[
 				"canvas.ser",
-				"src/server/drivers/objects/canvas.server.lua"
+				"src/genes/canvas/canvas.server.lua"
 			],
 			[
-				"baltoo",
-				"src/client/drivers/tools/balloonTool.client.lua"
+				"sched.strea",
+				"src/schedule/schedule.streams.lua"
 			],
 			[
-				"schedul.ser",
-				"src/server/drivers/schedule.server.lua"
+				"canv.clie",
+				"src/genes/canvas/canvas.client.lua"
 			],
 			[
-				"bpcli",
-				"src/client/drivers/objects/bananaPeel.client.lua"
+				"canv.util",
+				"src/genes/canvas/canvas.util.lua"
 			],
 			[
-				"banana",
-				"src/server/drivers/objects/bananaPeel.server.lua"
+				"socc.ser",
+				"src/genes/activity/soccer/soccer.server.lua"
 			],
 			[
-				"actio",
-				"src/client/drivers/guis/core/actions.client.lua"
+				"tb",
+				"packages/axis/lib/tableau.lua"
 			],
 			[
-				"sticknotoo",
-				"src/client/drivers/tools/stickyNoteTool.client.lua"
+				"env.",
+				"src/env.lua"
 			],
 			[
-				"stickno.ser",
-				"src/server/drivers/objects/stickyNote.server.lua"
+				"acti.da",
+				"src/genes/activity/activity.data.lua"
 			],
 			[
-				"ball",
-				"src/server/drivers/objects/balloon.server.lua"
+				"sched.stream",
+				"src/schedule/schedule.streams.lua"
 			],
 			[
-				"bpeel.",
-				"net/objects/bananaPeel.model.json"
+				"scorebo",
+				"src/genes/scoreboard/scoreboard.util.lua"
 			],
 			[
-				"toolu",
-				"src/client/utils/toolUtil.lua"
+				"socc",
+				"src/activities/--soccer/soccer.server.lua"
 			],
 			[
-				"stickto",
-				"src/client/drivers/tools/stickyNoteTool.client.lua"
+				"activitiesutil",
+				"src/activities/activities.util.lua"
 			],
 			[
-				"ragdocli",
-				"src/client/drivers/ragdoll.client.lua"
+				"ta",
+				"packages/axis/lib/tableau.lua"
 			],
 			[
-				"actions",
-				"src/client/drivers/guis/core/actions.client.lua"
+				"observa",
+				"packages/axis/rx/Observable.lua"
 			],
 			[
-				"stickyserv",
-				"src/server/drivers/objects/stickyNote.server.lua"
+				"activ.util",
+				"src/genes/activity/activity.util.lua"
 			],
 			[
-				"sticktoo",
-				"src/client/drivers/tools/stickyNoteTool.client.lua"
+				"activity.ut",
+				"src/genes/activity/activity.util.lua"
 			],
 			[
-				"obse",
-				"src/shared/axis/rx/Observable.lua"
+				"aenro.ser",
+				"src/genes/activity/activityEnrollment/activityEnrollment.server.lua"
 			],
 			[
-				"rx",
-				"src/shared/axis/lib/rx.lua"
+				"skewer",
+				"src/genes/skewerable/skewerable.server.lua"
 			],
 			[
-				"axisbo",
-				"src/client/axisboot.client.lua"
+				"activity.ser",
+				"src/genes/activity/activity.server.lua"
 			],
 			[
-				"glib",
-				"src/shared/axis/lib/glib.lua"
+				"inter.clie",
+				"src/genes/interact/interact.client.lua"
+			],
+			[
+				"dish.ser",
+				"src/genes/dish/dish.server.lua"
+			],
+			[
+				"skew",
+				"src/genes/skewerable/skewerable.server.lua"
+			],
+			[
+				"sticksta.cli",
+				"src/genes/stickyNoteStack/stickyNoteStack.client.lua"
+			],
+			[
+				"sched.conf",
+				"src/schedule/schedule.config.lua"
+			],
+			[
+				"pull",
+				"src/genes/pulloutChair/pulloutChair.data.lua"
+			],
+			[
+				"fire.util",
+				"src/genes/fireplace/fireplace.util.lua"
+			],
+			[
+				"firepl.da",
+				"src/genes/fireplace/fireplace.data.lua"
+			],
+			[
+				"powdsa",
+				"src/genes/powderSack/powderSack.data.lua"
+			],
+			[
+				"skewe",
+				"src/genes/skewerable/skewerable.server.lua"
+			],
+			[
+				"daytim",
+				"src/genes/multiswitch/timeOfDaySwitch/daytimeSwitch/daytimeSwitch.data.lua"
+			],
+			[
+				"timeof",
+				"src/genes/multiswitch/timeOfDaySwitch/daytimeSwitch/daytimeSwitch.server.lua"
+			],
+			[
+				"coll",
+				"packages/axis/lib/collection.lua"
+			],
+			[
+				"collec",
+				"packages/axis/lib/collection.lua"
+			],
+			[
+				"actuti",
+				"src/activities/activities.util.lua"
+			],
+			[
+				"humhol.ser",
+				"src/genes/humanoidHolder/humanoidHolder.server.lua"
+			],
+			[
+				"interut",
+				"src/genes/interact/interact.util.lua"
+			],
+			[
+				"sched.con",
+				"src/schedule/schedule.config.lua"
+			],
+			[
+				"dar",
+				"packages/axis/lib/dart.lua"
+			],
+			[
+				"axisbo.cli",
+				"src/axisboot/axisboot.client.lua"
+			],
+			[
+				"axisbo.ser",
+				"src/axisboot/axisboot.server.lua"
 			],
 			[
 				"gli",
-				"src/shared/axis/lib/glib.lua"
+				"packages/axis/lib/glib.lua"
 			],
 			[
-				"lightg",
-				"src/server/drivers/objects/lightGroup.server.lua"
+				"fx",
+				"packages/axis/lib/fx.lua"
 			],
 			[
-				"sticknoteser",
-				"src/server/drivers/objects/stickyNote.server.lua"
+				"schedule.ser",
+				"src/schedule/schedule.server.lua"
 			],
 			[
-				"observ",
-				"src/shared/axis/rx/Observer.lua"
+				"schedstre",
+				"src/schedule/schedule.streams.lua"
 			],
 			[
-				"intser",
-				"src/server/drivers/interact.server.lua"
+				"light",
+				"src/genes/lightGroup/lightGroup.data.lua"
 			],
 			[
-				"interacli",
-				"src/client/drivers/interact.client.lua"
+				"stick",
+				"src/genes/stickyNoteStack/stickyNoteStack.util.lua"
 			],
 			[
-				"ragdo",
-				"src/client/drivers/ragdoll.client.lua"
+				"role.util",
+				"src/roles/roles.util.lua"
 			],
 			[
-				"canvas ser",
-				"src/server/drivers/objects/canvas.server.lua"
+				"table",
+				"packages/axis/lib/tableau.lua"
 			],
 			[
-				"canv ser",
-				"src/server/drivers/objects/canvas.server.lua"
+				"tal",
+				"packages/axis/lib/tableau.lua"
 			],
 			[
-				"canvas.cli",
-				"src/client/drivers/objects/canvas.client.lua"
+				"seat",
+				"src/genes/seat/seat.data.lua"
 			],
 			[
-				"sticknt",
-				"src/client/drivers/tools/stickyNoteTool.client.lua"
-			],
-			[
-				"stickyno",
-				"net/objects/stickyNote.model.json"
-			],
-			[
-				"B",
-				"src/shared/axis/classes/Bin.lua"
-			],
-			[
-				"dbb",
-				"src/server/components/activities/dodgeballBall.lua"
-			],
-			[
-				"dbto",
-				"src/client/drivers/tools/dodgeballTool.client.lua"
-			],
-			[
-				"dodgeba.ser",
-				"src/server/drivers/activities/dodgeball.server.lua"
-			],
-			[
-				"sched.c",
-				"src/client/drivers/guis/schedule.client.lua"
-			],
-			[
-				"Bin",
-				"src/shared/axis/classes/Bin.lua"
-			],
-			[
-				"canv",
-				"src/client/drivers/objects/canvas.client.lua"
-			],
-			[
-				"bin",
-				"src/shared/axis/classes/Bin.lua"
-			],
-			[
-				"dodbb",
-				"src/server/components/activities/dodgeballBall.lua"
-			],
-			[
-				"rag",
-				"src/client/drivers/ragdoll.client.lua"
+				"banpee.clie",
+				"src/genes/bananaPeel/bananaPeel.client.lua"
 			]
 		],
 		"width": 0.0
@@ -1628,13 +1815,93 @@
 	},
 	"select_symbol":
 	{
-		"height": 82.0,
-		"last_filter": "withlat",
+		"height": 208.0,
+		"last_filter": "",
 		"selected_items":
 		[
 			[
+				"fromprop",
+				"Observable.fromProperty"
+			],
+			[
+				"smoothat",
+				"axisUtil.smoothAttach"
+			],
+			[
+				"smoothatt",
+				"axisUtil.smoothAttach"
+			],
+			[
+				"observestate",
+				"genesUtil.observeStateValue"
+			],
+			[
+				"pophum",
+				"humanoidHolderUtil.popHumanoid"
+			],
+			[
+				"repla",
+				"Observable:replay"
+			],
+			[
+				"setswit",
+				"multiswitchUtil.setSwitchEnabled"
+			],
+			[
+				"filter",
+				"ftable:filter"
+			],
+			[
+				"ftable",
+				"ftable:min"
+			],
+			[
+				"min",
+				"ftable:min"
+			],
+			[
+				"fromplayertouc",
+				"Observable.fromPlayerTouchedDescendant"
+			],
+			[
 				"withlat",
 				"Observable:withLatestFrom"
+			],
+			[
+				"ftable min",
+				"ftable:min"
+			],
+			[
+				"share",
+				"Observable:share"
+			],
+			[
+				"getbasic",
+				"inputUtil.getBasicRaycastParams"
+			],
+			[
+				"tabletovalu",
+				"tableau.tableToValueObjects"
+			],
+			[
+				"tablea.log",
+				"tableau.log"
+			],
+			[
+				"log",
+				"log"
+			],
+			[
+				"frominstlef",
+				"Observable.fromInstanceLeftGame"
+			],
+			[
+				"setligh",
+				"fx.setLightsEnabled"
+			],
+			[
+				"ftable:fir",
+				"ftable:first"
 			],
 			[
 				"boolall",
@@ -1665,20 +1932,12 @@
 				"Observable:partition"
 			],
 			[
-				"smoothatt",
-				"axisUtil.smoothAttach"
-			],
-			[
 				"startwithtabl",
 				"Observable:startWithTable"
 			],
 			[
 				"startwi",
 				"Observable:startWith"
-			],
-			[
-				"smoothat",
-				"axisUtil.smoothAttach"
 			],
 			[
 				"distun",
@@ -1745,10 +2004,6 @@
 				"raycastMouse"
 			],
 			[
-				"share",
-				"Observable:share"
-			],
-			[
 				"flatma",
 				"Observable:flatMap"
 			],
@@ -1791,10 +2046,6 @@
 			[
 				"frominsta",
 				"Observable.fromInstanceTag"
-			],
-			[
-				"frominstlef",
-				"Observable.fromInstanceLeftGame"
 			],
 			[
 				"fromkey",
@@ -1846,6 +2097,21 @@
 	"selected_group": 0,
 	"settings":
 	{
+		"last_automatic_layout":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		]
 	},
 	"show_minimap": false,
 	"show_open_files": false,

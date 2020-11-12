@@ -12,7 +12,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local activity = genes.activity
-local activityEnrollment = genes.activity.activityEnrollment
+-- local activityEnrollment = genes.activity.activityEnrollment
 
 -- modules
 local rx = require(axis.lib.rx)
@@ -30,12 +30,12 @@ local scheduleStreams = require(env.src.schedule.streams)
 local function isInSession(activityInstance)
 	return activityInstance.state.activity.inSession.Value
 end
-local function isEnrolled(activityInstance, cabin)
-	return collection.getValue(activityInstance.state.activity.enrolledTeams, cabin)
-end
-local function enrollCabin(activityInstance, cabin)
-	collection.addValue(activityInstance.state.activity.enrolledTeams, cabin)
-end
+-- local function isEnrolled(activityInstance, cabin)
+-- 	return collection.getValue(activityInstance.state.activity.enrolledTeams, cabin)
+-- end
+-- local function enrollCabin(activityInstance, cabin)
+-- 	collection.addValue(activityInstance.state.activity.enrolledTeams, cabin)
+-- end
 local function startSession(activityInstance)
 	for _, value in pairs(activityInstance.state.activity.enrolledTeams:GetChildren()) do
 		value.Parent = activityInstance.state.activity.sessionTeams
@@ -79,7 +79,8 @@ local function createTrophy(activityInstance, cabin)
 		trophy.config.teamOnly.team.Value = cabin
 	end
 	genesUtil.getInstanceStream(genes.multiswitch.teamOnly)
-		:first(dart.equals(trophy))
+		:filter(dart.equals(trophy))
+		:first()
 		:subscribe(setTeam)
 end
 
@@ -91,19 +92,19 @@ end
 local activities = genesUtil.initGene(activity)
 
 -- Listen to activityEnrollment requests from child with gene
-activities
-	:flatMap(function (activityInstance)
-		return genesUtil.getInstanceStream(activityEnrollment)
-			:filter(dart.isDescendantOf(activityInstance))
-			:flatMap(function (enrollmentInstance)
-				return rx.Observable.from(enrollmentInstance.interface.activityEnrollment.cabinCounselorTriggered)
-			end)
-			:reject(dart.bind(isEnrolled, activityInstance))
-			:reject(activityUtil.getCabinActivity)
-			:reject(dart.bind(isInSession, activityInstance))
-			:map(dart.carry(activityInstance))
-	end)
-	:subscribe(enrollCabin)
+-- activities
+-- 	:flatMap(function (activityInstance)
+-- 		return genesUtil.getInstanceStream(activityEnrollment)
+-- 			:filter(dart.isDescendantOf(activityInstance))
+-- 			:flatMap(function (enrollmentInstance)
+-- 				return rx.Observable.from(enrollmentInstance.interface.activityEnrollment.cabinCounselorTriggered)
+-- 			end)
+-- 			:reject(dart.bind(isEnrolled, activityInstance))
+-- 			:reject(activityUtil.getCabinActivity)
+-- 			:reject(dart.bind(isInSession, activityInstance))
+-- 			:map(dart.carry(activityInstance))
+-- 	end)
+-- 	:subscribe(enrollCabin)
 
 -- Listen to enrolled list changed and begin activity when it's full
 -- We have to spawn the subscription to this because it is subscribes to the collection's ChildRemoved event
