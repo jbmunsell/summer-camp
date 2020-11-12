@@ -203,13 +203,9 @@ canvases
 			stream = rx.Observable.just(false)
 		else
 			local owner = rx.Observable.from(instance.state.canvas.owner)
-			local acceptingTeam = rx.Observable.from(instance.state.canvas.teamToAcceptFrom)
-				:map(function (team)
-					return not team or team == env.LocalPlayer.Team
-				end)
 			stream = owner
 				:map(dart.boolNot)
-				:combineLatest(acceptingTeam, playerOwnsAnyCanvas:map(dart.boolNot), dart.boolAll)
+				:combineLatest(playerOwnsAnyCanvas:map(dart.boolNot), dart.boolAll)
 		end
 		return stream:map(dart.carry(instance, "interact", "canvas"))
 	end)

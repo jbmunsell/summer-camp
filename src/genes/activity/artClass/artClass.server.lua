@@ -33,7 +33,10 @@ end
 -- Init canvases
 -- 	Places a switch in canvases so that we can lock them for our class
 local function initCanvases(artClassInstance)
-	getCanvases(artClassInstance):foreach(dart.follow(multiswitchUtil.createSwitch, "interact", "artClass"))
+	getCanvases(artClassInstance):foreach(function (canvasInstance)
+		multiswitchUtil.createSwitch(canvasInstance, "interact", "artClass")
+		genesUtil.addGene(canvasInstance, genes.multiswitch.teamOnly)
+	end)
 end
 
 -- Open canvases
@@ -42,7 +45,8 @@ local function openCanvases(artClassInstance)
 	local function open(canvasInstance)
 		canvasUtil.clearCanvas(canvasInstance)
 		canvasInstance.state.interact.switches:WaitForChild("artClass").Value = true
-		canvasInstance.state.canvas.teamToAcceptFrom.Value = team
+		canvasInstance.config.teamOnly.team.Value = team
+		-- canvasInstance.state.canvas.teamToAcceptFrom.Value = team
 	end
 	getCanvases(artClassInstance):foreach(open)
 end

@@ -12,7 +12,6 @@ return genesUtil.createGeneData({
 	state = {
 		canvas = {
 			owner = tableau.null,
-			teamToAcceptFrom = tableau.null,
 			locked = false,
 			editing = false, -- For use on client to connect to tools and such
 		},

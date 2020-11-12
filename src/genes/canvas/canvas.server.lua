@@ -60,12 +60,7 @@ canvases:subscribe(wipeCanvas)
 
 -- Connect to client ownership request
 rx.Observable.from(canvas.net.CanvasOwnershipRequested.OnServerEvent)
-	:filter(function (client, canvasInstance)
-		local team = canvasInstance.state.canvas.teamToAcceptFrom.Value
-		local teamGood = (not team) or (team == client.Team)
-		local hasAlready = canvasUtil.getPlayerCanvas(client)
-		return teamGood and not hasAlready
-	end)
+	:reject(canvasUtil.getPlayerCanvas)
 	:subscribe(canvasUtil.setCanvasOwner)
 
 -- Connect to client change request
