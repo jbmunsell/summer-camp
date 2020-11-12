@@ -81,14 +81,17 @@ end
 local function getHoldDistance(characterAttachment, hold)
 	return (characterAttachment.WorldPosition - getHoldPosition(hold)).magnitude
 end
-local function getDistanceModifier(characterAttachment, hold)
+local function getDistanceModifier(characterAttachment, instance, hold)
 	local offset = getHoldOffset(hold)
 	local cameraLook = workspace.CurrentCamera.CFrame.LookVector
 	local dot = offset.unit:Dot(cameraLook)
 	if dot <= 0 then
-		return math.huge
+		return -math.huge
 	end
-	return getHoldDistance(characterAttachment, hold) * (1 - dot)
+	local max = instance.config.interact.distanceThreshold.Value
+	local dmod = 1 - (getHoldDistance(characterAttachment, hold) / max)
+	-- print(instance.Name, dot, dmod)
+	return (dmod * 0.5) + (dot * 0.5)
 end
 
 -- Is in range
@@ -100,6 +103,8 @@ local function isInSight(characterAttachment, instance, hold)
 	local params = inputUtil.getBasicRaycastParams()
 	local pos = (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
 	local result = workspace:Raycast(charpos, (pos - charpos), params)
+
+	print(result and result.Instance)
 
 	return not result
 	or not result.Instance
@@ -114,24 +119,24 @@ local function getBestHold()
 	local attachment = head and head:FindFirstChild("FaceFrontAttachment")
 	if not attachment then return end
 
-	local closestInstance, closestHold
-	local closestModifier = math.huge
+	local bestInstance, bestHold
+	local bestModifier = -math.huge
 	genesUtil.getInstances(interact)
 		:filter(isInteractable)
 		:foreach(function (instance)
 			getInteractionHolds(instance)
 				:filter(dart.bind(isInRange, attachment, instance))
 				:foreach(function (hold)
-					local dmod = getDistanceModifier(attachment, hold)
-					if dmod < closestModifier then
-						closestModifier = dmod
-						closestInstance = instance
-						closestHold = hold
+					local dmod = getDistanceModifier(attachment, instance, hold)
+					if dmod > bestModifier then
+						bestModifier = dmod
+						bestInstance = instance
+						bestHold = hold
 					end
 				end)
 		end)
 
-	return closestHold and isInSight(attachment, closestInstance, closestHold) and closestHold or nil
+	return bestHold and isInSight(attachment, bestInstance, bestHold) and bestHold or nil
 end
 
 -- Get interactable from hold
