@@ -53,6 +53,23 @@ end
 
 -- Create trophy for activity instance and team, place it at the spawn
 local function createTrophy(activityInstance, cabin)
+	-- Create trophy
+	local trophy = activityInstance.config.activity.trophy.Value:Clone()
+	trophy.CFrame = activityInstance.functional.TrophySpawn.CFrame
+	trophy.Parent = workspace
+
+	-- Tag and apply functionality
+	genesUtil.addGene(trophy, genes.pickup)
+	genesUtil.addGene(trophy, genes.multiswitch.teamOnly)
+	genesUtil.addGene(trophy, genes.multiswitch.counselorOnly)
+
+	-- Wait for full state
+	local function setTeam()
+		trophy.config.teamOnly.team.Value = cabin
+	end
+	genesUtil.getInstanceStream(genes.multiswitch.teamOnly)
+		:first(dart.equals(trophy))
+		:subscribe(setTeam)
 end
 
 ---------------------------------------------------------------------------------------------------
