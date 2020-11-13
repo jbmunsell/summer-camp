@@ -271,14 +271,14 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 	local weld = Instance.new("Weld", a)
 	weld.C0 = info.target
 
-	local collisionGroups = {}
-	local instances = (b:IsA("BasePart") and { b } or b:GetDescendants())
-	for _, d in pairs(instances) do
-		if d:IsA("BasePart") then
-			collisionGroups[d] = d.CollisionGroupId
-			PhysicsService:SetPartCollisionGroup(d, "FXParts")
-		end
-	end
+	-- local collisionGroups = {}
+	-- local instances = (b:IsA("BasePart") and { b } or b:GetDescendants())
+	-- for _, d in pairs(instances) do
+	-- 	if d:IsA("BasePart") then
+	-- 		collisionGroups[d] = d.CollisionGroupId
+	-- 		PhysicsService:SetPartCollisionGroup(d, "FXParts")
+	-- 	end
+	-- end
 
 	-- If B is a part, then tween the part. If it's a model, tween entire model
 	local originalCFrame
@@ -310,9 +310,9 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 
 		info.att_b.Parent.Anchored = wasAnchored
 
-		for part, group in pairs(collisionGroups) do
-			part.CollisionGroupId = group
-		end
+		-- for part, group in pairs(collisionGroups) do
+		-- 	part.CollisionGroupId = group
+		-- end
 
 		if weld:IsDescendantOf(game) then
 			weld.Part0 = info.att_a.Parent
