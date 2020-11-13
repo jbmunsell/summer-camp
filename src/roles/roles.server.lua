@@ -64,6 +64,8 @@ local function recalculateCounselors(team)
 	local players = tableau.from(team:GetPlayers())
 	local currentCount = rolesUtil.getTeamCounselors(team):size()
 	local desiredCount = math.ceil(players:size() / rolesConfig.campersPerCounselor)
+	print(string.format("Counselor calculation, #players: %d, currentCount: %d, desiredCount: %d",
+		players:size(), currentCount, desiredCount))
 
 	-- Add new counselors if we need them,
 	-- 	but do not remove people who are already counselors if we dip below count
