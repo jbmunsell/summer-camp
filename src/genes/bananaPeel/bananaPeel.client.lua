@@ -54,12 +54,14 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
+-- init
+genesUtil.initGene(bananaPeel)
+
 -- Peel slip request
 local slipStream = rx.Observable.from(bananaPeel.net.Slipped)
 
 -- Slip
-slipStream
-	:subscribe(slip)
+slipStream:subscribe(slip)
 
 -- Get up
 slipStream

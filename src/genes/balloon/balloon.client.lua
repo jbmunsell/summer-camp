@@ -19,6 +19,10 @@ local balloon = genes.balloon
 local dart = require(axis.lib.dart)
 local inputUtil = require(input.util)
 local pickupUtil = require(pickup.util)
+local genesUtil = require(genes.util)
+
+-- init
+genesUtil.initGene(balloon)
 
 -- Bind click
 pickupUtil.getClickWhileHoldingStream(balloon)

@@ -88,7 +88,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- All enrollments
-local enrollments = genesUtil.getInstanceStream(activityEnrollment)
+local enrollments = genesUtil.initGene(activityEnrollment)
 	:flatMap(function (enrollmentInstance)
 		return genesUtil.getInstanceStream(activity)
 			:filter(function (activityInstance)

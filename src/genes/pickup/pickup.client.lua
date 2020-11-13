@@ -20,6 +20,7 @@ local tableau = require(axis.lib.tableau)
 local pickupUtil = require(pickup.util)
 local pickupStreams = require(pickup.streams)
 local inputUtil = require(input.util)
+local genesUtil = require(genes.util)
 local inputStreams = require(input.streams)
 
 ---------------------------------------------------------------------------------------------------
@@ -29,6 +30,9 @@ local inputStreams = require(input.streams)
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
+
+-- init
+genesUtil.initGene(pickup)
 
 -- Play equip on equip
 -- 	The server does this exact same thing, but it also tells the clients

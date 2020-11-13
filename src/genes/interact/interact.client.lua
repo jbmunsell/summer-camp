@@ -8,6 +8,7 @@
 
 -- env
 local UserInputService = game:GetService("UserInputService")
+local CollectionService = game:GetService("CollectionService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local input = env.src.input
@@ -18,7 +19,6 @@ local multiswitch = genes.multiswitch
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
-local tableau = require(axis.lib.tableau)
 local inputUtil = require(input.util)
 local genesUtil = require(genes.util)
 local multiswitchUtil = require(multiswitch.util)
@@ -39,6 +39,9 @@ end
 local SpritesheetDims = Vector2.new(4, 4)
 local SpritesheetScale = 128
 
+-- caches
+local holdPackages = {}
+
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
@@ -52,23 +55,6 @@ end
 local function isInteractable(instance)
 	return instance:IsDescendantOf(workspace)
 	and multiswitchUtil.all(instance, "interact")
-end
-
--- Get interaction holds
--- 	Returns a list of all properly named attachments
--- 	OR the part / PrimaryPart if no such attachments exist.
-local function getInteractionHolds(instance)
-	local atts = tableau.from(instance:GetDescendants())
-		:filter(dart.isNamed("InteractionPromptAdornee"))
-	if atts:size() > 0 then
-		return atts
-	else
-		if instance:IsA("BasePart") then
-			return tableau.from({ instance })
-		elseif instance:IsA("Model") then
-			return tableau.from({ instance.PrimaryPart })
-		end
-	end
 end
 
 -- Get distance modifier
@@ -113,27 +99,26 @@ end
 -- Get best hold
 local function getBestHold()
 	local head = env.LocalPlayer.Character:FindFirstChild("Head")
-	local attachment = head and head:FindFirstChild("FaceFrontAttachment")
-	if not attachment then return end
+	local faceFront = head and head:FindFirstChild("FaceFrontAttachment")
+	if not faceFront then return end
 
-	local bestInstance, bestHold
+	local bestPackage = nil
 	local bestModifier = -math.huge
-	genesUtil.getInstances(interact)
-		:filter(isInteractable)
-		:foreach(function (instance)
-			getInteractionHolds(instance)
-				:filter(dart.bind(isInRange, attachment, instance))
-				:foreach(function (hold)
-					local dmod = getDistanceModifier(attachment, instance, hold)
-					if dmod > bestModifier then
-						bestModifier = dmod
-						bestInstance = instance
-						bestHold = hold
-					end
-				end)
-		end)
+	for _, package in pairs(holdPackages) do
+		local interactable = isInteractable(package.instance)
+		local inRange = interactable and isInRange(faceFront, package.instance, package.hold)
+		if interactable and inRange then
+			local dmod = getDistanceModifier(faceFront, package.instance, package.hold)
+			if dmod > bestModifier then
+				bestModifier = dmod
+				bestPackage = package
+			end
+		end
+	end
 
-	return bestHold and isInSight(attachment, bestInstance, bestHold) and bestHold or nil
+	if bestPackage and isInSight(faceFront, bestPackage.instance, bestPackage.hold) then
+		return bestPackage.hold
+	end
 end
 
 -- Get interactable from hold
@@ -178,6 +163,34 @@ end
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
+
+-- Init gene
+local interactStream = genesUtil.initGene(interact)
+
+-- Maintain hold packages cache list
+interactStream:subscribe(function (instance)
+	local inserted
+	for _, d in pairs(instance:GetDescendants()) do
+		if d.Name == "InteractionPromptAdornee" then
+			inserted = true
+			table.insert(holdPackages, { instance = instance, hold = d })
+		end
+	end
+	if not inserted then
+		table.insert(holdPackages, {
+			instance = instance,
+			hold = (instance:IsA("BasePart") and instance or instance.PrimaryPart),
+		})
+	end
+end)
+rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.data).instanceTag))
+	:subscribe(function (instance)
+		for i = #holdPackages, 1, -1 do
+			if holdPackages[i].instance == instance then
+				table.remove(holdPackages, i)
+			end
+		end
+	end)
 
 -- 	Merge E up/down to true/false stream
 -- 	with the (mouse is down inside the button) stream

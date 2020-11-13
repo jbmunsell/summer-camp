@@ -9,6 +9,7 @@
 -- env
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 
@@ -19,7 +20,6 @@ local tableau = require(axis.lib.tableau)
 
 -- lib
 local genesUtil = {}
-local geneInstanceStreams = {}
 local geneFolders = {}
 
 -- Has gene
@@ -27,7 +27,10 @@ function genesUtil.hasGene(instance, gene)
 	return CollectionService:HasTag(instance, require(gene.data).instanceTag)
 end
 function genesUtil.addGene(instance, gene)
-	CollectionService:AddTag(instance, require(gene.data).instanceTag)
+	local tag = require(gene.data).instanceTag
+	if not CollectionService:HasTag(instance, tag) then
+		CollectionService:AddTag(instance, tag)
+	end
 end
 
 -- Get genes
@@ -42,57 +45,70 @@ function genesUtil.getAllSubGenes(gene)
 	return tableau.from(genes)
 end
 
+-- init object server
+local readyInstances = {}
+local instanceReadiedStreams = {}
+local function createInstanceReadiedStream(gene)
+	local geneData = require(gene.data)
+	local instanceAdded = CollectionService:GetInstanceAddedSignal(geneData.instanceTag)
+	return rx.Observable.from(instanceAdded)
+		:flatMap(function (instance)
+			if genesUtil.hasFullState(instance, gene) then
+				return rx.Observable.just(instance)
+			else
+				return rx.Observable.from(instance.DescendantAdded)
+					:throttle(0.2)
+					:filter(dart.bind(genesUtil.hasFullState, instance, gene))
+					:map(dart.constant(instance))
+					:first()
+			end
+		end)
+end
+local function getInstanceReadiedStream(gene)
+	if not instanceReadiedStreams[gene] then
+		instanceReadiedStreams[gene] = createInstanceReadiedStream(gene)
+	end
+	return instanceReadiedStreams[gene]
+end
+function genesUtil.initGene(gene)
+	-- Grab data
+	local geneData = require(gene.data)
+
+	-- (server only) Init all tagged instances when we hear about them
+	if RunService:IsServer() then
+		local function initInstance(instance)
+			-- Add folders
+			genesUtil.touchFolder(instance, gene, "config")
+			genesUtil.touchFolder(instance, gene, "state")
+			genesUtil.addInterface(instance, gene)
+
+			-- Add tags to apply inherited gene functionality
+			for _, g in pairs(geneData.genes) do
+				genesUtil.addGene(instance, g)
+			end
+		end
+		rx.Observable.fromInstanceTag(geneData.instanceTag)
+			:subscribe(initInstance)
+	end
+
+	-- Cache a list of these instances for rapid accessing
+	local instanceRemoved = CollectionService:GetInstanceRemovedSignal(geneData.instanceTag)
+	readyInstances[gene] = {}
+	getInstanceReadiedStream(gene):subscribe(dart.bind(table.insert, readyInstances[gene]))
+	rx.Observable.from(instanceRemoved):subscribe(dart.bind(tableau.removeValue, readyInstances[gene]))
+
+	-- return instance stream
+	return genesUtil.getInstanceStream(gene)
+end
+
 -- Get a SNAPSHOT list of instances with a particular gene
 function genesUtil.getInstances(gene)
-	return tableau.fromInstanceTag(require(gene.data).instanceTag)
-		:filter(function (instance)
-			return genesUtil.hasFullState(instance, gene)
-		end)
+	return tableau.from(readyInstances[gene] or {})
 end
 
--- Get an ongoing stream of all instances with a gene
+-- Get instance stream
 function genesUtil.getInstanceStream(gene)
-	-- Operate cache
-	local cached = geneInstanceStreams[gene]
-	if not cached then
-		local data = require(gene.data)
-		cached = rx.Observable.fromInstanceTag(data.instanceTag)
-			:flatMap(function (instance)
-				if genesUtil.hasFullState(instance, gene) then
-					return rx.Observable.just(instance)
-				else
-					return rx.Observable.from(instance.DescendantAdded)
-						:filter(function ()
-							return genesUtil.hasFullState(instance, gene)
-						end)
-						:map(dart.constant(instance))
-						:merge(rx.Observable.fromInstanceLeftGame(instance):map(dart.constant(nil)))
-						:first()
-				end
-			end)
-			:filter()
-	end
-
-	return cached
-end
-
--- init object server
-function genesUtil.initGene(gene)
-	local geneData = require(gene.data)
-	local function initInstance(instance)
-		-- Add folders
-		genesUtil.touchFolder(instance, gene, "config")
-		genesUtil.touchFolder(instance, gene, "state")
-		genesUtil.addInterface(instance, gene)
-
-		-- Add tags to apply inherited gene functionality
-		genesUtil.getAllSubGenes(gene):foreach(function (g)
-			genesUtil.addGene(instance, g)
-		end)
-	end
-	rx.Observable.fromInstanceTag(geneData.instanceTag)
-		:subscribe(initInstance)
-	return genesUtil.getInstanceStream(gene)
+	return getInstanceReadiedStream(gene):startWithTable(genesUtil.getInstances(gene))
 end
 
 -- Add new state folder to object
@@ -144,20 +160,30 @@ local function check(folder, tb)
 	end
 	return true
 end
+local function checkGene(instance, gene, checked)
+	checked = checked or {}
+
+	local data = require(gene.data)
+	for _, g in pairs(data.genes) do
+		-- Keep a list of what we've checked so that we don't double check genes
+		if not checked[g] then
+			if not checkGene(instance, g, checked) then return false end
+			checked[g] = true
+		end
+	end
+	if data.state and not check(instance.state, data.state) then return false end
+	if data.config and not check(instance.config, data.config) then return false end
+	return true
+end
 function genesUtil.hasFullState(instance, gene)
 	-- Check primary state
+	-- print("checking full state")
+	-- print(debug.traceback())
 	if not instance:FindFirstChild("state") then return end
 	if not instance:FindFirstChild("config") then return end
 
 	-- Chase all genes to see if they have the appropriate state folder
-	return genesUtil.getAllSubGenes(gene)
-		:append({ gene })
-		:all(function (g)
-			local data = require(g.data)
-			local hasState = not data.state or check(instance.state, data.state)
-			local hasConfig = not data.config or check(instance.config, data.config)
-			return hasState and hasConfig
-		end)
+	return checkGene(instance, gene)
 end
 
 -- Create gene data

@@ -7,7 +7,7 @@ local genesUtil = require(env.src.genes.util)
 return genesUtil.createGeneData({
 	instanceTag = "gene_timeOfDaySwitch",
 	name = "timeOfDaySwitch",
-	-- genes = {  },
+	genes = {},
 	config = {
 		timeOfDaySwitch = {
 			switchOnTime = 6.0,

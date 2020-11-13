@@ -38,7 +38,8 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- When any changes, check if any has local owner
-genesUtil.getInstanceStream(humanoidHolder)
+local holders = genesUtil.initGene(humanoidHolder)
+holders
 	:flatMap(function (holder)
 		return rx.Observable.from(holder.state.humanoidHolder.owner)
 	end)

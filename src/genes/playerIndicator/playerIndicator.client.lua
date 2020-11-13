@@ -78,6 +78,9 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
+-- init gene
+genesUtil.initGene(playerIndicator)
+
 -- Update raycast list
 rx.Observable.from(IgnoreTags)
 	:flatMap(function (tag)

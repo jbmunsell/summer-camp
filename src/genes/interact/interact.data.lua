@@ -5,6 +5,7 @@ local genesUtil = require(env.src.genes.util)
 local interactData = genesUtil.createGeneData({
 	instanceTag = "gene_interact",
 	name = "interact",
+	genes = {},
 	state = {
 		interact = {
 			switches = {

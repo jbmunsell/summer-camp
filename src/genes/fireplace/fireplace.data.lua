@@ -5,6 +5,7 @@ local genesUtil = require(env.src.genes.util)
 local interactData = genesUtil.createGeneData({
 	instanceTag = "gene_fireplace",
 	name = "fireplace",
+	genes = {},
 	state = {
 		fireplace = {
 			enabled = false,

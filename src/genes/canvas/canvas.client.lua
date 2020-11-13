@@ -184,7 +184,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Canvas instance stream
-local canvases = genesUtil.getInstanceStream(canvas)
+local canvases = genesUtil.initGene(canvas)
 
 -- Player owns any
 local playerOwnsAnyCanvas = canvases

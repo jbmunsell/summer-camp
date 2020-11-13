@@ -69,7 +69,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- All foods forever
-local dishStream = genesUtil.getInstanceStream(dish)
+local dishStream = genesUtil.initGene(dish)
 local foodTrayStream = genesUtil.getInstanceStream(foodTray)
 
 -- When any dish becomes attached to this local player's tray, lock all
@@ -87,5 +87,5 @@ local trayHolderValueStream = foodTrayStream
 	end)
 
 foodTrayValueStream:merge(trayHolderValueStream)
-	:throttleFirst(0.1) -- Nice lil throttle to prevent an assload of events hitting at once
+	:throttle(0.1) -- Nice lil throttle to prevent an assload of events hitting at once
 	:subscribe(updateFoodSwitches)

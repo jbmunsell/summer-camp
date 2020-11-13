@@ -36,7 +36,8 @@ end
 
 -- Apply interact lock for teams when the unlocked team changes
 -- OR the localplayer team changes
-genesUtil.getInstanceStream(teamOnly)
+local instances = genesUtil.initGene(teamOnly)
+instances
 	:flatMap(function (instance)
 		return rx.Observable.from(instance.config.teamOnly.team)
 			:merge(rx.Observable.fromProperty(env.LocalPlayer, "Team"))

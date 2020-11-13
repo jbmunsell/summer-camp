@@ -21,6 +21,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local inputUtil = require(input.util)
 local pickupUtil = require(pickup.util)
+local genesUtil = require(genes.util)
 local stickyNoteStackUtil = require(stickyNoteStack.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -116,6 +117,9 @@ end
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
+
+-- init gene
+genesUtil.initGene(stickyNoteStack)
 
 -- Heartbeat mapped to held stack
 local holdingStream = rx.Observable.heartbeat()
