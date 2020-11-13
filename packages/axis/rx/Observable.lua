@@ -467,6 +467,31 @@ function Observable:distinctUntilChanged(comparator)
 	end)
 end
 
+-- Throttle
+-- 	Returns an observable that will produce the latest value from any values collected
+-- 	during the throttling window, which resets each time a value is received.
+function Observable:throttle(t)
+	assert(type(t) == "number", "Observable:throttle requires a number")
+
+	return Observable.new(function (observer)
+		local throttle = 0
+		local latest
+		local sub = self:subscribe(function (...)
+			throttle = t
+			latest = table.pack(...)
+		end, observer:wrapFailComplete())
+		observer.bin:hold(sub)
+		observer.bin:hold(RunService.Heartbeat:Connect(function (dt)
+			if throttle > 0 then
+				throttle = throttle - dt
+				if throttle <= 0 then
+					observer:push(table.unpack(latest, 1, latest.n))
+				end
+			end
+		end))
+	end)
+end
+
 -- Throttle first
 -- 	Returns an observable that will not produce any values within a certain time window of the first
 -- 	value produced. The window resets each time a value is produced when the observable is NOT
