@@ -48,12 +48,19 @@ end
 -- init object server
 local readyInstances = {}
 local instanceReadiedStreams = {}
+local function getReadyInstances(gene)
+	if not readyInstances[gene] then
+		readyInstances[gene] = {}
+	end
+	return readyInstances[gene]
+end
 local function createInstanceReadiedStream(gene)
 	local geneData = require(gene.data)
 	local instanceAdded = CollectionService:GetInstanceAddedSignal(geneData.instanceTag)
 	return rx.Observable.from(instanceAdded)
+		:startWithTable(CollectionService:GetTagged(geneData.instanceTag))
 		:flatMap(function (instance)
-			if genesUtil.hasFullState(instance, gene) then
+			if table.find(getReadyInstances(gene), instance) or genesUtil.hasFullState(instance, gene) then
 				return rx.Observable.just(instance)
 			else
 				return rx.Observable.from(instance.DescendantAdded)
@@ -65,14 +72,21 @@ local function createInstanceReadiedStream(gene)
 		end)
 end
 local function getInstanceReadiedStream(gene)
-	if not instanceReadiedStreams[gene] then
-		instanceReadiedStreams[gene] = createInstanceReadiedStream(gene)
-	end
-	return instanceReadiedStreams[gene]
+	return createInstanceReadiedStream(gene)
+	-- if not instanceReadiedStreams[gene] then
+	-- 	instanceReadiedStreams[gene] = createInstanceReadiedStream(gene)
+	-- end
+	-- return instanceReadiedStreams[gene]
 end
 function genesUtil.initGene(gene)
 	-- Grab data
 	local geneData = require(gene.data)
+
+	-- Cache a list of these instances for rapid accessing
+	local instanceRemoved = CollectionService:GetInstanceRemovedSignal(geneData.instanceTag)
+	local geneReady = getReadyInstances(gene)
+	getInstanceReadiedStream(gene):subscribe(dart.bind(table.insert, geneReady))
+	rx.Observable.from(instanceRemoved):subscribe(dart.bind(tableau.removeValue, geneReady))
 
 	-- (server only) Init all tagged instances when we hear about them
 	if RunService:IsServer() then
@@ -91,24 +105,18 @@ function genesUtil.initGene(gene)
 			:subscribe(initInstance)
 	end
 
-	-- Cache a list of these instances for rapid accessing
-	local instanceRemoved = CollectionService:GetInstanceRemovedSignal(geneData.instanceTag)
-	readyInstances[gene] = {}
-	getInstanceReadiedStream(gene):subscribe(dart.bind(table.insert, readyInstances[gene]))
-	rx.Observable.from(instanceRemoved):subscribe(dart.bind(tableau.removeValue, readyInstances[gene]))
-
 	-- return instance stream
 	return genesUtil.getInstanceStream(gene)
 end
 
 -- Get a SNAPSHOT list of instances with a particular gene
 function genesUtil.getInstances(gene)
-	return tableau.from(readyInstances[gene] or {})
+	return tableau.from(getReadyInstances(gene) or {})
 end
 
 -- Get instance stream
 function genesUtil.getInstanceStream(gene)
-	return getInstanceReadiedStream(gene):startWithTable(genesUtil.getInstances(gene))
+	return getInstanceReadiedStream(gene)--:startWithTable(genesUtil.getInstances(gene))
 end
 
 -- Add new state folder to object

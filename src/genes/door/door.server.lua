@@ -14,7 +14,6 @@ local interact = genes.interact
 local door = genes.door
 
 -- modules
-local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local interactUtil = require(interact.util)
 local genesUtil = require(genes.util)
