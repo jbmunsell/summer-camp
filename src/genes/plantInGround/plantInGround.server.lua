@@ -44,10 +44,8 @@ local function unplant(instance)
 end
 
 -- Try planting object in the ground
-local function tryPlant(holder, instance)
-	-- Release object
-	pickupUtil.disownHeldObjects(holder)
-	pickupUtil.releaseHeldObjects(holder)
+local function tryPlant(instance)
+	pickupUtil.stripObject(instance)
 
 	-- Grab attachment
 	local attachmentName = "PlantAttachment" .. instance.state.plantInGround.plantId.Value
@@ -80,8 +78,10 @@ local plants = genesUtil.initGene(plantInGround)
 -- Create plant ids
 plants:subscribe(createId)
 
--- On activated, try sticking it in the ground
-pickupUtil.getActivatedStream(plantInGround)
+-- Stick on activated or optional init
+plants:filter(function (instance) return instance.config.plantInGround.initPlant.Value end)
+	:merge(pickupUtil.getActivatedStream(plantInGround)
+		:map(dart.select(2)))
 	:subscribe(tryPlant)
 
 -- On pickup, destroy plant weld

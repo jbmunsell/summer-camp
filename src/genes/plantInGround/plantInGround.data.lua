@@ -17,6 +17,7 @@ return genesUtil.createGeneData({
 	
 	config = {
 		plantInGround = {
+			initPlant = true,
 		},
 	},
 })
