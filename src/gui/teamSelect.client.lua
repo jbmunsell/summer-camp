@@ -105,7 +105,7 @@ arrowToShift("LeftArrow", -1)
 local enableStream = rx.Observable.fromProperty(splashScreen, "Enabled")
 	:reject()
 	:first()
-	:merge(rx.Observable.from(coreGui:FindFirstChild("ChangeTeam", true).Button.Activated))
+	:merge(rx.Observable.from(coreGui:FindFirstChild("TeamDisplay", true).Button.Activated))
 	:reject(function () return teamSelect.Enabled end)
 enableStream:subscribe(function ()
 	-- Create terminator
