@@ -69,7 +69,6 @@ local function createTrophy(activityInstance, cabin)
 	-- Tag and apply functionality
 	genesUtil.addGene(trophy, genes.pickup)
 	genesUtil.addGene(trophy, genes.multiswitch.teamOnly)
-	genesUtil.addGene(trophy, genes.multiswitch.counselorOnly)
 
 	-- Play sound inside the trophy
 	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
