@@ -24,13 +24,19 @@ local multiswitchUtil = require(multiswitch.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init gene
-genesUtil.initGene(counselorOnly)
+local counselorOnlyInstanceStream = genesUtil.initGene(counselorOnly)
 
 -- Apply interact lock if we aren't a counselor
-genesUtil.observeStateValue(genes.player.counselor, "isCounselor")
+local isCounselorStream = genesUtil.observeStateValue(genes.player.counselor, "isCounselor")
 	:filter(dart.equals(env.LocalPlayer))
-	:flatMap(function (_, isCounselor)
+	:map(dart.select(2))
+
+isCounselorStream
+	:flatMap(function (isCounselor)
 		return rx.Observable.from(genesUtil.getInstances(counselorOnly))
-			:map(dart.drag("interact", "counselorOnly", isCounselor))
+			:map(dart.drag(isCounselor))
 	end)
-	:subscribe(multiswitchUtil.setSwitchEnabled)
+	:merge(counselorOnlyInstanceStream:withLatestFrom(isCounselorStream))
+	:subscribe(function (instance, isCounselor)
+		multiswitchUtil.setSwitchEnabled(instance, "interact", "counselorOnly", isCounselor)
+	end)
