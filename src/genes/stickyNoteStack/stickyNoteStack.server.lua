@@ -54,14 +54,15 @@ local function placePlayerStackNote(player, stack, raycastData, text)
 
 	-- Sticky note destroy stream
 	local config = stack.config.stickyNoteStack
-	local isStuckToCharacter
-	for _, p in pairs(Players:GetPlayers()) do
-		if p.Character and raycastData.instance:IsDescendantOf(p.Character) then
-			isStuckToCharacter = true
-			break
+	local isStuckToCharacter = (raycastData.instance.Parent.Name == "PlayerBackpack")
+	if not isStuckToCharacter then
+		for _, p in pairs(Players:GetPlayers()) do
+			if p.Character and raycastData.instance:IsDescendantOf(p.Character) then
+				isStuckToCharacter = true
+				break
+			end
 		end
 	end
-	print(isStuckToCharacter)
 	local dur = config[isStuckToCharacter and "characterStickTimer" or "removeAfterTimer"].Value
 	local timer = (dur and rx.Observable.timer(dur) or rx.Observable.never())
 	local playerLeft = (config.removeAfterOwnerLeft.Value
