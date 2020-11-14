@@ -31,10 +31,10 @@ local function changeTeam(player, team)
 
 	-- Fire event
 	local teams = {
-		Teams.Lupus,
-		Teams.Strix,
-		Teams.Felis,
-		Teams.Scorpius,
+		Teams.Wolves,
+		Teams.Owls,
+		Teams.Cheetahs,
+		Teams.Scorpions,
 	}
 	table.sort(teams, function (a, b)
 		return #a:GetPlayers() < #b:GetPlayers()

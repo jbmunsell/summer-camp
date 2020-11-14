@@ -42,10 +42,10 @@ local labels = {
 }
 
 local TeamsList = {
-	Teams.Lupus,
-	Teams.Strix,
-	Teams.Scorpius,
-	Teams.Felis,
+	Teams.Wolves,
+	Teams.Owls,
+	Teams.Scorpions,
+	Teams.Cheetahs,
 }
 
 local inspectingTeam = rx.BehaviorSubject.new(tableau.from(TeamsList):random())
@@ -57,7 +57,7 @@ local inspectingTeam = rx.BehaviorSubject.new(tableau.from(TeamsList):random())
 -- Set inspecting team
 local function renderInspectingTeam(team)
 	-- Get config
-	local config = env.config.cabins[team.Name]
+	local config = env.config.teams[team.Name]
 	local color = config.color.Value
 	local dullColor do
 		local h, s, v = color:ToHSV()
