@@ -125,7 +125,7 @@ end
 -- 	This function reads upward the instance hierarchy until it finds the ancestor that 
 -- 	has the interactable tag
 local function getInteractableFromHold(hold)
-	if hold == game then
+	if hold == game or not hold then
 		return nil
 	end
 	return genesUtil.hasGene(hold, interact) and hold or getInteractableFromHold(hold.Parent)
@@ -177,11 +177,15 @@ interactStream:subscribe(function (instance)
 		end
 	end
 	if not inserted then
+		if instance:IsA("Model") and not instance.PrimaryPart then
+			error("Interactable model has no PrimaryPart or interact attachments: " .. instance:GetFullName())
+		end
 		table.insert(holdPackages, {
 			instance = instance,
 			hold = (instance:IsA("BasePart") and instance or instance.PrimaryPart),
 		})
 	end
+	print("#holdPackages: " .. #holdPackages)
 end)
 rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.data).instanceTag))
 	:subscribe(function (instance)
@@ -190,6 +194,7 @@ rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.d
 				table.remove(holdPackages, i)
 			end
 		end
+		print("#holdPackages: " .. #holdPackages)
 	end)
 
 -- 	Merge E up/down to true/false stream
@@ -231,7 +236,8 @@ hotInteractor
 	:merge(advancingInteract:reject())
 	:map(function ()
 		local hot = hotInteractor:getValue()
-		return hot and getInteractableFromHold(hot).config.interact.duration.Value
+		local interactable = getInteractableFromHold(hot)
+		return hot and interactable and interactable.config.interact.duration.Value
 	end)
 	:multicast(interactionTimer)
 

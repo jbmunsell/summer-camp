@@ -27,8 +27,9 @@ local multiswitchUtil = require(multiswitch.util)
 genesUtil.initGene(counselorOnly)
 
 -- Apply interact lock if we aren't a counselor
-rx.Observable.from(env.LocalPlayer:WaitForChild("state").roles.isCounselor)
-	:flatMap(function (isCounselor)
+genesUtil.observeStateValue(genes.player.counselor, "isCounselor")
+	:filter(dart.equals(env.LocalPlayer))
+	:flatMap(function (_, isCounselor)
 		return rx.Observable.from(genesUtil.getInstances(counselorOnly))
 			:map(dart.drag("interact", "counselorOnly", isCounselor))
 	end)

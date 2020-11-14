@@ -11,7 +11,7 @@ return genesUtil.createGeneData({
 	genes = { env.src.genes.pickup },
 	state = {
 		plantInGround = {
-			plantId = 0,
+			plantId = -1,
 		},
 	},
 	

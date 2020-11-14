@@ -10,7 +10,7 @@ return genesUtil.createGeneData({
 	genes = { env.src.genes.throw },
 	state = {
 		bananaPeel = {
-			slips = 3,
+			slips = 8,
 			hot = true,
 			expired = false,
 		},

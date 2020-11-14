@@ -22,7 +22,7 @@ return genesUtil.createGeneData({
 		},
 
 		stickyNoteStack = {
-			count = 5,
+			count = 10,
 
 			placementDistanceThreshold = 20, -- Sticky notes cannot be placed beyond this distance (studs) from character
 			rotationRange = 6, -- Total degree rotation range of sticky notes (half on each side)

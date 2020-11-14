@@ -15,6 +15,7 @@ local door = genes.door
 
 -- modules
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local interactUtil = require(interact.util)
 local genesUtil = require(genes.util)
 local doorUtil = require(door.util)
@@ -35,6 +36,12 @@ genesUtil.observeStateValue(door, "open")
 	:subscribe(doorUtil.renderDoor)
 
 -- Activated
-interactUtil.getInteractStream(door)
+local interacted = interactUtil.getInteractStream(door)
 	:map(dart.select(2)) -- drop the client, keep just the door
-	:subscribe(genesUtil.toggleStateValue(door, "open"))
+interacted:subscribe(genesUtil.toggleStateValue(door, "open"))
+interacted:subscribe(function (instance)
+	local attachment = instance:FindFirstChild("InteractionPromptAdornee", true)
+	if attachment then
+		soundUtil.playRandom(env.res.genes.door.sounds, attachment)
+	end
+end)

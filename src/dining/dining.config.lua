@@ -3,22 +3,22 @@ local diningConfig = {
 	-- numFreshTrays = 0,
 	
 	breakfast = {
-		-- entreeList = { "Cereal" },
-		entreeList = { "PlaceholderDish" },
-		-- drinkList = { "Milk" },
-		drinkList = { "PlaceholderDrink" },
+		entreeList = { "Cereal" },
+		-- entreeList = { "PlaceholderDish" },
+		drinkList = { "Milk" },
+		-- drinkList = { "PlaceholderDrink" },
 	},
 	lunch = {
-		-- entreeList = { "Burger", "Sandwiches" },
-		entreeList = { "PlaceholderDish" },
-		-- drinkList = { "Water" },
-		drinkList = { "PlaceholderDrink" },
+		entreeList = { "Burger", "Sandwiches" },
+		-- entreeList = { "PlaceholderDish" },
+		drinkList = { "Water" },
+		-- drinkList = { "PlaceholderDrink" },
 	},
 	dinner = {
-		-- entreeList = { "TomatoSoup", "Sandwiches", "Ramen", "Bolog" },
-		entreeList = { "PlaceholderDish" },
-		-- drinkList = { "Water" },
-		drinkList = { "PlaceholderDrink" },
+		entreeList = { "TomatoSoup", "Sandwiches", "Ramen", "Bolog" },
+		-- entreeList = { "PlaceholderDish" },
+		drinkList = { "Water" },
+		-- drinkList = { "PlaceholderDrink" },
 	},
 }
 

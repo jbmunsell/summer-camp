@@ -14,8 +14,8 @@ local pickup = genes.pickup
 local flashlight = genes.flashlight
 
 -- modules
-local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local pickupUtil = require(pickup.util)
 local genesUtil = require(genes.util)
 local flashlightUtil = require(flashlight.util)
@@ -36,6 +36,12 @@ genesUtil.observeStateValue(flashlight, "enabled")
 	:subscribe(flashlightUtil.renderFlashlight)
 
 -- Activated
-pickupUtil.getActivatedStream(flashlight)
+local activated = pickupUtil.getActivatedStream(flashlight)
 	:map(dart.select(2))
-	:subscribe(genesUtil.toggleStateValue(flashlight, "enabled"))
+activated:subscribe(genesUtil.toggleStateValue(flashlight, "enabled"))
+activated:subscribe(function (instance)
+	local attachment = instance.PrimaryPart
+	if attachment then
+		soundUtil.playRandom(env.res.genes.lightGroup.sounds, attachment)
+	end
+end)

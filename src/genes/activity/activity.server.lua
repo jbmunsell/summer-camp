@@ -18,6 +18,7 @@ local fx = require(axis.lib.fx)
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
+local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
@@ -69,6 +70,9 @@ local function createTrophy(activityInstance, cabin)
 	genesUtil.addGene(trophy, genes.pickup)
 	genesUtil.addGene(trophy, genes.multiswitch.teamOnly)
 	genesUtil.addGene(trophy, genes.multiswitch.counselorOnly)
+
+	-- Play sound inside the trophy
+	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
 
 	-- Wait for full state
 	local function setTeam()

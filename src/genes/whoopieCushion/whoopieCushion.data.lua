@@ -10,7 +10,7 @@ return genesUtil.createGeneData({
 	genes = { env.src.genes.throw },
 	state = {
 		whoopieCushion = {
-			blows = 3,
+			blows = 10,
 			hot = false,
 			filled = false,
 		},

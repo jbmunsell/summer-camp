@@ -314,6 +314,104 @@ function fx.setTransparency(instance, transparency)
 end
 
 ---------------------------------------------------------------------------------------------------
+-- Scale setting
+---------------------------------------------------------------------------------------------------
+
+local function logScaleVectorProperty(instance, property, value, initValue)
+	value = value or instance[property]
+	local v = Instance.new("Vector3Value", instance.FullScaleProperties)
+	v.Name = property
+	v.Value = value * (1 / initValue)
+end
+local function logScaleCFrameProperty(instance, property, value, initValue)
+	value = value or instance[property]
+	local v = Instance.new("CFrameValue", instance.FullScaleProperties)
+	v.Name = property
+	v.Value = value - value.p + (1 / initValue) * value.p
+	-- v.Value = value + (-1 + 1 / initValue) * value.p
+end
+local function scaleCFrame(cframe, scale)
+	return cframe - cframe.p + scale * cframe.p
+	-- return cframe + (-1 + scale) * cframe.p
+end
+local function renderCFrameValue(instance, property, scale)
+	instance[property] = scaleCFrame(instance.FullScaleProperties[property].Value, scale)
+end
+local function renderVectorValue(instance, property, scale)
+	instance[property] = instance.FullScaleProperties[property].Value * scale
+end
+function fx.logScaleWithValue(instance, initValue, model)
+	-- Parameters
+	model = model or instance
+	initValue = initValue or 1
+	assert(instance and type(instance) == "userdata", "fx.logScaleWithValue requires an instance")
+	assert(initValue > 0, "fx.logScaleWithValue requires a value greater than 0")
+
+	-- Full scale properties folder
+	local propertiesFolder
+	local function touchFolder()
+		if not propertiesFolder then
+			propertiesFolder = Instance.new("Folder", instance)
+			propertiesFolder.Name = "FullScaleProperties"
+		end
+		return propertiesFolder
+	end
+
+	-- If base part, log size and offset
+	if instance:IsA("BasePart") then
+		touchFolder()
+		local offset = model:GetPrimaryPartCFrame():toObjectSpace(instance.CFrame)
+		logScaleVectorProperty(instance, "Size", nil, initValue)
+		logScaleCFrameProperty(instance, "Offset", offset, initValue)
+	end
+	if instance:IsA("Attachment") then
+		touchFolder()
+		logScaleCFrameProperty(instance, "CFrame", nil, initValue)
+	end
+	if instance:IsA("JointInstance") then
+		touchFolder()
+		logScaleCFrameProperty(instance, "C0", nil, initValue)
+		logScaleCFrameProperty(instance, "C1", nil, initValue)
+	end
+	if instance:IsA("SpecialMesh") then
+		touchFolder()
+		logScaleVectorProperty(instance, "Scale", nil, initValue)
+	end
+
+	-- Recurse through children
+	for _, child in pairs(instance:GetChildren()) do
+		fx.logScaleWithValue(child, initValue, model)
+	end
+end
+function fx.setScale(instance, scale, model)
+	-- Parameters
+	model = model or instance
+	assert(instance and type(instance) == "userdata", "fx.setScale requires an instance")
+	assert(scale, "fx.setScale requires a number")
+
+	-- Parts
+	if instance:FindFirstChild("FullScaleProperties") then
+		if instance:IsA("BasePart") then
+			local offset = scaleCFrame(instance.FullScaleProperties.Offset.Value, scale)
+			renderVectorValue(instance, "Size", scale)
+			instance.CFrame = model:GetPrimaryPartCFrame():toWorldSpace(offset)
+		elseif instance:IsA("Attachment") then
+			renderCFrameValue(instance, "CFrame", scale)
+		elseif instance:IsA("JointInstance") then
+			renderCFrameValue(instance, "C0", scale)
+			renderCFrameValue(instance, "C1", scale)
+		elseif instance:IsA("SpecialMesh") then
+			renderVectorValue(instance, "Scale", scale)
+		end
+	end
+
+	-- Recurse through children
+	for _, child in pairs(instance:GetChildren()) do
+		fx.setScale(child, scale, model)
+	end
+end
+
+---------------------------------------------------------------------------------------------------
 -- Brightness setting
 ---------------------------------------------------------------------------------------------------
 
@@ -409,6 +507,14 @@ local InstanceEffects = {
 			effect.Value = value or 0
 		end,
 		render = fx.setTransparency,
+	},
+	ScaleEffect = {
+		valueType = "NumberValue",
+		init = function (effect, instance, value)
+			fx.logScaleWithValue(instance, value)
+			effect.Value = value or 1
+		end,
+		render = fx.setScale,
 	},
 }
 

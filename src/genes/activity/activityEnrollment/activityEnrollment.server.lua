@@ -19,7 +19,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
-local rolesUtil = require(env.src.roles.util)
+local counselorUtil = require(genes.player.counselor.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -58,7 +58,7 @@ genesUtil.initGene(activityEnrollment)
 -- Process requests from counselors
 local function processCounselorRequest(remote, callback)
 	rx.Observable.from(remote)
-		:filter(rolesUtil.isPlayerCounselor)
+		:filter(counselorUtil.isCounselor)
 		:flatMap(function (player, enrollmentInstance)
 			return genesUtil.getInstanceStream(activity)
 				:filter(function (activityInstance)

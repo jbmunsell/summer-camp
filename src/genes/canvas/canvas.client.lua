@@ -31,6 +31,7 @@ local inputUtil = require(input.util)
 -- Paint canvas cell
 -- 	(and submit change request to server)
 local function changeCanvas(canvasInstance, change)
+	print("client change canvas")
 	canvasUtil.changeCanvas(canvasInstance, change)
 	canvas.net.CanvasChangeRequested:FireServer(canvasInstance, change)
 end
@@ -115,12 +116,16 @@ local function connectDrawingInput(canvasInstance)
 			return rx.Observable.from(button.Activated)
 				:map(dart.constant(button.Name))
 		end)
+		:tap(print)
+		:takeUntil(terminator)
 		:multicast(activeTool)
 
 	-- Switch tool on color picker canvas interact
 	canvasInteractStream
+		:tap(print)
 		:filter(function () return activeTool:getValue() == "ColorPicker" end)
 		:map(dart.constant("Brush"))
+		:takeUntil(terminator)
 		:multicast(activeTool)
 
 	-- Stream for whether tool buttons should be active

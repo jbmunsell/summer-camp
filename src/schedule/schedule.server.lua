@@ -26,6 +26,12 @@ local scheduleConfig = require(schedule.config)
 local genesUtil = require(genes.util)
 
 ---------------------------------------------------------------------------------------------------
+-- Instances
+---------------------------------------------------------------------------------------------------
+
+env.res.audio.sounds:Clone().Parent = workspace
+
+---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
@@ -37,6 +43,9 @@ local function fireChunkChanged(chunk)
 
 	-- Fire remote event
 	schedule.net.ChunkChanged:FireAllClients(chunk)
+
+	-- Play sound!
+	workspace.sounds.ScheduleBell:Play()
 
 	-- Get config folder and send notification to all clients
 	if chunk.StartMessage then

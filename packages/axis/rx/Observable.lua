@@ -152,13 +152,14 @@ end
 
 -- From property
 -- 	Returns an observable that fires each time a specific property of an instance is changed.
-function Observable.fromProperty(instance, property)
+function Observable.fromProperty(instance, property, init)
 	assert(typeof(instance) == "Instance", "Observable.fromProperty requires an instance")
 	assert(type(property) == "string", "Observable.fromProperty requires a string")
-	return Observable.from(instance:GetPropertyChangedSignal(property))
+	local o = Observable.from(instance:GetPropertyChangedSignal(property))
 		:map(function ()
 			return instance[property]
 		end)
+	return (init and o:startWith(instance[property]) or o)
 end
 
 -- From instance tag

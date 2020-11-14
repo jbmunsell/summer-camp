@@ -16,6 +16,7 @@ local multiswitch = genes.multiswitch
 
 -- modules
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local interactUtil = require(interact.util)
 local lightGroupUtil = require(lightGroup.util)
@@ -33,6 +34,12 @@ multiswitchUtil.getSwitchStream(lightGroup)
 	:subscribe(lightGroupUtil.renderLightGroup)
 
 -- Light group interacted
-interactUtil.getInteractStream(lightGroup)
-	:map(dart.drop(1))
-	:subscribe(dart.follow(multiswitchUtil.toggleSwitch, "lightGroup", "primary"))
+local interacted = interactUtil.getInteractStream(lightGroup)
+	:map(dart.select(2))
+interacted:subscribe(dart.follow(multiswitchUtil.toggleSwitch, "lightGroup", "primary"))
+interacted:subscribe(function (instance)
+	local attachment = instance:FindFirstChild("InteractionPromptAdornee", true)
+	if attachment then
+		soundUtil.playRandom(env.res.genes.lightGroup.sounds, attachment)
+	end
+end)

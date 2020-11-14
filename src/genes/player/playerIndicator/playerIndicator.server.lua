@@ -11,7 +11,7 @@ local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local playerIndicator = genes.playerIndicator
+local playerIndicator = genes.player.playerIndicator
 
 -- modules
 local rx = require(axis.lib.rx)
@@ -45,7 +45,9 @@ end
 
 local function updateColor(indicator)
 	local state = indicator.state.playerIndicator
-	state.color.Value = env.config.cabins[state.player.Value.Team.Name].color.Value
+	local teamName = state.player.Value.team.Name
+	if teamName == "New Arrivals" then return end
+	state.color.Value = env.config.cabins[teamName].color.Value
 end
 
 local function setEnabled(instance, enabled)
@@ -74,8 +76,7 @@ rx.Observable.from(Players.PlayerRemoving)
 
 -- Set color on team changed
 players:flatMap(function (player)
-	return rx.Observable.fromProperty(player, "Team")
-		:startWith(0)
+	return rx.Observable.fromProperty(player, "Team", true)
 		:map(dart.constant(player))
 end):map(getPlayerIndicator)
 	:filter()

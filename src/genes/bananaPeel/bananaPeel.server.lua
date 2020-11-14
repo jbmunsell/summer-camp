@@ -64,10 +64,14 @@ local peelInstanceStream = genesUtil.initGene(bananaPeel)
 
 -- Currently the only thing influencing peel's hot value is
 -- 	whether or not it is being held by a person
+local bananaPeelHasHolderStream = genesUtil.crossObserveStateValue(bananaPeel, genes.pickup, "holder")
+	:filter(dart.select(2))
+	:map(dart.select(1))
 throwUtil.getThrowStream(bananaPeel)
 	:map(dart.select(1))
 	:delay(0.2)
 	:map(dart.drag(true))
+	:merge(bananaPeelHasHolderStream:map(dart.drag(false)))
 	:subscribe(genesUtil.setStateValue(bananaPeel, "hot"))
 
 -- Destroy banana peels after a number of slips

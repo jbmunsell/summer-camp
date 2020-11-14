@@ -5,7 +5,7 @@ local StartMessages = {
 	Meal = "Meal time! Follow your cabin leaders to the dining area.",
 	MealOver = "Meal time is over! Drop your trays and dishes off at the cleaning tent and ",
 
-	FreeTime = "enjoy your free time.",
+	FreeTime = "head to the campfire for roasting marshmallows.",
 	Activity = "follow your cabin leaders to an activity.",
 }
 

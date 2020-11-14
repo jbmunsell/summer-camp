@@ -102,8 +102,9 @@ local enrollments = genesUtil.initGene(activityEnrollment)
 local isActivityChunkStream = activityUtil.isActivityChunkStream
 
 -- Is local player counselor
-dataUtil.waitForState(env.LocalPlayer, "roles")
-local isCounselor = rx.Observable.from(env.LocalPlayer.state.roles.isCounselor)
+local isCounselor = genesUtil.observeStateValue(genes.player.counselor, "isCounselor")
+	:filter(dart.equals(env.LocalPlayer))
+	:map(dart.select(2))
 
 -- Get a stream from an activity's inSession value
 local function getSessionStream(activityInstance)

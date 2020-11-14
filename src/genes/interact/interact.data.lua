@@ -16,7 +16,7 @@ local interactData = genesUtil.createGeneData({
 
 	config = {
 		interact = {
-			distanceThreshold = 40,
+			distanceThreshold = 20,
 			duration = 0.3,
 		},
 	},

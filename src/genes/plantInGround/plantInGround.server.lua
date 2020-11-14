@@ -47,8 +47,14 @@ end
 local function tryPlant(instance)
 	pickupUtil.stripObject(instance)
 
+	-- Set value if not already
+	local id = instance.state.plantInGround.plantId
+	if id.Value < 0 then
+		createId(instance)
+	end
+
 	-- Grab attachment
-	local attachmentName = "PlantAttachment" .. instance.state.plantInGround.plantId.Value
+	local attachmentName = "PlantAttachment" .. id.Value
 	local attachment = instance:FindFirstChild(attachmentName, true)
 	assert(attachment, "No PlantAttachment found in " .. instance:GetFullName())
 
@@ -74,9 +80,6 @@ end
 
 -- init gene
 local plants = genesUtil.initGene(plantInGround)
-
--- Create plant ids
-plants:subscribe(createId)
 
 -- Stick on activated or optional init
 plants:filter(function (instance) return instance.config.plantInGround.initPlant.Value end)

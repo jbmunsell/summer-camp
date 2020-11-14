@@ -23,7 +23,7 @@ local collection = require(axis.lib.collection)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
-local rolesUtil = require(env.src.roles.util)
+local counselorUtil = require(genes.player.counselor.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -58,7 +58,7 @@ local function fillRoster(smashballInstance)
 	local roster = smashballInstance.state.smashball.roster
 	for i = 1, 2 do
 		tableau.from(smashballInstance.state.activity.sessionTeams[i].Value:GetPlayers())
-			:reject(rolesUtil.isPlayerCounselor)
+			:reject(counselorUtil.isCounselor)
 			:foreach(dart.bind(collection.addValue, roster[i]))
 	end
 	smashballInstance.state.smashball.rosterReady.Value = true

@@ -47,7 +47,6 @@ end
 
 -- init object server
 local readyInstances = {}
-local instanceReadiedStreams = {}
 local function getReadyInstances(gene)
 	if not readyInstances[gene] then
 		readyInstances[gene] = {}
@@ -84,9 +83,19 @@ function genesUtil.initGene(gene)
 
 	-- Cache a list of these instances for rapid accessing
 	local instanceRemoved = CollectionService:GetInstanceRemovedSignal(geneData.instanceTag)
-	local geneReady = getReadyInstances(gene)
-	getInstanceReadiedStream(gene):subscribe(dart.bind(table.insert, geneReady))
-	rx.Observable.from(instanceRemoved):subscribe(dart.bind(tableau.removeValue, geneReady))
+	local geneReadyList = getReadyInstances(gene)
+	if not gene.data:FindFirstChild("InstanceReadyEvent") then
+		if RunService:IsServer() then
+			Instance.new("BindableEvent", gene.data).Name = "InstanceReadyEvent"
+		elseif RunService:IsClient() then
+			gene.data:WaitForChild("InstanceReadyEvent")
+		end
+	end
+	getInstanceReadiedStream(gene):subscribe(function (instance)
+		table.insert(geneReadyList, instance)
+		gene.data.InstanceReadyEvent:Fire(instance)
+	end)
+	rx.Observable.from(instanceRemoved):subscribe(dart.bind(tableau.removeValue, geneReadyList))
 
 	-- (server only) Init all tagged instances when we hear about them
 	if RunService:IsServer() then
@@ -116,7 +125,8 @@ end
 
 -- Get instance stream
 function genesUtil.getInstanceStream(gene)
-	return getInstanceReadiedStream(gene)--:startWithTable(genesUtil.getInstances(gene))
+	local event = gene.data:WaitForChild("InstanceReadyEvent")
+	return rx.Observable.from(event):startWithTable(genesUtil.getInstances(gene):raw())
 end
 
 -- Add new state folder to object
@@ -185,13 +195,16 @@ local function checkGene(instance, gene, checked)
 end
 function genesUtil.hasFullState(instance, gene)
 	-- Check primary state
-	-- print("checking full state")
-	-- print(debug.traceback())
 	if not instance:FindFirstChild("state") then return end
 	if not instance:FindFirstChild("config") then return end
 
 	-- Chase all genes to see if they have the appropriate state folder
 	return checkGene(instance, gene)
+end
+function genesUtil.waitForState(instance, gene)
+	while not genesUtil.hasFullState(instance, gene) do
+		wait()
+	end
 end
 
 -- Create gene data

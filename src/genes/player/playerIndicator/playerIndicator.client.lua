@@ -12,7 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local playerIndicator = genes.playerIndicator
+local playerIndicator = genes.player.playerIndicator
 
 -- modules
 local rx = require(axis.lib.rx)

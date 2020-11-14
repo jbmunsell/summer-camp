@@ -19,6 +19,7 @@ local stickyNoteStack = genes.stickyNoteStack
 local rx = require(axis.lib.rx)
 local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
@@ -87,13 +88,19 @@ genesUtil.observeStateValue(stickyNoteStack, "count")
 	:subscribe(dart.destroy)
 
 -- Handle placement requests
-pickupUtil.getPlayerObjectActionRequestStream(
+local placementStream = pickupUtil.getPlayerObjectActionRequestStream(
 	stickyNoteStack.net.PlacementRequested,
 	stickyNoteStack
-)	:filter(function (_, _, raycastData)
-		return raycastData
-		and raycastData.instance
-		and raycastData.instance:IsDescendantOf(workspace)
-	end)
-	:subscribe(placePlayerStackNote)
+):filter(function (_, _, raycastData)
+	return raycastData
+	and raycastData.instance
+	and raycastData.instance:IsDescendantOf(workspace)
+end)
+placementStream:subscribe(placePlayerStackNote)
+placementStream:subscribe(function (_, instance)
+	local attachment = instance:FindFirstChild("RightGripAttachment", true)
+	if attachment then
+		soundUtil.playRandom(env.res.genes.stickyNoteStack.sounds, attachment)
+	end
+end)
 

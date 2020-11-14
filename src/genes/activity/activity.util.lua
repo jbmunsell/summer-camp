@@ -13,6 +13,7 @@ local genes = env.src.genes
 local activity = genes.activity
 
 -- modules
+local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
@@ -41,6 +42,21 @@ function activityUtil.getCabinActivity(team)
 	return genesUtil.getInstances(activity)
 		:first(function (activityInstance)
 			return collection.getValue(activityInstance.state.activity.sessionTeams, team)
+		end)
+end
+
+-- Get player competing stream
+function activityUtil.getPlayerCompetingStream(player)
+	return genesUtil.getInstanceStream(activity)
+		:flatMap(function (activityInstance)
+			local teams = activityInstance.state.activity.sessionTeams
+			return collection.observeChanged(teams)
+		end)
+		:merge(rx.Observable.fromProperty(player, "Team", true))
+		:map(function ()
+			return genesUtil.getInstances(activity):first(function (activityInstance)
+				return collection.getValue(activityInstance.state.activity.sessionTeams, player.Team)
+			end)
 		end)
 end
 

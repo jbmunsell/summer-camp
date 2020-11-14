@@ -53,6 +53,17 @@ function BehaviorSubject:push(...)
 	end
 end
 
+-- fail and complete
+function BehaviorSubject:fail(...)
+	for _, observer in pairs(self.observers) do
+		observer:fail(...)
+	end
+end
+function BehaviorSubject:complete(...)
+	for _, observer in pairs(self.observers) do
+		observer:complete(...)
+	end
+end
 
 -- return class
 return BehaviorSubject
