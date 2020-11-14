@@ -32,11 +32,14 @@ end
 
 -- Init canvases
 -- 	Places a switch in canvases so that we can lock them for our class
+local function createCanvasSwitch(canvasInstance)
+	multiswitchUtil.createSwitch(canvasInstance, "interact", "artClass")
+	genesUtil.addGene(canvasInstance, genes.multiswitch.teamOnly)
+end
 local function initCanvases(artClassInstance)
-	getCanvases(artClassInstance):foreach(function (canvasInstance)
-		multiswitchUtil.createSwitch(canvasInstance, "interact", "artClass")
-		genesUtil.addGene(canvasInstance, genes.multiswitch.teamOnly)
-	end)
+	genesUtil.getInstanceStream(canvas)
+		:filter(dart.isDescendantOf(artClassInstance))
+		:subscribe(createCanvasSwitch)
 end
 
 -- Open canvases
