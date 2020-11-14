@@ -44,6 +44,7 @@ holders
 		return rx.Observable.from(holder.state.humanoidHolder.owner)
 	end)
 	:map(axisUtil.getLocalHumanoid)
+	:filter()
 	:map(humanoidHolderUtil.getHumanoidHolder)
 	:map(dart.boolNot)
 	:subscribe(setSwitch)
