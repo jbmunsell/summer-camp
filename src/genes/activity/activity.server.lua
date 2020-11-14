@@ -63,8 +63,11 @@ end
 local function createTrophy(activityInstance, cabin)
 	-- Create trophy
 	local trophy = activityInstance.config.activity.trophy.Value:Clone()
-	trophy.CFrame = activityInstance.functional.TrophySpawn.CFrame
+	trophy:SetPrimaryPartCFrame(activityInstance.functional.TrophySpawn.CFrame)
 	trophy.Parent = workspace
+
+	-- Set decal part texture id
+	trophy.DecalPart.Decal.Texture = env.config.teams[cabin.Name].image.Value
 
 	-- Tag and apply functionality
 	genesUtil.addGene(trophy, genes.pickup)
