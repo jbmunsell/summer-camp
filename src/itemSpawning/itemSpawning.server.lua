@@ -18,7 +18,7 @@ local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
-local scheduleStreams = require(env.src.schedule.streams)
+local scheduleUtil = require(env.src.schedule.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Variables
@@ -95,17 +95,8 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Day start and end streams
-local function fromTimeStream(t)
-	return scheduleStreams.gameTime
-		:map(function (time)
-			return time > t
-		end)
-		:startWith(false)
-		:distinctUntilChanged()
-		:filter()
-end
-local dayStartStream = fromTimeStream(8)
-local dayEndStream = fromTimeStream(18)
+local dayStartStream = scheduleUtil.getTimeOfDayStream(8)
+local dayEndStream = scheduleUtil.getTimeOfDayStream(18)
 
 -- Spawn items on day start stream
 local function spawnItemsAtAttachments(stream, instance, attachmentName, itemList)
@@ -132,7 +123,7 @@ dayEndStream:subscribe(destroyBalls)
 -- Marshmallow spawning
 ---------------------------------------------------------------------------------------------------
 
-fromTimeStream(18):subscribe(function ()
+scheduleUtil.getTimeOfDayStream(18):subscribe(function ()
 	local folder = env.res.sticksAndMarshmallows:Clone()
 	folder.Parent = workspace
 	for _, d in pairs(folder:GetChildren()) do
@@ -143,7 +134,7 @@ fromTimeStream(18):subscribe(function ()
 		weld.Parent = d
 	end
 end)
-fromTimeStream(22):subscribe(dart.bind(axisUtil.destroyChild, workspace, "sticksAndMarshmallows"))
+scheduleUtil.getTimeOfDayStream(22):subscribe(dart.bind(axisUtil.destroyChild, workspace, "sticksAndMarshmallows"))
 
 ---------------------------------------------------------------------------------------------------
 -- Tip generation

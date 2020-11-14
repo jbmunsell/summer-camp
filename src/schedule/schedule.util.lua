@@ -13,10 +13,14 @@ local gui      = env.src.gui
 
 -- modules
 local scheduleConfig = require(schedule.config)
+local scheduleStreams = require(schedule.streams)
 local displayConfig  = require(gui.config)
 
+-- lib
+local scheduleUtil = {}
+
 -- Get time string
-local function getTimeString(gameTimeHours)
+function scheduleUtil.getTimeString(gameTimeHours)
 	local chopDisplay = not displayConfig.display24HourClock
 	local hours = math.floor(gameTimeHours); hours = (chopDisplay and (hours - 1) % 12 + 1 or hours)
 	local minutes = math.floor(math.fmod(gameTimeHours, 1) * 60)
@@ -25,7 +29,7 @@ local function getTimeString(gameTimeHours)
 end
 
 -- Get start time
-local function getChunkStartTime(chunk)
+function scheduleUtil.getChunkStartTime(chunk)
 	local t = scheduleConfig.agenda[1].StartingTime
 	for _, c in pairs(scheduleConfig.agenda) do
 		if c.Index == chunk.Index then break end
@@ -34,8 +38,16 @@ local function getChunkStartTime(chunk)
 	return t
 end
 
+-- Get time of day stream
+function scheduleUtil.getTimeOfDayStream(t)
+	return scheduleStreams.gameTime
+		:map(function (time)
+			return time > t
+		end)
+		:startWith(false)
+		:distinctUntilChanged()
+		:filter()
+end
+
 -- return lib
-return {
-	getTimeString = getTimeString,
-	getChunkStartTime = getChunkStartTime,
-}
+return scheduleUtil
