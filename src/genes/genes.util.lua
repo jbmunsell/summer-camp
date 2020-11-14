@@ -22,6 +22,11 @@ local tableau = require(axis.lib.tableau)
 local genesUtil = {}
 local geneFolders = {}
 
+-- Create gene folders
+if RunService:IsServer() then
+	Instance.new("Folder", ReplicatedStorage).Name = "_geneValueFolders"
+end
+
 -- Has gene
 function genesUtil.hasGene(instance, gene)
 	return CollectionService:HasTag(instance, require(gene.data).instanceTag)
@@ -163,7 +168,7 @@ function genesUtil.touchFolder(instance, gene, tableName)
 	if not geneFolders[tableName][gene] then
 		geneFolders[tableName][gene] = tableau.tableToValueObjects("", geneData[tableName])
 	end
-	geneFolders[tableName][gene].Parent = ReplicatedStorage
+	geneFolders[tableName][gene].Parent = ReplicatedStorage._geneValueFolders
 	mergeFolders(geneFolders[tableName][gene], folder)
 end
 
