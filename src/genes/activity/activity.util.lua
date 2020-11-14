@@ -7,6 +7,7 @@
 --
 
 -- env
+local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -70,6 +71,21 @@ function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
 		:map(dart.index("Character"))
 		:filter()
 		:foreach(place)
+end
+
+-- Eject players from instance
+function activityUtil.ejectPlayers(activityInstance)
+	local ejectionSpawnPlane = activityInstance:FindFirstChild("EjectionSpawnPlane", true)
+	local pitchBounds = activityInstance:FindFirstChild("PitchBounds", true)
+	assert(ejectionSpawnPlane and pitchBounds, activityInstance:GetFullName() .. " does not have ejection "
+		.. "spawn plane or pitch bounds.")
+
+	local players = tableau.from(Players:GetPlayers())
+		:filter(function (p)
+			local root = axisUtil.getPlayerHumanoidRootPart(p)
+			return root and axisUtil.isPointInPartXZ(root.Position, pitchBounds)
+		end)
+	activityUtil.spawnPlayersInPlane(players:raw(), ejectionSpawnPlane)
 end
 
 -- return lib

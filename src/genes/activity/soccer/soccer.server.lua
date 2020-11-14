@@ -171,12 +171,16 @@ local ballEscapedStream = volleyActivePulse
 	:reject(isBallInBounds)
 
 -----------------------------------
+-- Eject players that are already in the thing when it starts
+sessionStartStream:subscribe(activityUtil.ejectPlayers)
+
+-----------------------------------
 -- Volley state subscriptions
 -- START VOLLEY when session starts OR on plain goal delay finished
 plainGoalStream
 	:delay(3)
 	:filter(activityUtil.isInSession)
-	:merge(sessionStartStream)
+	:merge(sessionStartStream:delay(0.1))
 	:subscribe(startVolley)
 
 -- STOP VOLLEY when any goal is scored OR session terminates

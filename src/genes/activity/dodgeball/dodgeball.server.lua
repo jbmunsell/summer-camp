@@ -187,7 +187,8 @@ sessionStart:subscribe(fillRoster)
 sessionEnd:subscribe(resetRosterReady)
 
 -- Spawn players on session start
-sessionStart:subscribe(spawnPlayers)
+sessionStart:subscribe(activityUtil.ejectPlayers)
+sessionStart:delay(0.1):subscribe(spawnPlayers)
 
 -- Get player out when they are touched by a hot ball OR their character dies
 playerDied
