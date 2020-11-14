@@ -58,6 +58,16 @@ local SpawnHandlers = {
 
 -- Place random item at attachment
 local function placeRandomItemAtAttachment(attachment, itemList)
+	-- Track what has been spawned
+	-- TEMPORARY until we create a real spawn gene
+	if not attachment:FindFirstChild("spawnedInstance") then
+		Instance.new("ObjectValue", attachment).Name = "spawnedInstance"
+	end
+	if attachment.spawnedInstance.Value then
+		print("Attachment still has object; returning")
+		return
+	end
+
 	-- Clone item
 	local itemSource = tableau.from(itemList):random()
 	local item = itemSource:Clone()
@@ -75,12 +85,17 @@ local function placeRandomItemAtAttachment(attachment, itemList)
 
 	-- Randomize color
 	if RandomizeColor[itemSource] then
-		genesUtil.getInstanceStream(genes.color)
-			:filter(dart.equals(item))
-			:map(getRandomColor)
-			:map(dart.carry(item))
-			:subscribe(genesUtil.setStateValue(genes.color, "color"))
+		genesUtil.waitForState(item, genes.color)
+		item.state.color.color.Value = getRandomColor()
 	end
+
+	-- Track spawned
+	attachment.spawnedInstance.Value = item
+	genesUtil.waitForState(item, genes.pickup)
+	rx.Observable.from(item.state.pickup.holder):filter():first():subscribe(function ()
+		print("Item grabbed; clearing attachment")
+		attachment.spawnedInstance.Value = nil
+	end)
 end
 
 -- Destroy balls
