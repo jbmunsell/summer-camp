@@ -159,7 +159,31 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 			:map(dart.drag(ball))
 	end)
 	:map(function (hit, ball)
-		return Players:GetPlayerFromCharacter(hit.Parent), ball
+		local player = Players:GetPlayerFromCharacter(hit.Parent)
+		if player then print("dodgeball hit player character directly") end
+		if not player then
+			for _, p in pairs(genesUtil.getInstances(genes.player.characterBackpack)) do
+				local backpack = player.state.characterBackpack.instance.Value
+				if backpack and hit:IsDescendantOf(backpack) then
+					print("dodgeball hit backpack")
+					player = p
+					break
+				end
+			end
+		end
+		if not player then
+			for _, v in pairs(genesUtil.getInstances(genes.pickup)) do
+				if (hit == v or hit:IsDescendantOf(v)) then
+					local p = Players:GetPlayerFromCharacter(v.state.pickup.holder.Value)
+					if p then
+						print("dodgeball hit player held item")
+						player = p
+						break
+					end
+				end
+			end
+		end
+		return player, ball
 	end)
 	:filter(dart.select(1))
 	:map(function (player, ball)
