@@ -15,6 +15,7 @@ local interact = genes.interact
 
 -- modules
 local rx = require(axis.lib.rx)
+local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 
 -- lib
@@ -24,6 +25,7 @@ local interactUtil = {}
 function interactUtil.getInteractStream(class)
 	if RunService:IsServer() then
 		return rx.Observable.from(interact.net.ClientInteracted)
+			:filter(dart.boolAnd)
 			:filter(function (_, instance)
 				return genesUtil.hasFullState(instance, class)
 			end)
