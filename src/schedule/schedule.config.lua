@@ -21,20 +21,20 @@ local scheduleConfig = {
 	agenda = {
 		{
 			Name = "LightsOut",
-			Duration = 8.25,
+			Duration = 8.0,
 			StartingTime = 0,
 			DisplayName = "Lights Out",
 			StartMessage = StartMessages.LightsOut
 		},
-		{
-			Name = "MorningRun",
-			Duration = 0.25,
-			DisplayName = "Morning Run",
-			StartMessage = StartMessages.MorningRun
-		},
+		-- {
+		-- 	Name = "MorningRun",
+		-- 	Duration = 0.25,
+		-- 	DisplayName = "Morning Run",
+		-- 	StartMessage = StartMessages.MorningRun
+		-- },
 		{
 			Name = "Breakfast",
-			Duration = 0.5,
+			Duration = 1.0,
 			DisplayName = "Breakfast",
 			MealKey = "breakfast",
 			StartMessage = StartMessages.Meal
@@ -47,7 +47,7 @@ local scheduleConfig = {
 		},
 		{
 			Name = "Lunch",
-			Duration = 0.5,
+			Duration = 1.0,
 			DisplayName = "Lunch",
 			MealKey = "lunch",
 			StartMessage = StartMessages.Meal
@@ -60,20 +60,20 @@ local scheduleConfig = {
 		},
 		{
 			Name = "Dinner",
-			Duration = 0.5,
+			Duration = 1.0,
 			DisplayName = "Dinner",
 			MealKey = "dinner",
 			StartMessage = StartMessages.Meal
 		},
 		{
 			Name = "FreeTime",
-			Duration = 4.0,
+			Duration = 2.0,
 			DisplayName = "Free Time",
 			StartMessage = StartMessages.MealOver .. StartMessages.FreeTime
 		},
 		{
 			Name = "LightsOut",
-			Duration = 2,
+			Duration = 3,
 			DisplayName = "Lights Out",
 			StartMessage = StartMessages.LightsOut
 		},
