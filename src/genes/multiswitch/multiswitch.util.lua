@@ -39,7 +39,13 @@ end
 
 -- Queries
 function multiswitchUtil.all(instance, setName, f)
-	return tableau.fromValueObjects(instance.state[setName].switches):all(f)
+	f = f or dart.identity
+	for _, switch in pairs(instance.state[setName].switches:GetChildren()) do
+		if not f(switch.Value) then
+			return false
+		end
+	end
+	return true
 end
 
 -- Streams
