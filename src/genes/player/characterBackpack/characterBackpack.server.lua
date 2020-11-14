@@ -29,7 +29,7 @@ local activityUtil = require(genes.activity.util)
 
 -- Set backpack color
 local function setBackpackTeam(instance, team, isCounselor)
-	local config = env.config.cabins[team.Name]
+	local config = env.config.teams[team.Name]
 	local color = (isCounselor and Color3.new(0.3, 0.3, 0.3) or config.color.Value)
 	local image = config.image.Value
 	instance.Handle.SpecialMesh.VertexColor = Vector3.new(color.R, color.G, color.B)

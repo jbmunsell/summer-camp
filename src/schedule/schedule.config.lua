@@ -42,7 +42,7 @@ local scheduleConfig = {
 		{
 			Name = "OpenActivityChunk",
 			Duration = 4.0,
-			DisplayName = "Morning Activity",
+			DisplayName = "Team Activities",
 			StartMessage = StartMessages.MealOver .. StartMessages.Activity,
 		},
 		{
@@ -55,7 +55,7 @@ local scheduleConfig = {
 		{
 			Name = "OpenActivityChunk",
 			Duration = 4.0,
-			DisplayName = "Afternoon Activity",
+			DisplayName = "Team Activities",
 			StartMessage = StartMessages.MealOver .. StartMessages.Activity
 		},
 		{

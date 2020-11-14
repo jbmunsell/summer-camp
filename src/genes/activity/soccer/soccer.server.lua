@@ -46,7 +46,7 @@ local function fireCannonsForTeam(soccerInstance, teamIndex)
 	local team = soccerInstance.state.activity.sessionTeams[teamIndex].Value
 	local descendants = tableau.from(soccerInstance:GetDescendants())
 	descendants:filter(dart.isNamed("ConfettiiTeam")):foreach(function (emitter)
-		emitter.Color = ColorSequence.new(env.config.cabins[team.Name].color.Value)
+		emitter.Color = ColorSequence.new(env.config.teams[team.Name].color.Value)
 		emitter:Emit(50)
 	end)
 	descendants:filter(dart.isNamed("ConfettiiGold"))

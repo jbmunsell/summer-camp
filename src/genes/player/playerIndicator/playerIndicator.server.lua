@@ -47,7 +47,8 @@ local function updateColor(indicator)
 	local state = indicator.state.playerIndicator
 	local teamName = state.player.Value.team.Name
 	if teamName == "New Arrivals" then return end
-	state.color.Value = env.config.cabins[teamName].color.Value
+	local h, s, _ = env.config.teams[teamName].color.Value:ToHSV()
+	state.color.Value = Color3.fromHSV(h, s, 145 / 255)
 end
 
 local function setEnabled(instance, enabled)

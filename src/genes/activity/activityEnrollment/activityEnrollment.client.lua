@@ -72,7 +72,7 @@ local function displayTeams(enrollmentInstance, folder)
 	local teamList = enrollmentInstance:FindFirstChild("TeamList", true)
 	local function createImage(team)
 		local image = enrollmentInstance:FindFirstChild("seeds", true).TeamImage:Clone()
-		image.Image = env.config.cabins[team.Name].image.Value
+		image.Image = env.config.teams[team.Name].image.Value
 		image.Visible = true
 		image.Parent = teamList
 	end

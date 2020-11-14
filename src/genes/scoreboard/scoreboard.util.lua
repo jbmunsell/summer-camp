@@ -32,7 +32,7 @@ function scoreboardUtil.setTeams(instance, teamsFolder)
 		local teamName = teamsFolder[i].Value.Name
 		local labels = getTeamLabels(instance, i)
 		for _, label in pairs(labels) do
-			label.TextColor3 = env.config.cabins[teamName].color.Value
+			label.TextColor3 = env.config.teams[teamName].color.Value
 		end
 		labels.nameLabel.Text = teamName
 	end
