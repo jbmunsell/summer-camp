@@ -15,6 +15,7 @@ local axis = env.packages.axis
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local tableau = require(axis.lib.tableau)
 
 ---------------------------------------------------------------------------------------------------
 -- Instances
@@ -40,14 +41,14 @@ local labels = {
 	teamDescription = teamSelect:FindFirstChild("TeamDescriptionLabel", true),
 }
 
-local inspectingTeam = rx.BehaviorSubject.new(Teams.Lupus)
-
 local TeamsList = {
 	Teams.Lupus,
 	Teams.Strix,
 	Teams.Scorpius,
 	Teams.Felis,
 }
+
+local inspectingTeam = rx.BehaviorSubject.new(tableau.from(TeamsList):random())
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
