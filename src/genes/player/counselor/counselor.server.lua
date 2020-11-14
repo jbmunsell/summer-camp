@@ -28,6 +28,15 @@ local counselorData = require(counselor.data)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
+-- Render new counselor
+local function renderNewCounselor(player)
+	-- Send gui notification
+	local notificationText = string.format("You have been appointed counselor of the %s! You are now "
+		.. "in charge of starting team activities. Ask your campers what they want to do.",
+		player.Team.Name)
+	env.src.gui.notifications.net.Push:FireClient(player, notificationText)
+end
+
 -- Add team counselor
 local function addTeamCounselor(team)
 	local target = genesUtil.getInstances(counselor)
@@ -37,6 +46,7 @@ local function addTeamCounselor(team)
 	if target then
 		print("Appointing " .. target.Name .. " as counselor")
 		target.state.counselor.isCounselor.Value = true
+
 		AnalyticsService:FireEvent("counselorAppointed", {
 			playerId = target.UserId,
 			sessionTime = sessionTimeUtil.getSessionTime(target),
@@ -97,7 +107,9 @@ playerStream
 	:subscribe(recalculateTeamCounselors)
 
 -- When a player counselor value changes, render their character size
-genesUtil.observeStateValue(counselor, "isCounselor")
+local isCounselorStream = genesUtil.observeStateValue(counselor, "isCounselor")
+isCounselorStream:filter(dart.select(2)):subscribe(renderNewCounselor)
+isCounselorStream
 	:map(dart.index("Character"))
 	:merge(playerStream:map(dart.index("CharacterAdded")):flatMap(rx.Observable.from))
 	:filter()
