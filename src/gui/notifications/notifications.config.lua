@@ -1,3 +1,3 @@
 return {
-	duration = 10,
+	duration = 20,
 }

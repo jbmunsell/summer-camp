@@ -22,6 +22,11 @@ local Core = env.PlayerGui:WaitForChild("Core")
 local seeds = Core.seeds
 local animations = Core.animations
 
+-- is core enabled
+local function isCoreEnabled()
+	return Core.Enabled
+end
+
 -- Destroy notification
 local function killNotification(notification)
 	glib.playAnimation(animations.notifications.hide, notification)
@@ -48,4 +53,5 @@ end
 
 -- Notification factory stream
 rx.Observable.from(notifications.net.Push)
+	:filter(isCoreEnabled)
 	:subscribe(notify)
