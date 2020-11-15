@@ -50,6 +50,29 @@ function genesUtil.getAllSubGenes(gene)
 	return tableau.from(genes)
 end
 
+-- init gene queue
+local _geneRequestQueue = {}
+local function initInstanceGene(instance, gene)
+	-- Add folders
+	local geneData = require(gene.data)
+	genesUtil.touchFolder(instance, gene, "config")
+	genesUtil.touchFolder(instance, gene, "state")
+	genesUtil.addInterface(instance, gene)
+
+	-- Add tags to apply inherited gene functionality
+	for _, g in pairs(geneData.genes) do
+		genesUtil.addGene(instance, g)
+	end
+end
+function genesUtil.initQueueProcessing(bufferSize)
+	rx.Observable.heartbeat():subscribe(function ()
+		for _ = 1, math.min(bufferSize, #_geneRequestQueue) do
+			local request = table.remove(_geneRequestQueue, 1)
+			initInstanceGene(unpack(request))
+		end
+	end)
+end
+
 -- init object server
 local readyInstances = {}
 local function getReadyInstances(gene)
@@ -77,10 +100,6 @@ local function createInstanceReadiedStream(gene)
 end
 local function getInstanceReadiedStream(gene)
 	return createInstanceReadiedStream(gene)
-	-- if not instanceReadiedStreams[gene] then
-	-- 	instanceReadiedStreams[gene] = createInstanceReadiedStream(gene)
-	-- end
-	-- return instanceReadiedStreams[gene]
 end
 function genesUtil.initGene(gene)
 	-- Grab data
@@ -104,19 +123,9 @@ function genesUtil.initGene(gene)
 
 	-- (server only) Init all tagged instances when we hear about them
 	if RunService:IsServer() then
-		local function initInstance(instance)
-			-- Add folders
-			genesUtil.touchFolder(instance, gene, "config")
-			genesUtil.touchFolder(instance, gene, "state")
-			genesUtil.addInterface(instance, gene)
-
-			-- Add tags to apply inherited gene functionality
-			for _, g in pairs(geneData.genes) do
-				genesUtil.addGene(instance, g)
-			end
-		end
-		rx.Observable.fromInstanceTag(geneData.instanceTag)
-			:subscribe(initInstance)
+		rx.Observable.fromInstanceTag(geneData.instanceTag):subscribe(function (instance)
+			table.insert(_geneRequestQueue, { instance, gene })
+		end)
 	end
 
 	-- return instance stream
