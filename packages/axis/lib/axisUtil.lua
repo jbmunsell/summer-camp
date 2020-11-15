@@ -48,6 +48,15 @@ function axisUtil.destroyChild(instance, childName)
 end
 
 -- Get player humanoid
+function axisUtil.getPlayerCharacterStream()
+	return rx.Observable.from(Players.PlayerAdded)
+		:startWithTable(Players:GetPlayers())
+		:flatMap(function (p)
+			return rx.Observable.from(p.CharacterAdded)
+				:startWith(p.Character)
+				:map(dart.carry(p))
+		end)
+end
 function axisUtil.getHumanoidDiedStream()
 	return rx.Observable.from(workspace.DescendantAdded)
 		:startWithTable(workspace:GetDescendants())
