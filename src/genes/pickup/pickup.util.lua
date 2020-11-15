@@ -99,14 +99,50 @@ function pickupUtil.equip(character, object)
 end
 
 -- Get character held objects
+-- 	Init held object tracker
+local _characterHeldObjects = {}
+function pickupUtil.initHeldObjectTracking()
+	genesUtil.getInstanceStream(pickup):flatMap(function (instance)
+		return rx.Observable.from(instance.state.pickup.holder)
+			:merge(rx.Observable.fromInstanceLeftGame(instance):map(dart.constant(nil)))
+			:replay(2)
+			:skip(1)
+			:map(function (a, b) return instance, a, b end)
+	end)
+	:subscribe(function (instance, oldHolder, newHolder)
+		if _characterHeldObjects[oldHolder] then
+			local t = _characterHeldObjects[oldHolder]:getValue()
+			tableau.removeValue(t, instance)
+			_characterHeldObjects[oldHolder]:push(t)
+			print("removed held object from tracker")
+		end
+		if _characterHeldObjects[newHolder] then
+			local t = _characterHeldObjects[newHolder]:getValue()
+			table.insert(t, instance)
+			_characterHeldObjects[newHolder]:push(t)
+			print("added held object to tracker")
+		end
+	end)
+end
+function pickupUtil.trackCharacterHeldObjects(character)
+	_characterHeldObjects[character] = rx.BehaviorSubject.new({})
+	rx.Observable.fromInstanceLeftGame(character):subscribe(function ()
+		_characterHeldObjects[character] = nil
+	end)
+end
+function pickupUtil.getCharacterHeldObjectsStream(character)
+	return _characterHeldObjects[character]
+end
 function pickupUtil.getCharacterHeldObjects(character)
-	return genesUtil.getInstances(pickup)
-		:filter(function (object)
-			return object.state.pickup.holder.Value == character
-		end)
+	local sub = _characterHeldObjects[character]
+	return sub and tableau.from(sub:getValue()) or tableau.empty()
+	-- return genesUtil.getInstances(pickup)
+	-- 	:filter(function (object)
+	-- 		return object.state.pickup.holder.Value == character
+	-- 	end)
 end
 function pickupUtil.getLocalCharacterHeldObjects()
-	if not env.LocalPlayer.Character then return tableau.from({}) end
+	if not env.LocalPlayer.Character then return tableau.empty() end
 	return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character)
 end
 
