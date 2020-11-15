@@ -34,6 +34,13 @@ local inputStreams = require(input.streams)
 -- init
 genesUtil.initGene(pickup)
 
+-- Track local character held objects
+pickupUtil.initHeldObjectTracking()
+rx.Observable.from(env.LocalPlayer.CharacterAdded)
+	:startWith(env.LocalPlayer.Character)
+	:filter()
+	:subscribe(pickupUtil.trackCharacterHeldObjects)
+
 -- Play equip on equip
 -- 	The server does this exact same thing, but it also tells the clients
 -- 	and has the clients perform the functionality as well. This way the clients
@@ -45,12 +52,12 @@ rx.Observable.from(pickup.net.ObjectEquipped)
 	end)
 
 -- Simple activation pass
-local clickWithHeldStream = inputStreams.click
+inputStreams.click
 	:map(function ()
 		return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character):first(),
 			inputUtil.getMouseHit()
 	end)
-clickWithHeldStream:subscribe(dart.forward(pickup.net.ObjectActivated))
+	:subscribe(dart.forward(pickup.net.ObjectActivated))
 
 -- Drop on backspace
 rx.Observable.from(Enum.KeyCode.Backspace)

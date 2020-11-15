@@ -30,24 +30,6 @@ local multiswitchUtil = require(multiswitch.util)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
--- Init an instance by creating state folder
-local function initInstance(instance)
-	-- When the holder changes, play and stop hold animation accordingly
-	local function tryUpdate(character)
-		if character then
-			pickupUtil.updateHoldAnimation(character)
-		end
-	end
-	local instanceDestroyed = rx.Observable.fromInstanceLeftGame(instance)
-	rx.Observable.from(instance.state.pickup.holder)
-		:merge(instanceDestroyed:map(dart.constant(nil)))
-		:replay(2)
-		:subscribe(function (old, new)
-			tryUpdate(old)
-			tryUpdate(new)
-		end)
-end
-
 -- Fire drop event
 local function fireDropEvent(character)
 	local instance = pickupUtil.getCharacterHeldObjects(character):first()
@@ -79,10 +61,20 @@ end
 
 -- Pickup object stream
 local pickupInstanceStream = genesUtil.initGene(pickup)
-pickupInstanceStream:subscribe(initInstance)
 
 -- Activated event
 -- pickupUtil.getActivatedStream(pickup):tap(print):subscribe(fireActivatedEvent)
+
+-- Track all character held objects
+pickupUtil.initHeldObjectTracking()
+axisUtil.getPlayerCharacterStream()
+	:map(dart.select(2))
+	:subscribe(function (character)
+		pickupUtil.trackCharacterHeldObjects(character)
+		pickupUtil.getCharacterHeldObjectsStream(character)
+			:map(dart.constant(character))
+			:subscribe(pickupUtil.updateHoldAnimation)
+	end)
 
 -- We should only be able to interact with an object if it has no holder and is enabled
 pickupInstanceStream
