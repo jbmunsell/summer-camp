@@ -69,7 +69,8 @@ local function connectDrawingInput(canvasInstance)
 	local function mapInputEventToConstant(event, constant)
 		return rx.Observable.from(event)
 			:filter(function (inputObject, processed)
-				return not processed and inputObject.UserInputType == Enum.UserInputType.MouseButton1
+				return not processed and (inputObject.UserInputType == Enum.UserInputType.MouseButton1
+					or inputObject.UserInputType == Enum.UserInputType.Touch)
 			end)
 			:map(dart.constant(constant))
 	end
@@ -106,11 +107,23 @@ local function connectDrawingInput(canvasInstance)
 	local satAdjustedStream = createSliderManipulationStream(sliders.Saturation, 1)
 	local valAdjustedStream = createSliderManipulationStream(sliders.Brightness, 1)
 
+	local function isMouse(inputObject)
+		return inputObject.UserInputType == Enum.UserInputType.Touch
+		or inputObject.UserInputType == Enum.UserInputType.MouseButton1
+	end
+	local mouseStateStream = rx.Observable.from(UserInputService.InputBegan)
+		:filter(isMouse)
+		:map(dart.constant(true))
+		:merge(rx.Observable.from(UserInputService.InputEnded):filter(isMouse):map(dart.constant(false)))
+		:multicast(rx.BehaviorSubject.new())
+
 	-- Stream for user clicking on a unique canvas cell
 	local canvasInteractStream = mouseRaycastStream
-		:filter(function ()
-			return UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
-		end)
+		:withLatestFrom(mouseStateStream)
+		:filter(dart.select(2))
+		-- :filter(function ()
+		-- 	return UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
+		-- end)
 		:map(dart.bind(canvasUtil.getCellIndexFromRaycastResult, canvasInstance))
 		:distinctUntilChanged()
 		:filter()
@@ -129,9 +142,21 @@ local function connectDrawingInput(canvasInstance)
 		:takeUntil(terminator)
 		:multicast(activeTool)
 
+	-- Get a stream for a specific tool interacting with the canvas
+	local function getToolInteractStream(toolName)
+		return canvasInteractStream
+			:filter(function ()
+				return toolName == activeTool:getValue()
+			end)
+	end
+
 	-- Switch tool on color picker canvas interact
-	canvasInteractStream
-		:filter(function () return activeTool:getValue() == "ColorPicker" end)
+	local colorPickedStream = getToolInteractStream("ColorPicker")
+		:map(function (cellIndex)
+			return canvasUtil.getCellFromIndex(canvasInstance, cellIndex).BackgroundColor3
+		end)
+		:pipe(shareUntil)
+	colorPickedStream
 		:map(dart.constant("Brush"))
 		:takeUntil(terminator)
 		:multicast(activeTool)
@@ -144,19 +169,8 @@ local function connectDrawingInput(canvasInstance)
 				:map(function (button) return button, button.Name == toolName end)
 		end)
 
-	-- Get a stream for a specific tool interacting with the canvas
-	local function getToolInteractStream(toolName)
-		return canvasInteractStream
-			:filter(function ()
-				return toolName == activeTool:getValue()
-			end)
-	end
-
 	-- Color changing streams
-	local colorChangedStream = getToolInteractStream("ColorPicker")
-		:map(function (cellIndex)
-			return canvasUtil.getCellFromIndex(canvasInstance, cellIndex).BackgroundColor3
-		end)
+	local colorChangedStream = colorPickedStream
 		:merge(hueAdjustedStream:combineLatest(satAdjustedStream, valAdjustedStream, Color3.fromHSV))
 		:pipe(shareUntil)
 		:startWith(Color3.new(1, 1, 1))
