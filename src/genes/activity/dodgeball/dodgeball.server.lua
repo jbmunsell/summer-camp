@@ -150,6 +150,7 @@ end
 local baseRosterStream = getTeamRosterStream(1):merge(getTeamRosterStream(2))
 
 -- Character died
+local playerLeft = rx.Observable.from(Players.PlayerRemoving)
 local playerDied = axisUtil.getHumanoidDiedStream()
 	:map(function (h)
 		return Players:GetPlayerFromCharacter(h.Parent)
@@ -226,6 +227,7 @@ sessionStart:delay(0.1):subscribe(spawnPlayers)
 
 -- Get player out when they are touched by a hot ball OR their character dies
 playerDied
+	:merge(playerLeft)
 	:flatMap(function (p)
 		return rx.Observable.from(genesUtil.getInstances(dodgeball))
 			:map(dart.drag(p))

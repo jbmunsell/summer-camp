@@ -130,10 +130,7 @@ local playerDied = axisUtil.getHumanoidDiedStream()
 	:map(function (h)
 		return Players:GetPlayerFromCharacter(h.Parent)
 	end)
-	:flatMap(function (p)
-		return rx.Observable.from(genesUtil.getInstances(smashball))
-			:map(dart.drag(p))
-	end)
+local playerLeft = rx.Observable.from(Players.PlayerRemoving)
 
 -- Ball touched character
 local playerHitByBall = smashballInstances
@@ -180,7 +177,13 @@ baseRosterStream
 	:subscribe(declareWinner)
 
 -- Drop player when touched by a ball OR character reset
-playerDied:merge(playerHitByBall)
+playerDied
+	:merge(playerLeft)
+	:flatMap(function (p)
+		return rx.Observable.from(genesUtil.getInstances(smashball))
+			:map(dart.drag(p))
+	end)
+	:merge(playerHitByBall)
 	:filter(activityUtil.isInSession)
 	:subscribe(dropPlayer)
 
