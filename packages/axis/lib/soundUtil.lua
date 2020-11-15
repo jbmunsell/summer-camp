@@ -31,6 +31,7 @@ function soundUtil.playSound(sound, parent)
 		sound:Destroy()
 	end)
 	sound:Play()
+	return sound
 end
 
 -- return lib
