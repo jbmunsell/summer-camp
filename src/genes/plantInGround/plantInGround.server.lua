@@ -34,7 +34,7 @@ local function createId(instance)
 	nextId = nextId + 1
 	instance.state.plantInGround.plantId.Value = nextId
 	local attachment = instance:FindFirstChild("PlantAttachment", true)
-	assert(attachment, "No 'PlantAttachment' found in " .. instance:GetFullName())
+	if not attachment then error("No 'PlantAttachment' found in " .. instance:GetFullName()) end
 	attachment.Name = attachment.Name .. instance.state.plantInGround.plantId.Value
 end
 
@@ -56,7 +56,7 @@ local function tryPlant(instance)
 	-- Grab attachment
 	local attachmentName = "PlantAttachment" .. id.Value
 	local attachment = instance:FindFirstChild(attachmentName, true)
-	assert(attachment, "No PlantAttachment found in " .. instance:GetFullName())
+	if not attachment then error("No PlantAttachment found in " .. instance:GetFullName()) end
 
 	-- Preserve Y rotation
 	local alook = attachment.WorldCFrame.LookVector

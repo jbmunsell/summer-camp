@@ -38,8 +38,8 @@ function propertySwitcherUtil.tweenToPropertySet(instance, setName)
 	-- Grab set
 	local config = instance.config.propertySwitcher
 	local set = config.propertySets:FindFirstChild(setName)
-	assert(set, string.format("%s does not have property set named %s",
-		instance:GetFullName(), setName))
+	if not set then error(string.format("%s does not have property set named %s",
+		instance:GetFullName(), setName)) end
 
 	-- Tween
 	local tweenInfo = TweenInfo.new(config.tweenDuration.Value,

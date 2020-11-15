@@ -54,6 +54,7 @@ function axisUtil.getPlayerCharacterStream()
 		:flatMap(function (p)
 			return rx.Observable.from(p.CharacterAdded)
 				:startWith(p.Character)
+				:filter()
 				:map(dart.carry(p))
 		end)
 end
@@ -77,7 +78,9 @@ end
 function axisUtil.getPosition(instance)
 	if instance:IsA("Model") then
 		local primary = instance.PrimaryPart
-		assert(primary, "Attempt to call getPosition on a model with no PrimaryPart: " .. instance:GetFullName())
+		if not primary then
+			error("Attempt to call getPosition on a model with no PrimaryPart: " .. instance:GetFullName())
+		end
 		return primary.Position
 	elseif instance:IsA("BasePart") then
 		return instance.Position
@@ -90,7 +93,9 @@ end
 function axisUtil.setCFrame(instance, cframe)
 	if instance:IsA("Model") then
 		local primary = instance.PrimaryPart
-		assert(primary, "Attempt to call setCFrame on a model with no PrimaryPart: " .. instance:GetFullName())
+		if not primary then
+			error("Attempt to call setCFrame on a model with no PrimaryPart: " .. instance:GetFullName())
+		end
 		instance:SetPrimaryPartCFrame(cframe)
 	elseif instance:IsA("BasePart") then
 		instance.CFrame = cframe
@@ -253,8 +258,10 @@ function axisUtil.findAttachments(a, b, attachmentName)
 	local att_a = a:FindFirstChild(attachmentName, true)
 	local att_b = b:FindFirstChild(attachmentName, true)
 
-	assert(att_a and att_b, "Unable to find attachments for name '" .. attachmentName .. "'; "
-		.. a:GetFullName() .. " and " .. b:GetFullName())
+	if not att_a and att_b then
+		error(string.format("Unable to find attachments for name '%s' in %s and %s",
+			attachmentName, a:GetFullName(), b:GetFullName()))
+	end
 
 	return att_a, att_b
 end
@@ -269,8 +276,13 @@ end
 function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 	local att_a = a:FindFirstChild(aName, true)
 	local att_b = b:FindFirstChild(bName, true)
-	assert(att_a, string.format("Unable to find attachment named '%s' in instance '%s'", aName, a:GetFullName()))
-	assert(att_b, string.format("Unable to find attachment named '%s' in instance '%s'", bName, b:GetFullName()))
+	local function assert(attachment, name, instance)
+		if not attachment then
+			error(string.format("Unable to find attachment named '%s' in %s", name, instance:GetFullName()))
+		end
+	end
+	assert(att_a, aName, a)
+	assert(att_b, bName, b)
 
 	local info = axisUtil.computeAttachInfo(att_a, att_b)
 
@@ -357,7 +369,9 @@ end
 
 -- Tween model cframe
 function axisUtil.tweenModelCFrame(model, info, target)
-	assert(model.PrimaryPart, "Cannot tween model with no PrimaryPart " .. model:GetFullName())
+	if not model.PrimaryPart then
+		error("Cannot tween model with no PrimaryPart " .. model:GetFullName())
+	end
 
 	local proxy = Instance.new("CFrameValue")
 	proxy.Value = model:GetPrimaryPartCFrame()
