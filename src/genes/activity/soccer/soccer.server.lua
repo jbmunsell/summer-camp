@@ -18,6 +18,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
 local scoreboardUtil = require(genes.scoreboard.util)
@@ -63,6 +64,11 @@ end
 local function increaseScore(soccerInstance, scoringTeam)
 	local valueObject = soccerInstance.state.soccer.score[scoringTeam]
 	valueObject.Value = valueObject.Value + 1
+	local sound = soundUtil.playSound(env.res.audio.sounds.soccer.GoalScored,
+		soccerInstance.functional["Team" .. (3 - scoringTeam) .. "GoalSensor"])
+	rx.Observable.timer(4):subscribe(function ()
+		sound:Stop()
+	end)
 end
 local function declareWinner(soccerInstance, team)
 	soccerInstance.state.activity.winningTeam.Value = team
@@ -238,3 +244,7 @@ scheduleStreams.chunkTimeLeft
 -----------------------------------
 -- Player placement subscriptions
 volleyStartStream:subscribe(placePlayersOnPitch)
+
+-----------------------------------
+-- Ball touched sound playing
+

@@ -64,7 +64,9 @@ end
 -- Spawn players in plane
 function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
 	local function place(character)
-		character:SetPrimaryPartCFrame(CFrame.new(axisUtil.getRandomPointInPart(plane), lookAtPosition))
+		local point = axisUtil.getRandomPointInPart(plane)
+		local cf = character:GetPrimaryPartCFrame()
+		character:SetPrimaryPartCFrame(CFrame.new(point, lookAtPosition or point + cf.LookVector))
 	end
 
 	tableau.from(players)

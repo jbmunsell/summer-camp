@@ -54,6 +54,17 @@ local function connectDrawingInput(canvasInstance)
 	local terminator = rx.Observable.fromInstanceLeftGame(canvasInstance)
 		:merge(stoppedEditing)
 
+	-- Share until operator
+	local function shareUntil(o)
+		return o:takeUntil(terminator):share()
+	end
+
+	-- Create mouse hit stream
+	local mouseRaycastStream = rx.Observable.heartbeat()
+		:map(dart.constant(nil))
+		:map(inputUtil.raycastMouse)
+		:pipe(shareUntil)
+
 	-- Stream for adjusting the sliders
 	local function mapInputEventToConstant(event, constant)
 		return rx.Observable.from(event)
@@ -72,12 +83,10 @@ local function connectDrawingInput(canvasInstance)
 		local sliderGrabbedStream = sliderDownStream:merge(sliderUpStream)
 
 		-- return a stream that emits the place from 0 to 1 along the slider that the cursor is at
-		return rx.Observable.heartbeat()
+		return mouseRaycastStream
+			:filter(function (result) return result and result.Instance == colorSelectorPart end)
 			:withLatestFrom(sliderGrabbedStream)
 			:filter(function (_, grabbed) return grabbed end)
-			:map(dart.constant(nil))
-			:map(inputUtil.raycastMouse)
-			:filter(function (result) return result.Instance == colorSelectorPart end)
 			:map(function (result)
 				-- NOTE: These calculations currently rely on the slider's container frame having an X size of 1,
 				-- 	and the slider itself being aligned by its center within the container frame,
@@ -89,6 +98,7 @@ local function connectDrawingInput(canvasInstance)
 				local guiProportion = (partX - guiStartX) / guiSizeX
 				return math.max(0, math.min(1, guiProportion))
 			end)
+			:pipe(shareUntil)
 			:startWith(initialValue)
 	end
 	local sliders = canvasInstance.ColorSelector.SurfaceGui.Sliders
@@ -97,13 +107,14 @@ local function connectDrawingInput(canvasInstance)
 	local valAdjustedStream = createSliderManipulationStream(sliders.Brightness, 1)
 
 	-- Stream for user clicking on a unique canvas cell
-	local canvasInteractStream = rx.Observable.heartbeat()
+	local canvasInteractStream = mouseRaycastStream
 		:filter(function ()
 			return UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
 		end)
-		:map(dart.bind(canvasUtil.getCanvasCellIndexFromMouse, canvasInstance))
+		:map(dart.bind(canvasUtil.getCellIndexFromRaycastResult, canvasInstance))
 		:distinctUntilChanged()
 		:filter()
+		:pipe(shareUntil)
 
 	-- Stream for the currently selected tool
 	local activeTool = rx.BehaviorSubject.new("Brush")
@@ -147,6 +158,8 @@ local function connectDrawingInput(canvasInstance)
 			return canvasUtil.getCellFromIndex(canvasInstance, cellIndex).BackgroundColor3
 		end)
 		:merge(hueAdjustedStream:combineLatest(satAdjustedStream, valAdjustedStream, Color3.fromHSV))
+		:pipe(shareUntil)
+		:startWith(Color3.new(1, 1, 1))
 
 	-- Paint application stream and erase stream
 	-- Erase stream is just a stream that applies white color to target cell
@@ -157,6 +170,7 @@ local function connectDrawingInput(canvasInstance)
 				transparency = 1,
 			}
 		end)
+		:pipe(shareUntil)
 	local paintStream = getToolInteractStream("Brush")
 		:withLatestFrom(colorChangedStream)
 		:map(function (cellIndex, color)
@@ -165,6 +179,7 @@ local function connectDrawingInput(canvasInstance)
 				color = color,
 			}
 		end)
+		:pipe(shareUntil)
 
 	-- Subscriptions
 	local function subscribe(stream, f)

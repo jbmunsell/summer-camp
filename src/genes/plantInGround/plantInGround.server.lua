@@ -58,6 +58,10 @@ local function tryPlant(instance)
 	local attachment = instance:FindFirstChild(attachmentName, true)
 	assert(attachment, "No PlantAttachment found in " .. instance:GetFullName())
 
+	-- Preserve Y rotation
+	local alook = attachment.WorldCFrame.LookVector
+	local rot = Vector3.new(alook.X, 0, alook.Z)
+
 	-- Get terrain hit point
 	local raycastResult = workspace:Raycast(attachment.WorldPosition, Vector3.new(0, -10, 0))
 	if not raycastResult or raycastResult.Instance ~= workspace.Terrain then return end
@@ -66,7 +70,8 @@ local function tryPlant(instance)
 	if not workspace.Terrain:FindFirstChild(attachmentName) then
 		Instance.new("Attachment", workspace.Terrain).Name = attachmentName
 	end
-	workspace.Terrain:FindFirstChild(attachmentName).CFrame = CFrame.new(raycastResult.Position)
+	local terrainAttachment = workspace.Terrain[attachmentName]
+	terrainAttachment.CFrame = CFrame.new(raycastResult.Position, raycastResult.Position + rot)
 
 	-- Smooth attach the things
 	local weld = axisUtil.smoothAttach(workspace.Terrain, instance, attachmentName)

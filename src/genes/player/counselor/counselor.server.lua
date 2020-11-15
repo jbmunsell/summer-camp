@@ -18,6 +18,7 @@ local counselor = genes.player.counselor
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local playerUtil = require(genes.player.util)
 local sessionTimeUtil = require(genes.player.sessionTime.util)
@@ -35,6 +36,11 @@ local function renderNewCounselor(player)
 		.. "in charge of starting team activities. Ask your campers what they want to do.",
 		player.Team.Name)
 	env.src.gui.notifications.net.Push:FireClient(player, notificationText)
+
+	-- Play a sound in their character
+	if player.Character then
+		soundUtil.playSound(env.res.audio.sounds.CounselorAppointed, player.Character.PrimaryPart)
+	end
 end
 
 -- Add team counselor

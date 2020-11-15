@@ -21,6 +21,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local inputUtil = require(input.util)
 local genesUtil = require(genes.util)
+local interactData = require(interact.data)
 local multiswitchUtil = require(multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -61,62 +62,47 @@ end
 local function getHoldPosition(hold)
 	return (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
 end
-local function getHoldOffset(hold)
-	return (getHoldPosition(hold) - workspace.CurrentCamera.CFrame.p)
-end
-local function getHoldDistance(characterAttachment, hold)
-	return (characterAttachment.WorldPosition - getHoldPosition(hold)).magnitude
-end
-local function getDistanceModifier(characterAttachment, instance, hold)
-	local offset = getHoldOffset(hold)
-	local cameraLook = workspace.CurrentCamera.CFrame.LookVector
-	local dot = offset.unit:Dot(cameraLook)
-	if dot <= 0 then
-		return -math.huge
-	end
-	local max = instance.config.interact.distanceThreshold.Value
-	local dmod = 1 - (getHoldDistance(characterAttachment, hold) / max)
-	return (dmod * 0.5) + (dot * 0.5)
-end
-
--- Is in range
-local function isInRange(characterAttachment, instance, hold)
-	return getHoldDistance(characterAttachment, hold) <= instance.config.interact.distanceThreshold.Value
-end
-local function isInSight(characterAttachment, instance, hold)
-	local charpos = characterAttachment.WorldPosition
-	local params = inputUtil.getBasicRaycastParams()
-	local pos = (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
-	local result = workspace:Raycast(charpos, (pos - charpos), params)
-
-	return not result
-	or not result.Instance
-	or hold == result.Instance
-	or hold.Parent == result.Instance
-	or result.Instance:IsDescendantOf(instance)
-end
 
 -- Get best hold
 local function getBestHold()
 	local head = env.LocalPlayer.Character:FindFirstChild("Head")
 	local faceFront = head and head:FindFirstChild("FaceFrontAttachment")
 	if not faceFront then return end
+	local charpos = faceFront.WorldPosition
 
 	local bestPackage = nil
 	local bestModifier = -math.huge
+	local bestHoldPosition = nil
+	local cameraCFrame = workspace.CurrentCamera.CFrame
 	for _, package in pairs(holdPackages) do
-		local interactable = isInteractable(package.instance)
-		local inRange = interactable and isInRange(faceFront, package.instance, package.hold)
-		if interactable and inRange then
-			local dmod = getDistanceModifier(faceFront, package.instance, package.hold)
-			if dmod > bestModifier then
-				bestModifier = dmod
-				bestPackage = package
+		local instance, hold = package.instance, package.hold
+		if isInteractable(package.instance) then
+			local holdPosition = getHoldPosition(hold)
+			local distanceFromCharacter = (charpos - holdPosition).magnitude
+			local threshold = instance.config.interact.distanceThreshold.Value
+			if distanceFromCharacter <= threshold then
+				local offset = holdPosition - cameraCFrame.p
+				local dot = offset.unit:Dot(cameraCFrame.LookVector)
+				if dot > 0 then
+					local dmod = (1 - distanceFromCharacter / threshold) * 0.5 + dot * 0.5
+					if dmod > bestModifier then
+						bestModifier = dmod
+						bestPackage = package
+						bestHoldPosition = holdPosition
+					end
+				end
 			end
 		end
 	end
+	if not bestPackage then return end
 
-	if bestPackage and isInSight(faceFront, bestPackage.instance, bestPackage.hold) then
+	local params = inputUtil.getToolRaycastParams()
+	local result = workspace:Raycast(charpos, (bestHoldPosition - charpos), params)
+	local instance = result and result.Instance
+	if not instance
+	or instance == bestPackage.instance
+	or instance:IsDescendantOf(bestPackage.instance)
+	then
 		return bestPackage.hold
 	end
 end
@@ -128,7 +114,7 @@ local function getInteractableFromHold(hold)
 	if hold == game or not hold then
 		return nil
 	end
-	return genesUtil.hasGene(hold, interact) and hold or getInteractableFromHold(hold.Parent)
+	return CollectionService:HasTag(hold, interactData.instanceTag) and hold or getInteractableFromHold(hold.Parent)
 end
 
 -- Update interact prompt
@@ -185,7 +171,6 @@ interactStream:subscribe(function (instance)
 			hold = (instance:IsA("BasePart") and instance or instance.PrimaryPart),
 		})
 	end
-	print("#holdPackages: " .. #holdPackages)
 end)
 rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.data).instanceTag))
 	:subscribe(function (instance)
@@ -194,7 +179,6 @@ rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.d
 				table.remove(holdPackages, i)
 			end
 		end
-		print("#holdPackages: " .. #holdPackages)
 	end)
 
 -- 	Merge E up/down to true/false stream

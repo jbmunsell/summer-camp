@@ -1,0 +1,13 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "CollisionGroupSet"
+		},
+		{
+			"ClassName": "RemoteFunction",
+			"Name": "GetLocalCharacterGroupId"
+		}
+	]
+}

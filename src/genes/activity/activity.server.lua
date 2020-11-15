@@ -77,13 +77,8 @@ local function createTrophy(activityInstance, cabin)
 	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
 
 	-- Wait for full state
-	local function setTeam()
-		trophy.config.teamOnly.team.Value = cabin
-	end
-	genesUtil.getInstanceStream(genes.multiswitch.teamOnly)
-		:filter(dart.equals(trophy))
-		:first()
-		:subscribe(setTeam)
+	genesUtil.waitForState(trophy, genes.multiswitch.teamOnly)
+	trophy.config.teamOnly.team.Value = cabin
 end
 
 -- Render gates

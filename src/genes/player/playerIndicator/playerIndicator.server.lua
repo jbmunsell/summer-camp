@@ -27,13 +27,8 @@ local function createIndicator(player)
 	local indicator = env.res.PlayerIndicator:Clone()
 	indicator.Parent = workspace
 	genesUtil.addGene(indicator, playerIndicator)
-
-	local function setup()
-		indicator.state.playerIndicator.player.Value = player
-	end
-	genesUtil.getInstanceStream(playerIndicator)
-		:filter(dart.equals(indicator))
-		:subscribe(setup)
+	genesUtil.waitForState(indicator, playerIndicator)
+	indicator.state.playerIndicator.player.Value = player
 end
 
 local function getPlayerIndicator(player)

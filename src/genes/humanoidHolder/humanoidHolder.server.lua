@@ -42,13 +42,11 @@ ownerStream
 	:subscribe(multiswitchUtil.setSwitchEnabled)
 
 -- Whenever any humanoid dies or leaves the game, clear holder ownership
-local humanoidStream = rx.Observable.from(workspace.DescendantAdded)
-	:startWithTable(workspace:GetDescendants()) -- there HAS to be a better way jackson
-	:filter(dart.isa("Humanoid"))
-
-humanoidStream
-	:flatMap(function (humanoid)
-		return rx.Observable.fromInstanceLeftGame(humanoid)
+axisUtil.getPlayerCharacterStream()
+	:map(dart.select(2))
+	:flatMap(function (character)
+		local humanoid = character:WaitForChild("Humanoid")
+		return rx.Observable.fromInstanceLeftGame(character)
 			-- :merge(rx.Observable.from(humanoid.Died), rx.Observable.from(humanoid.Jumping):filter())
 			:merge(rx.Observable.from(humanoid.Died))
 			:map(dart.constant(humanoid))

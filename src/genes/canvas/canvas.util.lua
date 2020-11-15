@@ -115,14 +115,11 @@ function canvasUtil.setEditing(instance, editing)
 	instance.state.canvas.editing.Value = editing
 end
 
--- Get canvas cell from mouse location
-function canvasUtil.getCanvasCellIndexFromMouse(canvasInstance)
+-- Get cell index from raycast result
+function canvasUtil.getCellIndexFromRaycastResult(canvasInstance, raycastResult)
 	-- Assert hit
 	local canvasPart = canvasInstance:FindFirstChild("CanvasPart", true)
-	local raycastResult = inputUtil.raycastMouse()
-	if not raycastResult
-	or raycastResult.Instance ~= canvasPart
-	then return nil end
+	if not raycastResult or raycastResult.Instance ~= canvasPart then return nil end
 
 	-- Get index from position
 	local canvasPartSize = canvasPart.Size
@@ -134,6 +131,11 @@ function canvasUtil.getCanvasCellIndexFromMouse(canvasInstance)
 		math.floor((1 - offset.Y / canvasPartSize.Y) * cellCount.Y)
 	)
 	return cellCoordinates.X + cellCoordinates.Y * cellCount.X
+end
+
+-- Get canvas cell from mouse location
+function canvasUtil.getCanvasCellIndexFromMouse(canvasInstance)
+	return canvasUtil.getCellIndexFromRaycastResult(canvasInstance, inputUtil.raycastMouse())
 end
 
 -- lib

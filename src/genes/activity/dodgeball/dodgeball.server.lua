@@ -21,6 +21,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
@@ -75,6 +76,9 @@ local function dropPlayer(dodgeballInstance, player)
 	end
 	if not value then return end
 
+	if player.Character then
+		soundUtil.playSound(env.res.audio.sounds.Whistle, player.Character.PrimaryPart)
+	end
 	value:Destroy()
 	ragdoll.net.Push:FireClient(player)
 	collection.addValue(state.ragdolls, player.Character)
@@ -159,11 +163,17 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 			:map(dart.drag(ball))
 	end)
 	:map(function (hit, ball)
-		local player = Players:GetPlayerFromCharacter(hit.Parent)
+		local player
+		for _, p in pairs(Players:GetPlayers()) do
+			if p.Character and hit:IsDescendantOf(p.Character) then
+				player = p
+				break
+			end
+		end
 		if player then print("dodgeball hit player character directly") end
 		if not player then
-			for _, p in pairs(genesUtil.getInstances(genes.player.characterBackpack)) do
-				local backpack = player.state.characterBackpack.instance.Value
+			for _, p in pairs(genesUtil.getInstances(genes.player.characterBackpack):raw()) do
+				local backpack = p.state.characterBackpack.instance.Value
 				if backpack and hit:IsDescendantOf(backpack) then
 					print("dodgeball hit backpack")
 					player = p
@@ -172,7 +182,7 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 			end
 		end
 		if not player then
-			for _, v in pairs(genesUtil.getInstances(genes.pickup)) do
+			for _, v in pairs(genesUtil.getInstances(genes.pickup):raw()) do
 				if (hit == v or hit:IsDescendantOf(v)) then
 					local p = Players:GetPlayerFromCharacter(v.state.pickup.holder.Value)
 					if p then
@@ -188,7 +198,7 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 	:filter(dart.select(1))
 	:map(function (player, ball)
 		local instance = genesUtil.getInstances(dodgeball):first(function (instance)
-			return ball:IsDescendantOf(instance)
+			return ball:IsDescendantOf(instance) and instance.state.activity.inSession.Value
 		end)
 		if instance then
 			return instance, player
@@ -249,6 +259,7 @@ baseRosterStream
 
 -- Destroy ball when it leaves
 sessionEnd
+	:delay(3)
 	:pipe(dragBalls)
 	:subscribe(destroyBall)
 

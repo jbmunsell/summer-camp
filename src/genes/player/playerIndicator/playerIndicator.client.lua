@@ -7,7 +7,6 @@
 --
 
 -- env
-local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -23,33 +22,12 @@ local genesUtil = require(genes.util)
 -- Variables
 ---------------------------------------------------------------------------------------------------
 
-local IgnoreTags = {
-	-- "PlayerCharacter",
-}
 local raycastParams = RaycastParams.new()
-raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+raycastParams.CollisionGroup = "IndicatorRaycast"
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
-
--- Update raycast list
-local function updateRaycastList()
-	local ignores = {}
-	print("Updating raycast list")
-	for _, d in pairs(workspace:GetDescendants()) do
-		if d:IsA("Humanoid") then
-			table.insert(ignores, d.Parent)
-		end
-	end
-	for _, tag in pairs(IgnoreTags) do
-		for _, instance in pairs(CollectionService:GetTagged(tag)) do
-			print("Inserting ", instance:GetFullName())
-			table.insert(ignores, instance)
-		end
-	end
-	raycastParams.FilterDescendantsInstances = ignores
-end
 
 -- Render indicator
 local function renderIndicatorPosition(indicator)
@@ -80,16 +58,6 @@ end
 
 -- init gene
 genesUtil.initGene(playerIndicator)
-
--- Update raycast list
-rx.Observable.from(IgnoreTags)
-	:flatMap(function (tag)
-		return rx.Observable.from(CollectionService:GetInstanceAddedSignal(tag))
-			:merge(rx.Observable.from(CollectionService:GetInstanceRemovedSignal(tag)))
-	end)
-	:startWith(0)
-	:merge(rx.Observable.from(workspace.DescendantAdded):filter(dart.isa("Humanoid")))
-	:subscribe(updateRaycastList)
 
 -- Reposition all indicators on heartbeat
 rx.Observable.heartbeat()

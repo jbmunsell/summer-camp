@@ -126,6 +126,7 @@ local holdingStream = rx.Observable.heartbeat()
 	:map(function ()
 		return pickupUtil.localCharacterHoldsObject(stickyNoteStack)
 	end)
+	:share()
 
 -- Recreate or destroy preview when holding stack changes
 holdingStream

@@ -80,5 +80,4 @@ local keyNames = {
 	"Nine",
 	"Zero",
 }
-tableau.from(keyNames)
-	:foreachi(bindKey)
+tableau.from(keyNames):foreachi(bindKey)
