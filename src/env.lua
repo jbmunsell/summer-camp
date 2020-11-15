@@ -52,12 +52,12 @@ if RunService:IsServer() then
 				local folderNamePattern = "([^%.]*)"
 				if instance.Name == instance.Parent.Name then
 					if instance:IsA("LocalScript") then
-						instance.Name = "client"
+						instance.Name = instance.Name .. ".client"
 					elseif instance:IsA("Script") then
-						instance.Name = "server"
+						instance.Name = instance.Name .. ".server"
 					end
 				elseif string.match(instance.Name, folderNamePattern) == instance.Parent.Name then
-					instance.Name = string.gsub(instance.Name, "([^%.]*%.)", "")
+					-- instance.Name = string.gsub(instance.Name, "([^%.]*%.)", "")
 				end
 
 				if instance:IsA("Folder") then
@@ -111,7 +111,8 @@ local index_mt = {
 	__index = function (self, str)
 		local dirLocations = rawget(self, "__locations")
 		for _, location in pairs(dirLocations) do
-			local instance = location:FindFirstChild(str)
+			local instance = location:FindFirstChild(location.Name .. "." .. str)
+				or location:FindFirstChild(str)
 			if instance then
 				if instance:IsA("Folder") then
 					return rawget(self, instance.Name)
