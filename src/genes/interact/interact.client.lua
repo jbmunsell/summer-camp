@@ -49,14 +49,16 @@ local holdPackages = {}
 
 -- Mouse event filtering
 local function mouseFilter(inputObject, processed)
-	return not processed and inputObject.UserInputType == Enum.UserInputType.MouseButton1
+	return not processed
+	and (inputObject.UserInputType == Enum.UserInputType.MouseButton1
+		or inputObject.UserInputType == Enum.UserInputType.Touch)
 end
 
 -- Is interactable
-local function isInteractable(instance)
-	return instance:IsDescendantOf(workspace)
-	and multiswitchUtil.all(instance, "interact")
-end
+-- local function isinteractable(instance)
+-- 	return instance:IsDescendantOf(workspace)
+-- 	and multiswitchUtil.all(instance, "interact")
+-- end
 
 -- Get distance modifier
 local function getHoldPosition(hold)
@@ -76,7 +78,7 @@ local function getBestHold()
 	local cameraCFrame = workspace.CurrentCamera.CFrame
 	for _, package in pairs(holdPackages) do
 		local instance, hold = package.instance, package.hold
-		if isInteractable(package.instance) then
+		if package.isInteractable:getValue() then
 			local holdPosition = getHoldPosition(hold)
 			local distanceFromCharacter = (charpos - holdPosition).magnitude
 			local threshold = instance.config.interact.distanceThreshold.Value
@@ -153,23 +155,44 @@ end
 -- Init gene
 local interactStream = genesUtil.initGene(interact)
 
+-- Get interactable stream
+local function getInteractableSubject(instance)
+	local ancestry = rx.Observable.from(instance.AncestryChanged)
+		:startWith(0)
+		:map(function () return instance:IsDescendantOf(workspace) end)
+	local switches = multiswitchUtil.observeSwitches(instance, "interact")
+		:startWith(0)
+		:map(dart.constant(nil))
+		:map(dart.bind(multiswitchUtil.all, instance, "interact"))
+	return ancestry:combineLatest(switches, dart.boolAnd)
+		:multicast(rx.BehaviorSubject.new())
+end
+
 -- Maintain hold packages cache list
 interactStream:subscribe(function (instance)
 	local inserted
+	local stream
+	local function insert(hold)
+		-- Connect to its interactable stream
+		if not inserted then
+			stream = getInteractableSubject(instance)
+		end
+
+		-- Set and insert
+		inserted = true
+		table.insert(holdPackages, { instance = instance, hold = hold, isInteractable = stream })
+	end
 	for _, d in pairs(instance:GetDescendants()) do
 		if d.Name == "InteractionPromptAdornee" then
-			inserted = true
-			table.insert(holdPackages, { instance = instance, hold = d })
+			insert(d)
 		end
 	end
 	if not inserted then
 		if instance:IsA("Model") and not instance.PrimaryPart then
-			error("Interactable model has no PrimaryPart or interact attachments: " .. instance:GetFullName())
+			warn("Interactable model has no PrimaryPart or interact attachments: " .. instance:GetFullName())
+		else
+			insert((instance:IsA("BasePart") and instance or instance.PrimaryPart))
 		end
-		table.insert(holdPackages, {
-			instance = instance,
-			hold = (instance:IsA("BasePart") and instance or instance.PrimaryPart),
-		})
 	end
 end)
 rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.data).instanceTag))
@@ -183,20 +206,20 @@ rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.d
 
 -- 	Merge E up/down to true/false stream
 -- 	with the (mouse is down inside the button) stream
-local function createButtonInputStream(event, value)
-	return rx.Observable.from(event)
-		:filter(mouseFilter)
-		:map(dart.constant(value))
-end
+-- local function createButtonInputStream(event, value)
+-- 	return rx.Observable.from(event)
+-- 		:filter(mouseFilter)
+-- 		:map(dart.constant(value))
+-- end
 local keyStateStream = rx.Observable.from(Enum.KeyCode.E)
 	:map(dart.equals(Enum.UserInputState.Begin))
 	:multicast(rx.BehaviorSubject.new(false))
-local buttonDownStream = createButtonInputStream(interactPrompt.InteractButton.InputBegan, true)
-local buttonUpStream = createButtonInputStream(interactPrompt.InteractButton.InputEnded, false)
-local buttonStateStream = buttonDownStream:merge(buttonUpStream)
-	:startWith(false)
+-- local buttonDownStream = createButtonInputStream(interactPrompt.InteractButton.InputBegan, true)
+-- local buttonUpStream = createButtonInputStream(interactPrompt.InteractButton.InputEnded, false)
+-- local buttonStateStream = buttonDownStream:merge(buttonUpStream)
+-- 	:startWith(false)
 local interactInputDown = keyStateStream
-	:combineLatest(buttonStateStream, dart.boolOr)
+	-- :combineLatest(buttonStateStream, dart.boolOr)
 	:multicast(rx.BehaviorSubject.new(false))
 
 -- Connect to heartbeat to sense interactables and place prompt
@@ -248,5 +271,6 @@ interactionTimer
 	:map(function (x) return x and x < 0 end)
 	:distinctUntilChanged()
 	:filter()
+	:merge(rx.Observable.from(interactPrompt.InteractButton.Activated))
 	:mapToLatest(hotInteractor)
 	:subscribe(triggerInteract)

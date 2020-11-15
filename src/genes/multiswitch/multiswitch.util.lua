@@ -49,6 +49,17 @@ function multiswitchUtil.all(instance, setName, f)
 end
 
 -- Streams
+-- 	Observes the switches for a single instance
+function multiswitchUtil.observeSwitches(instance, setName)
+	local switches = instance.state[setName].switches
+	return rx.Observable.from(switches.ChildAdded)
+		:startWithTable(switches:GetChildren())
+		:flatMap(function (c)
+			return rx.Observable.from(c.Changed) -- skip the first one so we don't push a bunch of init events
+		end)
+end
+
+-- 	Gets the switch stream for all instances of a gene
 function multiswitchUtil.getSwitchStream(gene)
 	local geneData = require(gene.data)
 	return genesUtil.getInstanceStream(gene)
