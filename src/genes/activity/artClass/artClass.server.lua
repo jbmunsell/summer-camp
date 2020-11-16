@@ -34,7 +34,7 @@ end
 -- 	Places a switch in canvases so that we can lock them for our class
 local function createCanvasSwitch(canvasInstance)
 	multiswitchUtil.createSwitch(canvasInstance, "interact", "artClass")
-	genesUtil.addGene(canvasInstance, genes.multiswitch.teamOnly)
+	genesUtil.addGeneTag(canvasInstance, genes.multiswitch.teamOnly)
 end
 local function initCanvases(artClassInstance)
 	genesUtil.getInstanceStream(canvas)

@@ -5,7 +5,7 @@ local genes = env.src.genes
 return {
 	instanceTag = "gene_characterBackpack",
 	name = "characterBackpack",
-	genes = { genes.player.counselor },
+	genes = { genes.player.leader },
 	state = {
 		characterBackpack = {
 			instance = tableau.null,

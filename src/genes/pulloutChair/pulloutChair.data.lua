@@ -2,9 +2,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_pulloutChair",
 	name = "pulloutChair",
 	genes = { env.src.genes.seat },
@@ -16,4 +14,4 @@ return genesUtil.createGeneData({
 	},
 
 	tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
-})
+}

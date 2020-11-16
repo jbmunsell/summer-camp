@@ -75,7 +75,7 @@ local function fillFreshTrolleyTrays()
 			local tray = env.res.dining.Tray:Clone()
 			tray.CFrame = spawnPoint.WorldCFrame + Vector3.new(0, 0.1 * (i - 1), 0)
 			tray.Parent = trolley.Trays
-			-- genesUtil.addGene(tray, foodTray)
+			-- genesUtil.addGeneTag(tray, foodTray)
 			local weld = Instance.new("WeldConstraint")
 			weld.Name = "StationaryWeld"
 			weld.Part0 = spawnPoint.Parent
@@ -105,7 +105,7 @@ local function fillServingTables(mealKey)
 			:random()
 		local dishInstance = env.res.dining.dishes[dishName]:Clone()
 		dishInstance.Parent = servingTable.Dishes
-		-- genesUtil.addGene(dishInstance, dish)
+		-- genesUtil.addGeneTag(dishInstance, dish)
 		axisUtil.snapAttachments(dishAttachment, dishUtil.getBottomAttachment(dishInstance))
 
 		local weld = Instance.new("WeldConstraint")

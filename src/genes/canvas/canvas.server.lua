@@ -7,6 +7,7 @@
 --
 
 -- env
+local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -54,6 +55,17 @@ end
 -- init all canvases forever
 local canvases = genesUtil.initGene(canvas)
 
+-- Remove owners when the player leaves
+rx.Observable.from(Players.PlayerRemoving):flatMap(function (player)
+	return rx.Observable.from(genesUtil.getInstances(canvas))
+		:filter(function (canvasInstance)
+			return canvasInstance.state.canvas.owner.Value == player
+		end)
+end):subscribe(function (canvasInstance)
+	wipeCanvas(canvasInstance)
+	canvasUtil.setCanvasOwner(canvasInstance, nil)
+end)
+
 -- Connect to name gui display and wipe on init
 canvases:subscribe(connectOwnerDisplay)
 canvases:subscribe(wipeCanvas)
@@ -61,6 +73,7 @@ canvases:subscribe(wipeCanvas)
 -- Connect to client ownership request
 rx.Observable.from(canvas.net.CanvasOwnershipRequested.OnServerEvent)
 	:reject(canvasUtil.getPlayerCanvas)
+	:map(function (p, c) return c, p end)
 	:subscribe(canvasUtil.setCanvasOwner)
 
 -- Connect to client change request

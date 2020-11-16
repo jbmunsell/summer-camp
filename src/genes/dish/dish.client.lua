@@ -43,7 +43,7 @@ local function updateFoodSwitches()
 	-- Get tray that local player is holding
 	local tray = env.LocalPlayer.Character
 		and pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character)
-			:first(dart.follow(genesUtil.hasGene, foodTray))
+			:first(dart.follow(genesUtil.hasGeneTag, foodTray))
 
 	-- If there's no tray then don't lock anything
 	if not tray then return end

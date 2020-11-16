@@ -2,9 +2,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	name = "bananaPeel",
 	instanceTag = "gene_bananaPeel",
 	genes = { env.src.genes.throw },
@@ -32,4 +30,4 @@ return genesUtil.createGeneData({
 			destroyFadeDuration = 0.5,
 		},
 	},
-})
+}

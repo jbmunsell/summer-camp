@@ -2,14 +2,11 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
-local activity = genes.activity
 
-local genesUtil = require(genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_activitySoccer",
 	name = "soccer",
-	genes = { activity },
+	genes = { genes.activity },
 	state = {
 		soccer = {
 			score = { 0, 0 },
@@ -20,8 +17,11 @@ return genesUtil.createGeneData({
 
 	config = {
 		activity = {
+			isCompetitive = true,
 			trophy = env.res.activities.SoccerTrophy,
+			displayName = "Soccer",
 			analyticsName = "soccer",
+			activityPromptImage = "rbxassetid://179546941",
 			teamCount = 2,
 		},
 
@@ -30,4 +30,4 @@ return genesUtil.createGeneData({
 			goalsToWin = 3,
 		},
 	},
-})
+}

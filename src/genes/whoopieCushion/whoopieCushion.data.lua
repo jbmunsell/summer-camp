@@ -1,13 +1,12 @@
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
+local genes = env.src.genes
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	name = "whoopieCushion",
 	instanceTag = "gene_whoopieCushion",
-	genes = { env.src.genes.throw },
+	genes = { genes.throw },
 	state = {
 		whoopieCushion = {
 			blows = 10,
@@ -37,4 +36,4 @@ return genesUtil.createGeneData({
 
 	tweenUpInfo = TweenInfo.new(0.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
 	tweenDownInfo = TweenInfo.new(0.1, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
-})
+}

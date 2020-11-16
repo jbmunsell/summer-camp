@@ -134,7 +134,7 @@ local characterEquipStream = playerEquipStream
 		return player.Character, instance
 	end)
 	:filter(function (character, instance)
-		return genesUtil.hasGene(instance, pickup)
+		return genesUtil.hasGeneTag(instance, pickup)
 		and character and not instance.state.pickup.holder.Value
 		and instance.state.pickup.enabled.Value
 		and not instance.state.pickup.dropDebounce.Value

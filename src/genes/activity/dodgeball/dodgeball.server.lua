@@ -44,31 +44,18 @@ local function destroyBall(_, ball)
 	ball:Destroy()
 end
 local function spawnBall(dodgeballInstance)
-	local spawnIndex = getBalls(dodgeballInstance):size() + 1
+	-- local spawnIndex = getBalls(dodgeballInstance):size() + 1
+	local spawnIndex = #dodgeballInstance.functional.balls:GetChildren() + 1
 	local ball = dodgeballInstance.config.dodgeball.ball.Value:Clone()
 	ball.CFrame = CFrame.new(dodgeballInstance.functional.BallSpawns[spawnIndex].Position)
 	ball.Parent = dodgeballInstance.functional.balls
-	genesUtil.addGene(ball, dodgeballBall)
+	genesUtil.addGeneTag(ball, dodgeballBall)
 end
 
 -- Roster manipulation
-local function isRosterReady(dodgeballInstance)
-	return dodgeballInstance.state.dodgeball.rosterReady.Value
-end
-local function resetRosterReady(dodgeballInstance)
-	dodgeballInstance.state.dodgeball.rosterReady.Value = false
-end
-local function fillRoster(dodgeballInstance)
-	local roster = dodgeballInstance.state.dodgeball.roster
-	for i = 1, 2 do
-		tableau.from(dodgeballInstance.state.activity.sessionTeams[i].Value:GetPlayers())
-			:foreach(dart.bind(collection.addValue, roster[i]))
-	end
-	dodgeballInstance.state.dodgeball.rosterReady.Value = true
-end
 local function dropPlayer(dodgeballInstance, player)
 	-- Push ragdoll and remove from roster
-	local state = dodgeballInstance.state.dodgeball
+	local state = dodgeballInstance.state.activity
 	local value
 	for i = 1, 2 do
 		value = collection.getValue(state.roster[i], player)
@@ -81,14 +68,20 @@ local function dropPlayer(dodgeballInstance, player)
 	end
 	value:Destroy()
 	ragdoll.net.Push:FireClient(player)
-	collection.addValue(state.ragdolls, player.Character)
+	collection.addValue(dodgeballInstance.state.dodgeball.ragdolls, player.Character)
 end
-local function spawnPlayers(dodgeballInstance)
+local function spawnPlayer(dodgeballInstance, player)
 	local functional = dodgeballInstance.functional
+	local teamIndex = activityUtil.getPlayerTeamIndex(dodgeballInstance, player)
+	local spawnPlane = functional["Team" .. teamIndex .. "SpawnPlane"]
+	activityUtil.spawnPlayersInPlane({ player }, spawnPlane, functional.CourtCenter.Position)
+end
+local function spawnAllPlayers(dodgeballInstance)
 	for i = 1, 2 do
-		local spawnPlane = functional["Team" .. i .. "SpawnPlane"]
 		local players = dodgeballInstance.state.activity.sessionTeams[i].Value:GetPlayers()
-		activityUtil.spawnPlayersInPlane(players, spawnPlane, functional.CourtCenter.Position)
+		for _, player in pairs(players) do
+			spawnPlayer(dodgeballInstance, player)
+		end
 	end
 end
 local function declareWinner(dodgeballInstance, team)
@@ -112,7 +105,7 @@ end
 local function updateScoreboardScore(dodgeballInstance)
 	local score = {}
 	for i = 1, 2 do
-		score[i] = #dodgeballInstance.state.dodgeball.roster[i]:GetChildren()
+		score[i] = #dodgeballInstance.state.activity.roster[i]:GetChildren()
 	end
 	scoreboardUtil.setScore(dodgeballInstance.Scoreboard, score)
 end
@@ -139,15 +132,26 @@ local dodgeballInstances = genesUtil.initGene(dodgeball)
 local sessionStart, sessionEnd = genesUtil.crossObserveStateValue(dodgeball, activity, "inSession")
 	:partition(dart.select(2))
 
+-- Play start stream (when roster collection is complete)
+local playStartStream = sessionStart:flatMap(function (activityInstance)
+	return rx.Observable.from(activityInstance.state.activity.isCollectingRoster.Changed)
+		:filter(dart.bind(activityUtil.isInSession, activityInstance))
+		:reject()
+		:first()
+		:map(dart.constant(activityInstance))
+end)
+
 -- Roster changed
-local function getTeamRosterStream(index)
-	return dodgeballInstances
-		:flatMap(function (instance)
-			return collection.observeChanged(instance.state.dodgeball.roster[index])
-				:map(dart.carry(instance))
+local playerRemovedFromRoster = dodgeballInstances:flatMap(function (dodgeballInstance)
+	local roster = dodgeballInstance.state.activity.roster
+	return rx.Observable.from(roster.ChildAdded):startWithTable(roster:GetChildren())
+		:flatMap(function (teamFolder)
+			return rx.Observable.from(teamFolder.ChildAdded)
+				:merge(rx.Observable.from(teamFolder.ChildRemoved))
 		end)
-end
-local baseRosterStream = getTeamRosterStream(1):merge(getTeamRosterStream(2))
+		:map(dart.index("Value"))
+		:map(dart.carry(dodgeballInstance))
+end)
 
 -- Character died
 local playerLeft = rx.Observable.from(Players.PlayerRemoving)
@@ -171,12 +175,10 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 				break
 			end
 		end
-		if player then print("dodgeball hit player character directly") end
 		if not player then
 			for _, p in pairs(genesUtil.getInstances(genes.player.characterBackpack):raw()) do
 				local backpack = p.state.characterBackpack.instance.Value
 				if backpack and hit:IsDescendantOf(backpack) then
-					print("dodgeball hit backpack")
 					player = p
 					break
 				end
@@ -187,7 +189,6 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 				if (hit == v or hit:IsDescendantOf(v)) then
 					local p = Players:GetPlayerFromCharacter(v.state.pickup.holder.Value)
 					if p then
-						print("dodgeball hit player held item")
 						player = p
 						break
 					end
@@ -217,13 +218,10 @@ local ballEscaped = rx.Observable.heartbeat()
 -- Subscriptions
 ---------------------------------------------------------------------------------------------------
 
--- Fill roster on session start
-sessionStart:subscribe(fillRoster)
-sessionEnd:subscribe(resetRosterReady)
-
 -- Spawn players on session start
 sessionStart:subscribe(activityUtil.ejectPlayers)
-sessionStart:delay(0.1):subscribe(spawnPlayers)
+playStartStream:subscribe(spawnAllPlayers)
+activityUtil.getPlayerAddedToRosterStream(dodgeball):subscribe(spawnPlayer)
 
 -- Get player out when they are touched by a hot ball OR their character dies
 playerDied
@@ -233,25 +231,25 @@ playerDied
 			:map(dart.drag(p))
 	end)
 	:merge(playerHitByBall)
+	:filter(activityUtil.isInSession)
 	:subscribe(dropPlayer)
 
 -- Update the scoreboard teams when the session starts, and update the score when roster changes
 sessionStart:subscribe(updateScoreboardTeams)
-baseRosterStream:subscribe(updateScoreboardScore)
+playerRemovedFromRoster:subscribe(updateScoreboardScore)
 scheduleStreams.chunkTimeLeft
-	:filter(activityUtil.isActivityChunk)
 	:flatMap(function (t)
 		return rx.Observable.from(genesUtil.getInstances(dodgeball))
 			:map(dart.drag(t))
 	end)
-	:subscribe(updateScoreboardTime)
+	-- :subscribe(updateScoreboardTime)
 
 -- Declare a winner when one team has zero players
-baseRosterStream
-	:filter(isRosterReady)
+playerRemovedFromRoster
+	:filter(activityUtil.isInPlay)
 	:map(function (instance)
 		for i = 1, 2 do
-			if #instance.state.dodgeball.roster[i]:GetChildren() == 0 then
+			if #instance.state.activity.roster[i]:GetChildren() == 0 then
 				return instance, instance.state.activity.sessionTeams[3 - i].Value
 			end
 		end
@@ -266,15 +264,13 @@ sessionEnd
 	:subscribe(destroyBall)
 
 -- Spawn five balls on session start
-sessionStart
-	:flatMap(function (instance)
-		return rx.Observable.range(1, 5)
-			:map(dart.constant(instance))
-	end)
-	:subscribe(spawnBall)
+playStartStream:flatMap(function (instance)
+	return rx.Observable.range(1, 5)
+		:map(dart.constant(instance))
+end):subscribe(spawnBall)
 
 -- When ball escapes, destroy and spawn
-ballEscaped:subscribe(function (instance, ball)
+ballEscaped:filter(activityUtil.isInPlay):subscribe(function (instance, ball)
 	destroyBall(instance, ball)
 	spawnBall(instance)
 end)

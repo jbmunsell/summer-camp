@@ -1,11 +1,9 @@
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
-
 local genes = env.src.genes
-local genesUtil = require(genes.util)
 
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_stickyNoteStack",
 	name = "stickyNoteStack",
 	genes = { genes.pickup, genes.color },
@@ -36,4 +34,4 @@ return genesUtil.createGeneData({
 			stickAngle = CFrame.Angles(math.rad(5), 0, 0),
 		},
 	},
-})
+}

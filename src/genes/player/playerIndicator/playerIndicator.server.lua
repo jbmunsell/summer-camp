@@ -16,8 +16,8 @@ local playerIndicator = genes.player.playerIndicator
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
-local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
+local activityUtil = require(genes.activity.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -26,7 +26,7 @@ local genesUtil = require(genes.util)
 local function createIndicator(player)
 	local indicator = env.res.PlayerIndicator:Clone()
 	indicator.Parent = workspace
-	genesUtil.addGene(indicator, playerIndicator)
+	genesUtil.addGeneTag(indicator, playerIndicator)
 	genesUtil.waitForState(indicator, playerIndicator)
 	indicator.state.playerIndicator.player.Value = player
 end
@@ -40,9 +40,9 @@ end
 
 local function updateColor(indicator)
 	local state = indicator.state.playerIndicator
-	local teamName = state.player.Value.team.Name
-	if teamName == "New Arrivals" then return end
-	local h, s, _ = env.config.teams[teamName].color.Value:ToHSV()
+	local team = state.player.Value.Team
+	if not genesUtil.hasFullState(team, genes.team) then return end
+	local h, s, _ = team.config.team.color.Value:ToHSV()
 	state.color.Value = Color3.fromHSV(h, s, 145 / 255)
 end
 
@@ -82,21 +82,8 @@ end):map(getPlayerIndicator)
 -- Indicator should only be enabled if we're in a competitive activity
 genesUtil.observeStateValue(playerIndicator, "player")
 	:filter(dart.select(2))
-	:flatMap(function (instance)
-		return genesUtil.getInstanceStream(genes.activity)
+	:flatMap(function (instance, player)
+		return activityUtil.getPlayerCompetingStream(player)
 			:map(dart.carry(instance))
-	end)
-	:flatMap(function (instance, activityInstance)
-		return collection.observeChanged(activityInstance.state.activity.sessionTeams)
-			:map(dart.constant(instance))
-	end)
-	:map(function (instance)
-		local activityInstance = genesUtil.getInstances(genes.activity)
-			:first(function (activityInstance)
-				local teams = activityInstance.state.activity.sessionTeams
-				local playerTeam = instance.state.playerIndicator.player.Value.Team
-				return collection.getValue(teams, playerTeam)
-			end)
-		return instance, (activityInstance and activityInstance.config.activity.teamCount.Value > 1)
 	end)
 	:subscribe(setEnabled)

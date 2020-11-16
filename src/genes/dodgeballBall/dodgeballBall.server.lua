@@ -40,7 +40,8 @@ end
 -- Handle hot ball touched
 local function handleHotBallTouched(ball, hit)
 	-- Throw out events where we touched the thrower
-	if hit.Parent and hit.Parent == ball.state.dodgeballBall.thrower.Value then return end
+	local thrower = ball.state.dodgeballBall.thrower.Value
+	if thrower and hit:IsDescendantOf(thrower) then return end
 	ball.interface.dodgeballBall.TouchedNonThrowerPart:Fire(hit)
 	ball.state.dodgeballBall.hot.Value = false
 	ball.state.dodgeballBall.thrower.Value = nil

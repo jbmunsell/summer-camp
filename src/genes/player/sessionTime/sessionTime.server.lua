@@ -1,9 +1,9 @@
 --
 --	Jackson Munsell
 --	13 Nov 2020
---	counselor.server.lua
+--	sessionTime.server.lua
 --
---	counselor gene server driver
+--	sessionTime gene server driver
 --
 
 -- env

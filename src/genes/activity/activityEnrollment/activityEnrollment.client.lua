@@ -19,7 +19,6 @@ local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local tableau = require(axis.lib.tableau)
 local collection = require(axis.lib.collection)
-local dataUtil = require(env.src.data.util)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
 
@@ -27,8 +26,6 @@ local activityUtil = require(activity.util)
 -- Variables
 ---------------------------------------------------------------------------------------------------
 
-local CounselorJoinText = "Join"
-local CamperJoinText = "Ask your counselor to join."
 local ReturnLaterText = "Come back later."
 
 ---------------------------------------------------------------------------------------------------
@@ -36,14 +33,8 @@ local ReturnLaterText = "Come back later."
 ---------------------------------------------------------------------------------------------------
 
 -- Basic setters
-local function setLeaveButtonVisible(enrollmentInstance, visible)
-	enrollmentInstance:FindFirstChild("LeaveButton", true).Visible = visible
-end
 local function setJoinButtonVisible(enrollmentInstance, visible)
 	enrollmentInstance:FindFirstChild("JoinButton", true).Visible = visible
-end
-local function setJoinButtonText(enrollmentInstance, text)
-	enrollmentInstance:FindFirstChild("JoinButton", true).TextLabel.Text = text
 end
 local function setStatusText(enrollmentInstance, text)
 	enrollmentInstance:FindFirstChild("StatusDisplay", true).TextLabel.Text = text
@@ -57,12 +48,13 @@ local function getStatusText(activityInstance)
 	if activityInstance.state.activity.inSession.Value then
 		return (activityInstance.config.activity.teamCount.Value > 1 and "Match" or "Activity")
 			.. " in progress."
-	elseif activityUtil.isActivityChunk() then
+	-- elseif activityUtil.isActivityChunk() then
+	else
 		local enrolled = activityInstance.state.activity.enrolledTeams
 		local desiredCount = activityInstance.config.activity.teamCount.Value
 		return string.format("%d/%d Teams Ready", #enrolled:GetChildren(), desiredCount)
-	else
-		return ReturnLaterText
+	-- else
+	-- 	return ReturnLaterText
 	end
 
 end
@@ -72,7 +64,7 @@ local function displayTeams(enrollmentInstance, folder)
 	local teamList = enrollmentInstance:FindFirstChild("TeamList", true)
 	local function createImage(team)
 		local image = enrollmentInstance:FindFirstChild("seeds", true).TeamImage:Clone()
-		image.Image = env.config.teams[team.Name].image.Value
+		image.Image = team.config.team.image.Value
 		image.Visible = true
 		image.Parent = teamList
 	end
@@ -99,12 +91,8 @@ local enrollments = genesUtil.initGene(activityEnrollment)
 	end)
 
 -- Activity chunk stream
-local isActivityChunkStream = activityUtil.isActivityChunkStream
-
--- Is local player counselor
-local isCounselor = genesUtil.observeStateValue(genes.player.counselor, "isCounselor")
-	:filter(dart.equals(env.LocalPlayer))
-	:map(dart.select(2))
+-- DISABLED FOR NOW
+local isActivityChunkStream = rx.Observable.just(true) -- activityUtil.isActivityChunkStream
 
 -- Get a stream from an activity's inSession value
 local function getSessionStream(activityInstance)
@@ -127,13 +115,6 @@ local function getLocalTeamEnrolledStream(activityInstance)
 		:map(dart.boolify)
 end
 
--- Leave button should be shown when this player is a counselor
--- 	AND this player's team is enrolled in the activity
-enrollments:flatMap(function (enrollmentInstance, activityInstance)
-	return isCounselor:combineLatest(getLocalTeamEnrolledStream(activityInstance), dart.boolAnd)
-		:map(dart.carry(enrollmentInstance))
-end):subscribe(setLeaveButtonVisible)
-
 -- Join button should be shown when it's an activity chunk
 -- 	AND we are not already enrolled
 -- 	AND this activity is not in session
@@ -143,14 +124,6 @@ enrollments:flatMap(function (enrollmentInstance, activityInstance)
 	return isActivityChunkStream:combineLatest(noSession, notEnrolled, dart.boolAll)
 		:map(dart.carry(enrollmentInstance))
 end):subscribe(setJoinButtonVisible)
-
--- Join button text should be "Join" if counselor and "Ask your counselor to sign up!"
--- 	if not a counselor
-enrollments:flatMap(function (enrollmentInstance, _)
-	return isCounselor
-		:map(function (c) return c and CounselorJoinText or CamperJoinText end)
-		:map(dart.carry(enrollmentInstance))
-end):subscribe(setJoinButtonText)
 
 -- Status text should be "Match in progress" if inSession
 -- 	else "x/x Teams Ready" if activity chunk
@@ -196,4 +169,3 @@ local function forwardButton(buttonName, remote)
 	end):subscribe(dart.forward(remote))
 end
 forwardButton("JoinButton", activityEnrollment.net.JoinRequested)
-forwardButton("LeaveButton", activityEnrollment.net.LeaveRequested)

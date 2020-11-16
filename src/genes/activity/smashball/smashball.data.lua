@@ -2,14 +2,11 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
-local activity = genes.activity
 
-local genesUtil = require(genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_activitySmashball",
 	name = "smashball",
-	genes = { activity },
+	genes = { genes.activity },
 	state = {
 		smashball = {
 			roster = { {}, {} },
@@ -21,6 +18,7 @@ return genesUtil.createGeneData({
 	config = {
 		activity = {
 			trophy = env.res.activities.SmashballTrophy,
+			displayName = "Smashball",
 			analyticsName = "smashball",
 			teamCount = 2,
 		},
@@ -30,4 +28,4 @@ return genesUtil.createGeneData({
 			spawnRadius = 25,
 		},
 	},
-})
+}

@@ -11,11 +11,13 @@ local Teams = game:GetService("Teams")
 local TweenService = game:GetService("TweenService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
+local genes = env.src.genes
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
+local activityUtil = require(genes.activity.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Instances
@@ -57,7 +59,7 @@ local inspectingTeam = rx.BehaviorSubject.new(tableau.from(TeamsList):random())
 -- Set inspecting team
 local function renderInspectingTeam(team)
 	-- Get config
-	local config = env.config.teams[team.Name]
+	local config = team.config.team
 	local color = config.color.Value
 	local dullColor do
 		local h, s, v = color:ToHSV()
@@ -106,6 +108,8 @@ local enableStream = rx.Observable.fromProperty(splashScreen, "Enabled")
 	:reject()
 	:first()
 	:merge(rx.Observable.from(coreGui:FindFirstChild("TeamDisplay", true).Button.Activated))
+	:withLatestFrom(activityUtil.getPlayerCompetingStream(env.LocalPlayer))
+	:reject(dart.select(2))
 	:reject(function () return teamSelect.Enabled end)
 enableStream:subscribe(function ()
 	-- Create terminator
@@ -129,6 +133,6 @@ enableStream:subscribe(function ()
 		:subscribe(function (...)
 			teamSelect.Enabled = false
 			coreGui.Enabled = true
-			env.src.genes.player.team.net.TeamChangeRequested:FireServer(...)
+			env.src.genes.team.net.TeamChangeRequested:FireServer(...)
 		end)
 end)

@@ -21,16 +21,15 @@ local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local playerUtil = require(genes.player.util)
-local activityUtil = require(genes.activity.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
 -- Set backpack color
-local function setBackpackTeam(instance, team, isCounselor)
-	local config = env.config.teams[team.Name]
-	local color = (isCounselor and Color3.new(0.3, 0.3, 0.3) or config.color.Value)
+local function setBackpackTeam(instance, team, isLeader)
+	local config = team.config.team
+	local color = (isLeader and Color3.new(0.3, 0.3, 0.3) or config.color.Value)
 	local image = config.image.Value
 	instance.Handle.SpecialMesh.VertexColor = Vector3.new(color.R, color.G, color.B)
 	instance.DecalPart.Color = color
@@ -73,15 +72,15 @@ local function createBackpack(player)
 	enabledStream:subscribe(dart.bind(setBackpackEnabled, backpack))
 
 	-- Set color according to team
-	local isCounselor = rx.Observable.from(player.state.counselor.isCounselor)
+	local isLeader = rx.Observable.from(player.state.leader.isLeader)
 	rx.Observable.fromProperty(player, "Team", true)
-		:combineLatest(isCounselor, dart.identity)
+		:combineLatest(isLeader, dart.identity)
 		:subscribe(dart.bind(setBackpackTeam, backpack))
 
-	-- Set size according to counselor
-	isCounselor
+	-- Set size according to leader
+	isLeader
 		:map(function (v)
-			local pre = (v and "counselor" or "camper")
+			local pre = (v and "leader" or "camper")
 			return env.config.roles[pre .. "BackpackScale"].Value
 		end)
 		:withLatestFrom(enabledStream)

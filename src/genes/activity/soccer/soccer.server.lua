@@ -47,7 +47,7 @@ local function fireCannonsForTeam(soccerInstance, teamIndex)
 	local team = soccerInstance.state.activity.sessionTeams[teamIndex].Value
 	local descendants = tableau.from(soccerInstance:GetDescendants())
 	descendants:filter(dart.isNamed("ConfettiiTeam")):foreach(function (emitter)
-		emitter.Color = ColorSequence.new(env.config.teams[team.Name].color.Value)
+		emitter.Color = ColorSequence.new(team.config.team.color.Value)
 		emitter:Emit(50)
 	end)
 	descendants:filter(dart.isNamed("ConfettiiGold"))
@@ -119,12 +119,18 @@ end
 local function updateScoreboardTime(soccerInstance, secondsRemaining)
 	scoreboardUtil.setTime(soccerInstance.Scoreboard, secondsRemaining)
 end
-local function placePlayersOnPitch(soccerInstance)
+local function placePlayerOnPitch(soccerInstance, player)
 	local functional = soccerInstance.functional
+	local teamIndex = activityUtil.getPlayerTeamIndex(soccerInstance, player)
+	local spawnPlane = functional["Team" .. teamIndex .. "SpawnPlane"]
+	activityUtil.spawnPlayersInPlane({ player }, spawnPlane, functional.BallSpawn.Position)
+end
+local function placeAllPlayersOnPitch(soccerInstance)
 	for i = 1, 2 do
-		local spawnPlane = functional["Team" .. i .. "SpawnPlane"]
 		local players = soccerInstance.state.activity.sessionTeams[i].Value:GetPlayers()
-		activityUtil.spawnPlayersInPlane(players, spawnPlane, functional.BallSpawn.Position)
+		for _, player in pairs(players) do
+			placePlayerOnPitch(soccerInstance, player)
+		end
 	end
 end
 
@@ -162,6 +168,15 @@ local plainGoalStream, winningGoalStream = teamScoredStream
 local sessionStartStream, sessionEndStream = genesUtil.crossObserveStateValue(soccer, activity, "inSession")
 	:pipe(splitAndSelect)
 
+-- Play start stream (when roster collection is complete)
+local playStartStream = sessionStartStream:flatMap(function (activityInstance)
+	return rx.Observable.from(activityInstance.state.activity.isCollectingRoster.Changed)
+		:filter(dart.bind(activityUtil.isInSession, activityInstance))
+		:reject()
+		:first()
+		:map(dart.constant(activityInstance))
+end)
+
 -- Volley state streams
 local volleyStartStream, _ = genesUtil.observeStateValue(soccer, "volleyActive")
 	:pipe(splitAndSelect)
@@ -182,11 +197,11 @@ sessionStartStream:subscribe(activityUtil.ejectPlayers)
 
 -----------------------------------
 -- Volley state subscriptions
--- START VOLLEY when session starts OR on plain goal delay finished
+-- START VOLLEY when play starts OR on plain goal delay finished
 plainGoalStream
 	:delay(3)
-	:filter(activityUtil.isInSession)
-	:merge(sessionStartStream:delay(0.1))
+	:filter(activityUtil.isInPlay)
+	:merge(playStartStream)
 	:subscribe(startVolley)
 
 -- STOP VOLLEY when any goal is scored OR session terminates
@@ -234,17 +249,22 @@ baseScoreStream:map(dart.select(1)):subscribe(updateScoreboardScore)
 
 -- Update scoreboard time when time changes
 scheduleStreams.chunkTimeLeft
-	:filter(activityUtil.isActivityChunk)
 	:flatMap(function (t)
 		return rx.Observable.from(genesUtil.getInstances(soccer))
 			:map(dart.drag(t))
 	end)
-	:subscribe(updateScoreboardTime)
+	-- :subscribe(updateScoreboardTime)
 
 -----------------------------------
 -- Player placement subscriptions
-volleyStartStream:subscribe(placePlayersOnPitch)
+-- Place all on volley start
+volleyStartStream:subscribe(placeAllPlayersOnPitch)
+
+-- Place single when they enter the roster
+activityUtil.getPlayerAddedToRosterStream(soccer):subscribe(placePlayerOnPitch)
 
 -----------------------------------
--- Ball touched sound playing
-
+-- Sound streams
+volleyStartStream:subscribe(function (soccerInstance)
+	soundUtil.playSound(env.res.audio.sounds.Whistle, soccerInstance:FindFirstChild("BallSpawn", true))
+end)

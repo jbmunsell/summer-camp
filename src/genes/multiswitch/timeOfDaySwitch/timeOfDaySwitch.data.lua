@@ -2,9 +2,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_timeOfDaySwitch",
 	name = "timeOfDaySwitch",
 	genes = {},
@@ -14,4 +12,4 @@ return genesUtil.createGeneData({
 			switchOffTime = 20.0,
 		},
 	},
-})
+}

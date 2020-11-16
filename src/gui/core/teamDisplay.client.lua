@@ -7,7 +7,6 @@
 --
 
 -- env
-local Teams = game:GetService("Teams")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
@@ -49,32 +48,7 @@ end
 
 -- Update team image
 local function updateTeamImage()
-	teamDisplay.Button.Image = env.config.teams[env.LocalPlayer.Team.Name].image.Value
-end
-
--- Update counselor list
-local function updateCounselorList()
-	-- Get counselors
-	local team = env.LocalPlayer.Team
-	local counselors = genesUtil.getInstances(genes.player.counselor)
-		:filter(function (p)
-			return p.Team == team and p.state.counselor.isCounselor.Value
-		end)
-
-	-- Destroy old
-	for _, instance in pairs(teamDisplay.Labels:GetChildren()) do
-		if instance:IsA("GuiObject") and instance.Name ~= "Title" then
-			instance:Destroy()
-		end
-	end
-
-	-- Create new
-	counselors:foreach(function (player)
-		local label = core.seeds.teamDisplay.CounselorLabel:Clone()
-		label.Text = player.Name
-		label.Visible = true
-		label.Parent = teamDisplay.Labels
-	end)
+	teamDisplay.Button.Image = env.LocalPlayer.Team.config.team.image.Value
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -83,10 +57,6 @@ end
 
 -- Team changed
 local teamChanged = rx.Observable.fromProperty(env.LocalPlayer, "Team", true)
-	:reject(dart.equals(Teams["New Arrivals"]))
+	:filter(dart.follow(genesUtil.hasGeneTag, genes.team))
 teamChanged:subscribe(updateTeamImage)
 teamChanged:subscribe(showChangeText)
-
--- Counselors changed
-local counselorsChanged = genesUtil.observeStateValue(genes.player.counselor, "isCounselor")
-counselorsChanged:merge(teamChanged):subscribe(updateCounselorList)

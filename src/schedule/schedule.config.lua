@@ -1,12 +1,11 @@
 local StartMessages = {
 	LightsOut = "Lights out! Head to your cabins and go to bed for the night.",
-	MorningRun = "Rise and shine! Follow your cabin leaders on a morning run around the lake.",
 
-	Meal = "Meal time! Follow your cabin leaders to the dining area.",
-	MealOver = "Meal time is over! Drop your trays and dishes off at the cleaning tent and ",
+	Meal = "Meal time! Go to the dining area.",
+	MealOver = "Meal time is over! Put your dishes in the cleaning tent and ",
 
 	FreeTime = "head to the campfire for roasting marshmallows.",
-	Activity = "follow your cabin leaders to an activity.",
+	Activity = "go play some games!",
 }
 
 local scheduleConfig = {

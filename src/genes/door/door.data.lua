@@ -2,9 +2,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_door",
 	name = "door",
 	genes = { env.src.genes.interact },
@@ -20,4 +18,4 @@ return genesUtil.createGeneData({
 			openAngle = 90,
 		},
 	},
-})
+}

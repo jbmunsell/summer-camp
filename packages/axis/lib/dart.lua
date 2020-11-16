@@ -140,6 +140,11 @@ function dart.lessThan(val)
 		return x < val
 	end
 end
+function dart.greaterThan(val)
+	return function (x)
+		return x > val
+	end
+end
 
 -- return constant value
 function dart.constant(val)

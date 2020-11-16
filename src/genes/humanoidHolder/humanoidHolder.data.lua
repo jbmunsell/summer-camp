@@ -1,9 +1,7 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local tableau = require(env.packages.axis.lib.tableau)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	name = "humanoidHolder",
 	instanceTag = "gene_humanoidHolder",
 	genes = { env.src.genes.interact },
@@ -28,4 +26,4 @@ return genesUtil.createGeneData({
 	
 	tweenInInfo = TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
 	tweenOutInfo = TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
-})
+}

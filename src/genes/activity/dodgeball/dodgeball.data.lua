@@ -2,26 +2,24 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
-local activity = genes.activity
 
-local genesUtil = require(genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_activityDodgeball",
 	name = "dodgeball",
-	genes = { activity },
+	genes = { genes.activity },
 	state = {
 		dodgeball = {
-			roster = { {}, {} },
 			ragdolls = {},
-			rosterReady = false,
 		},
 	},
 
 	config = {
 		activity = {
+			isCompetitive = true,
 			trophy = env.res.activities.DodgeballTrophy,
+			displayName = "Dodgeball",
 			analyticsName = "dodgeball",
+			activityPromptImage = "",
 			teamCount = 2,
 		},
 
@@ -29,4 +27,4 @@ return genesUtil.createGeneData({
 			ball = env.res.activities.DodgeballBall,
 		},
 	},
-})
+}

@@ -2,9 +2,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_balloon",
 	name = "balloon",
 	genes = { env.src.genes.pickup, env.src.genes.color },
@@ -30,4 +28,4 @@ return genesUtil.createGeneData({
 			destroyHeight = 500,
 		},
 	},
-})
+}

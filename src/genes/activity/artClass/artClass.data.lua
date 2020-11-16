@@ -2,20 +2,19 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
-local activity = genes.activity
 
-local genesUtil = require(genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_activityArtClass",
 	name = "artClass",
-	genes = { activity },
+	genes = { genes.activity },
 	state = {
 	},
 
 	config = {
 		activity = {
+			isCompetitive = false,
+			displayName = "Art Class",
 			analyticsName = "artClass",
 		},
 	},
-})
+}

@@ -3,9 +3,8 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
 local tableau = require(env.packages.axis.lib.tableau)
-local genesUtil = require(env.src.genes.util)
 
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_activity",
 	name = "activity",
 	genes = {},
@@ -14,15 +13,23 @@ return genesUtil.createGeneData({
 			inSession = false,
 			enrolledTeams = {},
 			sessionTeams = {},
+			roster = {},
+			isCollectingRoster = false,
 			winningTeam = tableau.null,
 		},
 	},
 
 	config = {
 		activity = {
+			isCompetitive = false,
+			rosterCollectionTimer = 15,
 			trophy = env.res.activities.PlaceholderTrophy,
 			teamCount = 1,
+			
+			displayName = "Activity",
 			analyticsName = "activity",
+			activityPromptImage = "",
 		},
 	},
-})
+
+}

@@ -12,7 +12,7 @@ local axis = env.packages.axis
 local notifications = env.src.gui.notifications
 
 -- modules
-local rx   = require(axis.lib.rx)
+local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local notificationsConfig = require(notifications.config)

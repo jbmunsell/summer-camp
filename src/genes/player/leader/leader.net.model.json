@@ -3,7 +3,7 @@
 	"Children": [
 		{
 			"ClassName": "RemoteEvent",
-			"Name": "TeamChangeRequested"
+			"Name": "RoleChangeRequested"
 		}
 	]
 }

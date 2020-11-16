@@ -8,6 +8,7 @@
 
 -- env
 local AnalyticsService = game:GetService("AnalyticsService")
+local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -18,27 +19,84 @@ local fx = require(axis.lib.fx)
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
+local axisUtil = require(axis.lib.axisUtil)
 local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local activityUtil = require(activity.util)
-local scheduleStreams = require(env.src.schedule.streams)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
--- Handy self-explanatory stream utility functions
-local function isInSession(activityInstance)
-	return activityInstance.state.activity.inSession.Value
+-- Roster management
+local function addPlayerToRoster(activityInstance, player)
+	local teamIndex = activityUtil.getPlayerTeamIndex(activityInstance, player)
+	collection.addValue(activityInstance.state.activity.roster[teamIndex], player)
 end
-local function startSession(activityInstance)
-	for _, value in pairs(activityInstance.state.activity.enrolledTeams:GetChildren()) do
-		value.Parent = activityInstance.state.activity.sessionTeams
+local function removePlayerFromRosters(player)
+	genesUtil.getInstances(activity):foreach(function (activityInstance)
+		local roster = activityInstance.state.activity.roster
+		for _, folder in pairs(roster:GetChildren()) do
+			collection.removeValue(folder, player)
+		end
+	end)
+end
+
+-- Handy self-explanatory stream utility functions
+local function stopSession(activityInstance)
+	local state = activityInstance.state.activity
+	collection.clear(state.enrolledTeams)
+	state.inSession.Value = false
+	collection.clear(state.sessionTeams)
+	for _, folder in pairs(state.roster:GetChildren()) do
+		collection.clear(folder)
+	end
+end
+local function clearWinner(activityInstance)
+	activityInstance.state.activity.winningTeam.Value = nil
+end
+
+-- Start collecting roster
+local function getRosterTimerLabel(activityInstance)
+	local timerLabel = activityInstance:FindFirstChild("RosterTimerLabel", true)
+	if not timerLabel then
+		error("No RosterTimerLabel found in " .. activityInstance:GetFullName())
+	end
+	return timerLabel
+end
+local function setRosterTimerVisible(activityInstance, visible)
+	local timerLabel = getRosterTimerLabel(activityInstance)
+	timerLabel.Parent.Enabled = visible
+end
+local function startCollectingRoster(activityInstance)
+	-- Move all enrolled teams to session teams
+	local state = activityInstance.state.activity
+	for _, value in pairs(state.enrolledTeams:GetChildren()) do
+		value.Parent = state.sessionTeams
 	end
 
-	-- Set state value to trigger action
-	activityInstance.state.activity.inSession.Value = true
+	-- Set state values to trigger any observers
+	state.isCollectingRoster.Value = true
+	state.inSession.Value = true
+
+	-- Show countdown part
+	local timerLabel = getRosterTimerLabel(activityInstance)
+	local function setTimerText(t)
+		timerLabel.Text = t
+	end
+	rx.Observable.heartbeat()
+		:scan(function (t, dt)
+			return t - dt
+		end, activityInstance.config.activity.rosterCollectionTimer.Value)
+		:map(math.floor)
+		:takeUntil(rx.Observable.from(state.isCollectingRoster):reject())
+		:subscribe(setTimerText)
+
+	-- Create roster folders
+	for i = 1, activityInstance.config.activity.teamCount.Value do
+		Instance.new("Folder", state.roster).Name = i
+	end
 
 	-- Fire analytics event
 	local teamsData = {}
@@ -50,35 +108,50 @@ local function startSession(activityInstance)
 		teams = teamsData,
 	})
 end
-local function stopSession(activityInstance)
-	collection.clear(activityInstance.state.activity.enrolledTeams)
-	activityInstance.state.activity.inSession.Value = false
-	collection.clear(activityInstance.state.activity.sessionTeams)
-end
-local function clearWinner(activityInstance)
-	activityInstance.state.activity.winningTeam.Value = nil
+
+-- Start PLAY
+local function startPlay(activityInstance)
+	-- Get state
+	local state = activityInstance.state.activity
+	print("starting play")
+
+	-- If we have players on both teams, then start a match
+	local hasBoth = true
+	for _, folder in pairs(state.roster:GetChildren()) do
+		if #folder:GetChildren() == 0 then
+			hasBoth = false
+			break
+		end
+	end
+	if not hasBoth then
+		stopSession(activityInstance)
+	end
+
+	-- Either way, we are no longer collecting roster
+	wait()
+	state.isCollectingRoster.Value = false
 end
 
 -- Create trophy for activity instance and team, place it at the spawn
-local function createTrophy(activityInstance, cabin)
+local function createTrophy(activityInstance, team)
 	-- Create trophy
 	local trophy = activityInstance.config.activity.trophy.Value:Clone()
 	trophy:SetPrimaryPartCFrame(activityInstance.functional.TrophySpawn.CFrame)
 	trophy.Parent = workspace
 
 	-- Set decal part texture id
-	trophy.DecalPart.Decal.Texture = env.config.teams[cabin.Name].image.Value
+	trophy.DecalPart.Decal.Texture = team.config.team.image.Value
 
 	-- Tag and apply functionality
-	genesUtil.addGene(trophy, genes.pickup)
-	genesUtil.addGene(trophy, genes.multiswitch.teamOnly)
+	genesUtil.addGeneTag(trophy, genes.pickup)
+	genesUtil.addGeneTag(trophy, genes.multiswitch.teamOnly)
 
 	-- Play sound inside the trophy
 	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
 
 	-- Wait for full state
 	genesUtil.waitForState(trophy, genes.multiswitch.teamOnly)
-	trophy.config.teamOnly.team.Value = cabin
+	trophy.config.teamOnly.team.Value = team
 end
 
 -- Render gates
@@ -115,35 +188,53 @@ end
 -- init gene
 local activities = genesUtil.initGene(activity)
 
+-- Set roster timer visible
+genesUtil.observeStateValue(activity, "isCollectingRoster"):subscribe(setRosterTimerVisible)
+
 -- Listen to enrolled list changed and begin activity when it's full
 -- We have to spawn the subscription to this because it is subscribes to the collection's ChildRemoved event
 -- 	and will create an infinite loop if single-threaded
-activities
+local rosterCollectingStart = activities
 	:flatMap(function (activityInstance)
 		local enrolled = activityInstance.state.activity.enrolledTeams
 		return collection.observeChanged(enrolled)
-			:filter(activityUtil.isActivityChunk)
-			:reject(dart.bind(isInSession, activityInstance))
+			:reject(dart.bind(activityUtil.isInSession, activityInstance))
 			:map(function () return #enrolled:GetChildren() end)
 			:filter(dart.equals(activityInstance.config.activity.teamCount.Value))
 			:map(dart.constant(activityInstance))
 	end)
-	:map(dart.carry(startSession))
+	:share()
+rosterCollectingStart
+	:map(dart.carry(startCollectingRoster))
 	:map(dart.bind)
 	:subscribe(spawn)
+rosterCollectingStart:delay(function (activityInstance)
+	return activityInstance.config.activity.rosterCollectionTimer.Value
+end):subscribe(startPlay)
 
--- Stop session when activity chunk ends OR when a winner is declared from the inside
+-- Add players to roster upon request
+rx.Observable.from(activity.net.RosterJoinRequested)
+	:filter(function (player, activityInstance)
+		local state = activityInstance.state.activity
+		return state.isCollectingRoster.Value and collection.getValue(state.sessionTeams, player.Team)
+	end)
+	:reject(activityUtil.isPlayerInAnyRoster)
+	:map(function (p, a) return a, p end)
+	:subscribe(addPlayerToRoster)
+
+-- Remove players from roster when they leave the game or die
+axisUtil.getPlayerCharacterStream():flatMap(function (_, character)
+	return rx.Observable.from(character:WaitForChild("Humanoid").Died)
+end):merge(rx.Observable.from(Players.PlayerRemoving))
+	:subscribe(removePlayerFromRosters)
+
+-- Stop session when a winner is declared from the inside
 local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")
 	:filter(dart.select(2))
-scheduleStreams.scheduleChunk
-	:reject(activityUtil.isActivityChunk)
-	:map(dart.bind(genesUtil.getInstances, activity))
-	:flatMap(rx.Observable.from)
-	:merge(winnerDeclared:map(dart.select(1)))
-	:subscribe(stopSession)
 
 -- Create trophy when a winner is declared
 winnerDeclared:subscribe(createTrophy)
+winnerDeclared:map(dart.select(1)):subscribe(stopSession)
 
 -- Clear winner after a moment
 winnerDeclared

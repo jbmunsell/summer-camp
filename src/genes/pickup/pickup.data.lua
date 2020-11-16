@@ -1,9 +1,7 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local tableau = require(env.packages.axis.lib.tableau)
 
-local genesUtil = require(env.src.genes.util)
-
-local pickupData = genesUtil.createGeneData({
+return {
 	name = "pickup",
 	instanceTag = "gene_pickup",
 	genes = { env.src.genes.interact },
@@ -33,6 +31,4 @@ local pickupData = genesUtil.createGeneData({
 			buttonColor = Color3.new(1, 1, 1)
 		},
 	},
-})
-
-return pickupData
+}

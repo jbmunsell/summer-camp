@@ -2,9 +2,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	name = "powderSack",
 	instanceTag = "gene_powderSack",
 	genes = { env.src.genes.throw, env.src.genes.color },
@@ -29,4 +27,4 @@ return genesUtil.createGeneData({
 			firePoofParticleCount = 20,
 		},
 	},
-})
+}

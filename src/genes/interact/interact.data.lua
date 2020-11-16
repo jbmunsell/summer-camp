@@ -1,8 +1,6 @@
-local env = require(game:GetService("ReplicatedStorage").src.env)
+-- local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-local interactData = genesUtil.createGeneData({
+return {
 	instanceTag = "gene_interact",
 	name = "interact",
 	genes = {},
@@ -20,6 +18,4 @@ local interactData = genesUtil.createGeneData({
 			duration = 0.3,
 		},
 	},
-})
-
-return interactData
+}

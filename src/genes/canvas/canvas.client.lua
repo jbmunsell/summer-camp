@@ -252,7 +252,7 @@ local canvasObtained = canvases
 
 -- Claim ownership on interact (another stream will connect on owner changed)
 rx.Observable.from(interact.interface.ClientInteracted.Event)
-	:filter(dart.follow(genesUtil.hasGene, canvas))
+	:filter(dart.follow(genesUtil.hasGeneTag, canvas))
 	:subscribe(claimCanvas)
 
 -- When a noncollaborative canvas sets US as the owner,

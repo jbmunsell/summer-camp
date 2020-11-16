@@ -1,13 +1,12 @@
 --
 --	Jackson Munsell
---	13 Nov 2020
---	counselor.server.lua
+--	16 Nov 2020
+--	team.server.lua
 --
---	counselor gene server driver
+--	team gene server driver
 --
 
 -- env
-local Teams = game:GetService("Teams")
 local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -16,26 +15,25 @@ local genes = env.src.genes
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
-local playerUtil = require(genes.player.util)
+local genesUtil = require(genes.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
+-- Increase team wins
+local function addWin(team)
+	team.state.team.wins.Value = team.state.team.wins.Value + 1
+end
+
 -- Change team
-local function changeTeam(player, team)
+local function changePlayerTeam(player, team)
 	-- Set values
 	local oldTeam = player.Team
-	player.state.counselor.isCounselor.Value = false
 	player.Team = team
 
 	-- Fire event
-	local teams = {
-		Teams.Wolves,
-		Teams.Owls,
-		Teams.Cheetahs,
-		Teams.Scorpions,
-	}
+	local teams = genesUtil.getTaggedInstances(genes.team)
 	table.sort(teams, function (a, b)
 		return #a:GetPlayers() < #b:GetPlayers()
 	end)
@@ -52,13 +50,14 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
--- init
-local playerStream = playerUtil.initPlayerGene(genes.player.team)
+-- init gene
+genesUtil.initGene(genes.team)
+
+-- When an activity declares a winner, increase the team's wins
+genesUtil.observeStateValue(genes.activity, "winningTeam")
+	:map(dart.select(2))
+	:filter()
+	:subscribe(addWin)
 
 -- Accept team change requests
-playerStream
-	:flatMap(function (player)
-		return rx.Observable.from(genes.player.team.net.TeamChangeRequested)
-			:filter(dart.equals(player))
-	end)
-	:subscribe(changeTeam)
+rx.Observable.from(genes.team.net.TeamChangeRequested):subscribe(changePlayerTeam)

@@ -4,9 +4,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
 local tableau = require(env.packages.axis.lib.tableau)
 
-local genesUtil = require(genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_dish",
 	name = "dish",
 	genes = { genes.edible },
@@ -29,4 +27,4 @@ return genesUtil.createGeneData({
 			buttonImage = "",
 		},
 	},
-})
+}

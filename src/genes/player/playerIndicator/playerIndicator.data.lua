@@ -1,11 +1,9 @@
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
-
 local tableau = require(env.packages.axis.lib.tableau)
-local genesUtil = require(env.src.genes.util)
 
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_playerIndicator",
 	name = "playerIndicator",
 	genes = {},
@@ -19,4 +17,4 @@ return genesUtil.createGeneData({
 	
 	config = {
 	},
-})
+}

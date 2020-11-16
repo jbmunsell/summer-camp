@@ -29,12 +29,12 @@ end
 -- Exported setters
 function scoreboardUtil.setTeams(instance, teamsFolder)
 	for i = 1, 2 do
-		local teamName = teamsFolder[i].Value.Name
+		local config = teamsFolder[i].Value.config.team
 		local labels = getTeamLabels(instance, i)
 		for _, label in pairs(labels) do
-			label.TextColor3 = env.config.teams[teamName].color.Value
+			label.TextColor3 = config.color.Value
 		end
-		labels.nameLabel.Text = teamName
+		labels.nameLabel.Text = config.displayName.Value
 	end
 end
 function scoreboardUtil.setScore(instance, score)

@@ -1,15 +1,11 @@
 
 -- env
-local env = require(game:GetService("ReplicatedStorage").src.env)
--- local genes = env.src.genes
--- local tableau = require(env.packages.axis.lib.tableau)
+-- local env = require(game:GetService("ReplicatedStorage").src.env)
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_activityEnrollment",
 	name = "activityEnrollment",
-	genes = {  },
+	genes = {},
 
 	state = {
 		interact = {
@@ -24,7 +20,7 @@ return genesUtil.createGeneData({
 	},
 
 	interface = {
-		events = { "cabinCounselorTriggered" },
+		events = {},
 	},
 	
 	config = {
@@ -32,4 +28,4 @@ return genesUtil.createGeneData({
 			triggerDistance = 10,
 		},
 	},
-})
+}

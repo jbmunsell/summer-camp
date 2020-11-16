@@ -55,7 +55,7 @@ local pickupUtil = {}
 function pickupUtil.characterHoldsObject(character, gene)
 	if not character then return end
 	return pickupUtil.getCharacterHeldObjects(character)
-		:first(dart.follow(genesUtil.hasGene, gene))
+		:first(dart.follow(genesUtil.hasGeneTag, gene))
 end
 function pickupUtil.localCharacterHoldsObject(gene)
 	return pickupUtil.characterHoldsObject(Players.LocalPlayer.Character, gene)

@@ -29,6 +29,11 @@ local activityUtil = {}
 function activityUtil.isInSession(activityInstance)
 	return activityInstance.state.activity.inSession.Value
 end
+function activityUtil.isInPlay(activityInstance)
+	local state = activityInstance.state.activity
+	return state.inSession.Value
+	and not state.isCollectingRoster.Value
+end
 
 -- Current chunk is activity chunk
 function activityUtil.isActivityChunk()
@@ -46,19 +51,62 @@ function activityUtil.getCabinActivity(team)
 		end)
 end
 
+-- Get team index
+function activityUtil.getTeamIndex(activityInstance, team)
+	local value = collection.getValue(activityInstance.state.activity.sessionTeams, team)
+	return value and tonumber(value.Name)
+end
+
+-- is player competing
+function activityUtil.isPlayerCompeting(player)
+	return genesUtil.getInstances(activity):first(function (activityInstance)
+		return activityUtil.isPlayerInRoster(activityInstance, player) and true or nil
+	end)
+end
+
 -- Get player competing stream
 function activityUtil.getPlayerCompetingStream(player)
-	return genesUtil.getInstanceStream(activity)
-		:flatMap(function (activityInstance)
-			local teams = activityInstance.state.activity.sessionTeams
-			return collection.observeChanged(teams)
-		end)
-		:merge(rx.Observable.fromProperty(player, "Team", true))
-		:map(function ()
-			return genesUtil.getInstances(activity):first(function (activityInstance)
-				return collection.getValue(activityInstance.state.activity.sessionTeams, player.Team)
-			end)
-		end)
+	return genesUtil.getInstanceStream(activity):flatMap(function (activityInstance)
+		local roster = activityInstance.state.activity.roster
+		local function isPlayer(o)
+			return o:filter(dart.isa("ObjectValue"))
+					:filter(function (c) return c.Value == player end)
+		end
+		return rx.Observable.from(roster.DescendantAdded)
+			:startWithTable(roster:GetDescendants())
+			:pipe(isPlayer)
+			:map(dart.constant(true))
+			:merge(rx.Observable.from(roster.DescendantRemoving)
+				:pipe(isPlayer)
+				:map(dart.constant(false)))
+	end)
+end
+
+-- Get player added to roster stream
+function activityUtil.getPlayerTeamIndex(activityInstance, player)
+	local value = collection.getValue(activityInstance.state.activity.sessionTeams, player.Team)
+	return value and tonumber(value.Name)
+end
+function activityUtil.isPlayerInAnyRoster(player)
+	return genesUtil.getInstances(activity):first(dart.follow(activityUtil.isPlayerInRoster, player))
+end
+function activityUtil.isPlayerInRoster(activityInstance, player)
+	local roster = activityInstance.state.activity.roster
+	for _, folder in pairs(roster:GetChildren()) do
+		if collection.getValue(folder, player) then
+			return true
+		end
+	end
+	return false
+end
+function activityUtil.getPlayerAddedToRosterStream(gene)
+	return genesUtil.getInstanceStream(gene):flatMap(function (activityInstance)
+		return rx.Observable.from(activityInstance.state.activity.roster.DescendantAdded)
+			:filter(dart.isa("ObjectValue"))
+			:map(dart.index("Value"))
+			:filter()
+			:map(dart.carry(activityInstance))
+	end)
 end
 
 -- Spawn players in plane

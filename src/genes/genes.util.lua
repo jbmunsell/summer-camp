@@ -28,14 +28,17 @@ if RunService:IsServer() then
 end
 
 -- Has gene
-function genesUtil.hasGene(instance, gene)
+function genesUtil.hasGeneTag(instance, gene)
 	return CollectionService:HasTag(instance, require(gene.data).instanceTag)
 end
-function genesUtil.addGene(instance, gene)
+function genesUtil.addGeneTag(instance, gene)
 	local tag = require(gene.data).instanceTag
 	if not CollectionService:HasTag(instance, tag) then
 		CollectionService:AddTag(instance, tag)
 	end
+end
+function genesUtil.getTaggedInstances(gene)
+	return CollectionService:GetTagged(require(gene.data).instanceTag)
 end
 
 -- Get genes
@@ -61,7 +64,7 @@ local function initInstanceGene(instance, gene)
 
 	-- Add tags to apply inherited gene functionality
 	for _, g in pairs(geneData.genes) do
-		genesUtil.addGene(instance, g)
+		genesUtil.addGeneTag(instance, g)
 	end
 end
 function genesUtil.initQueueProcessing(bufferSize)
@@ -219,36 +222,6 @@ function genesUtil.waitForState(instance, gene)
 	while not genesUtil.hasFullState(instance, gene) do
 		wait()
 	end
-end
-
--- Create gene data
--- Integrate existing gene data into new gene data
-local function integrate(baseGeneData, geneData)
-	-- Create config table if it doesn't exist
-	-- 	(we DO want this to happen for the first recursion with baseGeneData)
-	if not baseGeneData.config then
-		baseGeneData.config = {}
-	end
-	if not baseGeneData.config[geneData.name] then
-		baseGeneData.config[geneData.name] = {}
-	end
-
-	-- Skip the initial recursion with baseGeneData
-	if baseGeneData ~= geneData then
-		setmetatable(baseGeneData.config[geneData.name], { __index = geneData.config[geneData.name] })
-	end
-
-	-- Loop all subsequent genes and integrate
-	for _, g in pairs(geneData.genes or {}) do
-		integrate(baseGeneData, require(g.data))
-	end
-end
-function genesUtil.createGeneData(raw)
-	-- Start with base gene data to get its own sub genes
-	-- integrate(raw, raw)
-
-	-- return compiled data table (same variable "raw" because we set metatables)
-	return raw
 end
 
 -- Create interface

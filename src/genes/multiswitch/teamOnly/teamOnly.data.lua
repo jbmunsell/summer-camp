@@ -1,12 +1,10 @@
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
-local genes = env.src.genes
 local tableau = require(env.packages.axis.lib.tableau)
+local genes = env.src.genes
 
-local genesUtil = require(env.src.genes.util)
-
-return genesUtil.createGeneData({
+return {
 	instanceTag = "gene_teamOnly",
 	name = "teamOnly",
 	genes = { genes.interact },
@@ -24,4 +22,4 @@ return genesUtil.createGeneData({
 			team = tableau.null,
 		},
 	},
-})
+}
