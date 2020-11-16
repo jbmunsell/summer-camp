@@ -18,7 +18,7 @@ local scheduleUtil = require(schedule.util)
 local scheduleStreams = require(schedule.streams)
 
 -- instances
-local ClockFrame = env.PlayerGui:WaitForChild("Core").Container.Clock
+local ClockFrame = env.PlayerGui:WaitForChild("Core").Container.ClockContainer.Clock
 
 -- Set clock time
 local function setClockDisplay(timeString)
@@ -27,7 +27,7 @@ end
 
 -- Set activity text
 local function setActivityText(text)
-	ClockFrame.Activity.TextLabel.Text = text
+	ClockFrame.Parent.Activity.TextLabel.Text = text
 end
 
 -- Change clock
