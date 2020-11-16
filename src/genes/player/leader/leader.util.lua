@@ -7,6 +7,7 @@
 --
 
 -- env
+local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
 local leader = genes.player.leader
@@ -27,6 +28,25 @@ function leaderUtil.getTeamLeaders(team)
 	return genesUtil.getInstances(leader)
 		:filter(leaderUtil.isLeader)
 		:filter(function (p) return p.Team == team end)
+end
+
+-- Render character size
+function leaderUtil.renderCharacterSize(character)
+	-- Get player and humanoid
+	local player = Players:GetPlayerFromCharacter(character)
+	if not player then return end
+
+	leaderUtil.forceRenderCharacterSize(character, leaderUtil.isLeader(player))
+end
+
+-- Force render character size
+function leaderUtil.forceRenderCharacterSize(character, isLeader)
+	-- Set scale values
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then return end
+	for _, c in pairs(env.config.roles.camperSizeModifiers:GetChildren()) do
+		humanoid:WaitForChild(c.Name).Value = (isLeader and 1 or c.Value)
+	end
 end
 
 -- return lib

@@ -7,7 +7,6 @@
 --
 
 -- env
-local Players = game:GetService("Players")
 local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -38,20 +37,6 @@ local function sendRoleChangedAnalytics(player, isLeader)
 	})
 end
 
--- Render character size
-local function renderCharacterSize(character)
-	-- Get player and humanoid
-	local player = Players:GetPlayerFromCharacter(character)
-	local humanoid = character:FindFirstChild("Humanoid")
-	if not humanoid or not player then return end
-
-	-- Set scale values
-	local isLeader = leaderUtil.isLeader(player)
-	for _, c in pairs(env.config.roles.camperSizeModifiers:GetChildren()) do
-		humanoid:WaitForChild(c.Name).Value = (isLeader and 1 or c.Value)
-	end
-end
-
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
@@ -64,7 +49,7 @@ genesUtil.observeStateValue(leader, "isLeader")
 	:map(dart.index("Character"))
 	:merge(playerStream:map(dart.index("CharacterAdded")):flatMap(rx.Observable.from))
 	:filter()
-	:subscribe(renderCharacterSize)
+	:subscribe(leaderUtil.renderCharacterSize)
 
 -- Comply with player requests always
 local changeRequestStream = rx.Observable.from(leader.net.RoleChangeRequested)
