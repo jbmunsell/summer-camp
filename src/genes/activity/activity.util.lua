@@ -44,7 +44,7 @@ activityUtil.isActivityChunkStream = scheduleStreams.scheduleChunk
 	:map(activityUtil.isActivityChunk)
 
 -- Get cabin activity
-function activityUtil.getCabinActivity(team)
+function activityUtil.getTeamActivity(team)
 	return genesUtil.getInstances(activity)
 		:first(function (activityInstance)
 			return collection.getValue(activityInstance.state.activity.sessionTeams, team)

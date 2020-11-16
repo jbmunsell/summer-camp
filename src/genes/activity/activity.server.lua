@@ -48,13 +48,14 @@ local function stopSession(activityInstance)
 	local state = activityInstance.state.activity
 	collection.clear(state.enrolledTeams)
 	state.inSession.Value = false
+	state.winningTeam.Value = nil
 	collection.clear(state.sessionTeams)
 	for _, folder in pairs(state.roster:GetChildren()) do
 		collection.clear(folder)
 	end
-end
-local function clearWinner(activityInstance)
-	activityInstance.state.activity.winningTeam.Value = nil
+	for _, value in pairs(state.score:GetChildren()) do
+		value.Value = 0
+	end
 end
 
 -- Start collecting roster
@@ -93,11 +94,6 @@ local function startCollectingRoster(activityInstance)
 		:takeUntil(rx.Observable.from(state.isCollectingRoster):reject())
 		:subscribe(setTimerText)
 
-	-- Create roster folders
-	for i = 1, activityInstance.config.activity.teamCount.Value do
-		Instance.new("Folder", state.roster).Name = i
-	end
-
 	-- Fire analytics event
 	local teamsData = {}
 	for _, team in pairs(activityInstance.state.activity.sessionTeams:GetChildren()) do
@@ -117,7 +113,8 @@ local function startPlay(activityInstance)
 
 	-- If we have players on both teams, then start a match
 	local hasBoth = true
-	for _, folder in pairs(state.roster:GetChildren()) do
+	for i = 1, activityInstance.config.activity.teamCount.Value do
+		local folder = state.roster[i]
 		if #folder:GetChildren() == 0 then
 			hasBoth = false
 			break
@@ -234,13 +231,7 @@ local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")
 
 -- Create trophy when a winner is declared
 winnerDeclared:subscribe(createTrophy)
-winnerDeclared:map(dart.select(1)):subscribe(stopSession)
-
--- Clear winner after a moment
-winnerDeclared
-	:map(dart.carry(clearWinner))
-	:map(dart.bind)
-	:subscribe(spawn)
+winnerDeclared:map(dart.select(1)):delay(1.0):subscribe(stopSession)
 
 -- Hard switch gates on activity session
 activities:subscribe(initGates)

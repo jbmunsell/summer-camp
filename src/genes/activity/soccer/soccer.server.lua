@@ -57,12 +57,8 @@ local function fireCannonsForTeam(soccerInstance, teamIndex)
 end
 
 -- Score manipulation
-local function resetScore(instance)
-	tableau.from(instance.state.soccer.score:GetChildren())
-		:foreach(dart.setValue(0))
-end
 local function increaseScore(soccerInstance, scoringTeam)
-	local valueObject = soccerInstance.state.soccer.score[scoringTeam]
+	local valueObject = soccerInstance.state.activity.score[scoringTeam]
 	valueObject.Value = valueObject.Value + 1
 	local sound = soundUtil.playSound(env.res.audio.sounds.soccer.GoalScored,
 		soccerInstance.functional["Team" .. (3 - scoringTeam) .. "GoalSensor"])
@@ -113,7 +109,7 @@ local function updateScoreboardTeams(soccerInstance)
 	scoreboardUtil.setTeams(soccerInstance.Scoreboard, soccerInstance.state.activity.sessionTeams)
 end
 local function updateScoreboardScore(soccerInstance)
-	local score = tableau.valueObjectsToTable(soccerInstance.state.soccer.score)
+	local score = tableau.valueObjectsToTable(soccerInstance.state.activity.score)
 	scoreboardUtil.setScore(soccerInstance.Scoreboard, score)
 end
 local function updateScoreboardTime(soccerInstance, secondsRemaining)
@@ -152,7 +148,7 @@ end
 local function getTeamScoreStream(teamIndex)
 	return soccerInstances
 		:flatMap(function (instance)
-			return rx.Observable.from(instance.state.soccer.score[teamIndex])
+			return rx.Observable.from(instance.state.activity.score[teamIndex])
 				:map(dart.carry(instance, teamIndex))
 		end)
 end
@@ -229,15 +225,12 @@ local ballInGoalStream = volleyActivePulse
 ballInGoalStream:subscribe(increaseScore)
 ballInGoalStream:subscribe(fireCannonsForTeam)
 
--- Reset score when match begins
-sessionStartStream:subscribe(resetScore)
-
 -- Declare winner on winning goal
-winningGoalStream
+local winneringTeamStream = winningGoalStream
 	:map(function (soccerInstance, teamIndex)
 		return soccerInstance, soccerInstance.state.activity.sessionTeams[teamIndex].Value
 	end)
-	:subscribe(declareWinner)
+winneringTeamStream:subscribe(declareWinner)
 
 -----------------------------------
 -- Scoreboard subscriptions

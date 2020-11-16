@@ -102,6 +102,12 @@ end
 local function updateScoreboardTeams(dodgeballInstance)
 	scoreboardUtil.setTeams(dodgeballInstance.Scoreboard, dodgeballInstance.state.activity.sessionTeams)
 end
+local function updateScore(dodgeballInstance)
+	local state = dodgeballInstance.state.activity
+	for i = 1, 2 do
+		state.score[i].Value = #state.roster[i]:GetChildren()
+	end
+end
 local function updateScoreboardScore(dodgeballInstance)
 	local score = {}
 	for i = 1, 2 do
@@ -151,6 +157,14 @@ local playerRemovedFromRoster = dodgeballInstances:flatMap(function (dodgeballIn
 		end)
 		:map(dart.index("Value"))
 		:map(dart.carry(dodgeballInstance))
+end)
+
+-- Score changed
+local scoreChangedStream = dodgeballInstances:flatMap(function (dodgeballInstance)
+	local score = dodgeballInstance.state.activity.score
+	return rx.Observable.from(score:GetChildren())
+		:flatMap(rx.Observable.from)
+		:map(dart.constant(dodgeballInstance))
 end)
 
 -- Character died
@@ -236,13 +250,17 @@ playerDied
 
 -- Update the scoreboard teams when the session starts, and update the score when roster changes
 sessionStart:subscribe(updateScoreboardTeams)
-playerRemovedFromRoster:subscribe(updateScoreboardScore)
+playerRemovedFromRoster:merge(activityUtil.getPlayerAddedToRosterStream(dodgeball))
+	:subscribe(updateScore)
 scheduleStreams.chunkTimeLeft
 	:flatMap(function (t)
 		return rx.Observable.from(genesUtil.getInstances(dodgeball))
 			:map(dart.drag(t))
 	end)
 	-- :subscribe(updateScoreboardTime)
+
+-- Update scoreboard when score changes
+scoreChangedStream:subscribe(updateScoreboardScore)
 
 -- Declare a winner when one team has zero players
 playerRemovedFromRoster
