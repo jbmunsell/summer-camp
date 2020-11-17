@@ -103,7 +103,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init
-local playerStream = playerUtil.initPlayerGene(characterBackpack)
+local playerStream = playerUtil.softInitPlayerGene(characterBackpack)
 
 -- Create instance for each gene
 playerStream:subscribe(createBackpack)

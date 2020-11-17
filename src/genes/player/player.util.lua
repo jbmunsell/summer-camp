@@ -23,27 +23,40 @@ local genesUtil = require(genes.util)
 local playerUtil = {}
 
 -- init player gene
-function playerUtil.initPlayerGene(gene)
+local function initPlayerGene(gene, waitForTeam)
 	-- init gene
 	genesUtil.initGene(gene)
 
 	-- If server, wait for each player's first cabin request to add player gene
 	if RunService:IsServer() then
-		rx.Observable.from(Players.PlayerAdded)
+		local obs = rx.Observable.from(Players.PlayerAdded)
 			:startWithTable(Players:GetPlayers())
-			:flatMap(function (player)
+		if waitForTeam then
+			obs = obs:flatMap(function (player)
 				return rx.Observable.fromProperty(player, "Team", true)
 					:filter(dart.follow(genesUtil.hasGeneTag, genes.team))
 					:map(dart.constant(player))
 					:first()
 			end)
-			:subscribe(function (player)
-				CollectionService:AddTag(player, require(gene.data).instanceTag)
-			end)
+		end
+
+		obs:subscribe(function (player)
+			CollectionService:AddTag(player, require(gene.data).instanceTag)
+		end)
 	end
 
 	-- return stream
 	return genesUtil.getInstanceStream(gene)
+end
+
+-- init player gene AFTER they select a team
+function playerUtil.softInitPlayerGene(gene)
+	return initPlayerGene(gene, true)
+end
+
+-- hard init player gene
+function playerUtil.hardInitPlayerGene(gene)
+	return initPlayerGene(gene, false)
 end
 
 -- return lib

@@ -42,7 +42,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init
-local playerStream = playerUtil.initPlayerGene(leader)
+local playerStream = playerUtil.hardInitPlayerGene(leader)
 
 -- When a player leader value changes, render their character size
 genesUtil.observeStateValue(leader, "isLeader")
