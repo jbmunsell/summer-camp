@@ -114,6 +114,11 @@ function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
 	local function place(character)
 		local point = axisUtil.getRandomPointInPart(plane)
 		local cf = character:GetPrimaryPartCFrame()
+		local humanoid = character:FindFirstChild("Humanoid")
+		if humanoid then
+			humanoid.Sit = false
+			wait()
+		end
 		character:SetPrimaryPartCFrame(CFrame.new(point, lookAtPosition or point + cf.LookVector))
 	end
 
