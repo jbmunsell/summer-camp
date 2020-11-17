@@ -9,6 +9,7 @@ return {
 	genes = { genes.edible, genes.skewerable },
 	state = {
 		marshmallow = {
+			isCooking = false,
 			fireTime = 0,
 			stage = "normal",
 			destroyed = false,
@@ -18,7 +19,6 @@ return {
 	config = {
 		marshmallow = {
 			fireTimeMax = 30,
-			cookDistanceThreshold = 20,
 			stages = {
 				normal = {
 					time = 0.0,

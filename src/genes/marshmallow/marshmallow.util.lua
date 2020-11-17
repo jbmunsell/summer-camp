@@ -9,33 +9,12 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local genes = env.src.genes
-local fireplace = genes.fireplace
 
 -- modules
 local fx = require(axis.lib.fx)
-local axisUtil = require(axis.lib.axisUtil)
-local genesUtil = require(genes.util)
 
 -- lib
 local marshmallowUtil = {}
-local cookingStages = {
-	"normal",
-	"cooked",
-	"burnt",
-}
-
--- Get fire proximity
-function marshmallowUtil.getFireProximity(instance)
-	return genesUtil.getInstances(fireplace)
-		:filter(function (fire) return fire.state.fireplace.enabled.Value end)
-		:map(function (fire)
-			local dist = (axisUtil.getPosition(fire) - axisUtil.getPosition(instance)).magnitude
-			return (dist <= fire.config.fireplace.cookRadius.Value and dist)
-		end)
-		:filter()
-		:min() or math.huge
-end
 
 -- Increase fire time
 function marshmallowUtil.increaseFireTime(instance, dt)
@@ -44,20 +23,18 @@ end
 
 -- Render marshmallow
 function marshmallowUtil.updateMarshmallowStage(instance)
-	-- We have to use long form accessing here because of metatable magic
-	-- 	with config tables and folders
-	-- TODO: Change this because we removed metatable magic
 	local config = instance.config.marshmallow
-	local fireTime = instance.state.marshmallow.fireTime.Value / config.fireTimeMax.Value
+	local state = instance.state.marshmallow
+	local fireTime = state.fireTime.Value / config.fireTimeMax.Value
 	local max = nil
-	for _, stage in pairs(cookingStages) do
-		local t = config.stages[stage].time.Value
-		if t <= fireTime and (not max or (config.stages[max].time.Value < t))
+	for _, stage in pairs(config.stages:GetChildren()) do
+		local t = stage.time.Value
+		if t <= fireTime and (not max or (max.time.Value < t))
 		then
 			max = stage
 		end
 	end
-	instance.state.marshmallow.stage.Value = max
+	state.stage.Value = max.name
 end
 
 -- Render marshmallow

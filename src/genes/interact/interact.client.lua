@@ -77,11 +77,11 @@ local function getBestHold()
 	local bestHoldPosition = nil
 	local cameraCFrame = workspace.CurrentCamera.CFrame
 	for _, package in pairs(holdPackages) do
-		local instance, hold = package.instance, package.hold
+		local hold = package.hold
 		if package.isInteractable:getValue() then
 			local holdPosition = getHoldPosition(hold)
 			local distanceFromCharacter = (charpos - holdPosition).magnitude
-			local threshold = instance.config.interact.distanceThreshold.Value
+			local threshold = package.threshold
 			if distanceFromCharacter <= threshold then
 				local offset = holdPosition - cameraCFrame.p
 				local dot = offset.unit:Dot(cameraCFrame.LookVector)
@@ -180,7 +180,8 @@ interactStream:subscribe(function (instance)
 
 		-- Set and insert
 		inserted = true
-		table.insert(holdPackages, { instance = instance, hold = hold, isInteractable = stream })
+		table.insert(holdPackages, { instance = instance, hold = hold, isInteractable = stream,
+			threshold = instance.config.interact.distanceThreshold.Value })
 	end
 	for _, d in pairs(instance:GetDescendants()) do
 		if d.Name == "InteractionPromptAdornee" then

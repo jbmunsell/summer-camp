@@ -10,14 +10,12 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local throw = genes.throw
 local powderSack = genes.powderSack
 
 -- modules
 local rx = require(axis.lib.rx)
-local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
-local throwUtil = require(throw.util)
+local fireplaceUtil = require(genes.fireplace.util)
 local powderSackUtil = require(powderSack.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -37,14 +35,13 @@ genesUtil.crossObserveStateValue(powderSack, genes.color, "color")
 -- 	:subscribe(powderSackUtil.setHot)
 
 -- Blow it when one gets close enough to a fire
-rx.Observable.heartbeat()
-	:flatMap(function ()
-		return rx.Observable.from(genesUtil.getInstances(powderSack))
+genesUtil.getInstanceStream(powderSack):subscribe(function (instance)
+	rx.Observable.fromProperty(instance.PrimaryPart, "Position"):subscribe(function ()
+		if not powderSackUtil.isPoofed(instance) then
+			local fire = fireplaceUtil.getFireWithinRadius(instance, "powderAffectRadius")
+			if fire then
+				powderSackUtil.poofSackInFire(instance, fire)
+			end
+		end
 	end)
-	:reject(powderSackUtil.isPoofed)
-	:map(function (instance)
-		return instance, powderSackUtil.getNearestFire(instance)
-	end)
-	:map(dart.drop(3))
-	:filter(dart.boolAnd)
-	:subscribe(powderSackUtil.poofSackInFire)
+end)

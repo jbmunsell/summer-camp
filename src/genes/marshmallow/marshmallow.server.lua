@@ -14,8 +14,8 @@ local marshmallow = genes.marshmallow
 
 -- modules
 local rx = require(axis.lib.rx)
-local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
+local fireplaceUtil = require(genes.fireplace.util)
 local marshmallowUtil = require(marshmallow.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -36,19 +36,29 @@ fireTimeChanged
 fireTimeChanged:subscribe(marshmallowUtil.updateMarshmallowStage)
 
 -- When the stage changes, render
-genesUtil.observeStateValue(marshmallow, "stage")
-	:subscribe(marshmallowUtil.renderMarshmallowStage)
+genesUtil.observeStateValue(marshmallow, "stage"):subscribe(marshmallowUtil.renderMarshmallowStage)
 
 -- Increase fire time for all marshmallows that are either burning or near fire
-rx.Observable.heartbeat()
-	:flatMap(function (dt)
-		return rx.Observable.from(genesUtil.getInstances(marshmallow):raw())
-			:map(dart.drag(dt))
+genesUtil.getInstanceStream(marshmallow):subscribe(function (instance)
+	rx.Observable.fromProperty(instance, "Position"):subscribe(function ()
+		local fire = fireplaceUtil.getFireWithinRadius(instance, "cookRadius")
+		local isCooking = instance.state.marshmallow.isCooking
+		if fire then
+			isCooking.Value = true
+		else
+			local config = instance.config.marshmallow
+			local fireTime = instance.state.marshmallow.fireTime
+			local isBurning = (fireTime.Value >= config.stages.burnt.time.Value)
+			isCooking.Value = isBurning
+		end
 	end)
-	:filter(function (instance)
-		local config = instance.config.marshmallow
-		local fireTime = instance.state.marshmallow.fireTime.Value / config.fireTimeMax.Value
-		return fireTime >= config.stages.burnt.time.Value
-		or marshmallowUtil.getFireProximity(instance) <= config.cookDistanceThreshold.Value
-	end)
-	:subscribe(marshmallowUtil.increaseFireTime)
+end)
+rx.Observable.heartbeat():subscribe(function (dt)
+	for _, instance in pairs(genesUtil.getInstances(marshmallow):raw()) do
+		local state = instance.state.marshmallow
+		if state.isCooking.Value then
+			local fireTime = state.fireTime
+			fireTime.Value = fireTime.Value + dt
+		end
+	end
+end)

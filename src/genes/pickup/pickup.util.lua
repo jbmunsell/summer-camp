@@ -114,13 +114,11 @@ function pickupUtil.initHeldObjectTracking()
 			local t = _characterHeldObjects[oldHolder]:getValue()
 			tableau.removeValue(t, instance)
 			_characterHeldObjects[oldHolder]:push(t)
-			print("removed held object from tracker")
 		end
 		if _characterHeldObjects[newHolder] then
 			local t = _characterHeldObjects[newHolder]:getValue()
 			table.insert(t, instance)
 			_characterHeldObjects[newHolder]:push(t)
-			print("added held object to tracker")
 		end
 	end)
 end

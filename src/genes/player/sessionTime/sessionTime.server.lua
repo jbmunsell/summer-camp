@@ -14,18 +14,12 @@ local sessionTime = genes.player.sessionTime
 
 -- modules
 local rx = require(axis.lib.rx)
-local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local playerUtil = require(genes.player.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
-
--- Increase session time
-local function increaseSessionTime(player, dt)
-	player.state.sessionTime.sessionTime.Value = player.state.sessionTime.sessionTime.Value + dt
-end
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
@@ -35,9 +29,9 @@ end
 playerUtil.softInitPlayerGene(sessionTime)
 
 -- Increase on heartbeat
-rx.Observable.heartbeat()
-	:flatMap(function (dt)
-		return rx.Observable.from(genesUtil.getInstances(sessionTime))
-			:map(dart.drag(dt))
-	end)
-	:subscribe(increaseSessionTime)
+rx.Observable.heartbeat():subscribe(function (dt)
+	for _, player in pairs(genesUtil.getInstances(sessionTime):raw()) do
+		local sessionTimeValue = player.state.sessionTime.sessionTime
+		sessionTimeValue.Value = sessionTimeValue.Value + dt
+	end
+end)

@@ -63,12 +63,13 @@ local function removeHandleMass(balloonInstance)
 end
 
 -- Update air resistance based on velocity
+local resistanceFloor = Vector3.new(.01, .01, .01)
 local function updateBalloonAirResistance(balloonInstance)
 	-- Thank you joe!
 	-- Prevent NAAN when zero velocity
 	local balloonPart = balloonInstance.Balloon
 	local scale = (balloonPart.Size.Y / 6) ^ 3
-	local f = balloonPart.Velocity * balloonPart.Velocity + Vector3.new(.01, .01, .01)
+	local f = balloonPart.Velocity * balloonPart.Velocity + resistanceFloor
 	balloonPart.BodyVelocity.MaxForce = f.Unit * math.ceil(f.Magnitude) * scale
 end
 
@@ -96,11 +97,10 @@ pickupUtil.getPlayerObjectActionRequestStream(balloon.net.PlacementRequested, ba
 	:subscribe(attachBalloon)
 
 -- Update balloon velocity
-rx.Observable.heartbeat()
-	:map(dart.constant(balloon))
-	:map(genesUtil.getInstances)
-	:flatMap(rx.Observable.from)
-	:subscribe(updateBalloonAirResistance)
+balloonObjectStream:subscribe(function (instance)
+	rx.Observable.fromProperty(instance.Balloon, "Position")
+		:subscribe(dart.bind(updateBalloonAirResistance, instance))
+end)
 
 -- When a balloon is moved, destroy it if it's too high
 balloonObjectStream

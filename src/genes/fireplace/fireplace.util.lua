@@ -9,11 +9,14 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
+local genes = env.src.genes
 
 -- modules
 local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
+local axisUtil = require(axis.lib.axisUtil)
+local genesUtil = require(genes.util)
 
 -- lib
 local fireplaceUtil = {}
@@ -21,6 +24,18 @@ local fireplaceUtil = {}
 -- Set fire color
 function fireplaceUtil.setFireColor(instance, color)
 	instance.state.fireplace.color.Value = color
+end
+
+-- Get fire within radius
+function fireplaceUtil.getFireWithinRadius(instance, radiusProperty)
+	for _, fire in pairs(genesUtil.getInstances(genes.fireplace):raw()) do
+		if fire.state.fireplace.enabled.Value then
+			local dist = axisUtil.squareMagnitude(axisUtil.getPosition(fire) - axisUtil.getPosition(instance))
+			if dist <= math.pow(fire.config.fireplace[radiusProperty].Value, 2) then
+				return fire
+			end
+		end
+	end
 end
 
 -- Render fire

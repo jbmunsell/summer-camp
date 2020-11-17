@@ -16,9 +16,7 @@ local multiswitch = genes.multiswitch
 
 -- modules
 local fx = require(axis.lib.fx)
-local axisUtil = require(axis.lib.axisUtil)
 local soundUtil = require(axis.lib.soundUtil)
-local genesUtil = require(genes.util)
 local fireplaceUtil = require(fireplace.util)
 local multiswitchUtil = require(multiswitch.util)
 
@@ -31,18 +29,6 @@ function powderSackUtil.isPoofed(instance)
 end
 function powderSackUtil.setPoofed(instance, poofed)
 	instance.state.powderSack.poofed.Value = poofed
-end
-
--- Get nearest fire to a powder sack instance
-function powderSackUtil.getNearestFire(instance)
-	return genesUtil.getInstances(fireplace)
-		:filter(function (fireplaceInstance)
-			return fireplaceInstance.state.fireplace.enabled.Value
-		end)
-		:min(function (fireplaceInstance)
-			local dist = (axisUtil.getPosition(fireplaceInstance) - axisUtil.getPosition(instance)).magnitude
-			return (dist <= fireplaceInstance.config.fireplace.powderAffectRadius.Value and dist)
-		end)
 end
 
 -- Render color
