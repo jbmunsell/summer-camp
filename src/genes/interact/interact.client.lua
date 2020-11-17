@@ -164,6 +164,11 @@ local function getInteractableSubject(instance)
 end
 
 -- Maintain hold packages cache list
+spawn(function ()
+	while wait(1) do
+		print("interactables: ", #holdPackages)
+	end
+end)
 interactStream:subscribe(function (instance)
 	local inserted
 	local stream

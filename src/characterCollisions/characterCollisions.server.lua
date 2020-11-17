@@ -22,7 +22,6 @@ local axisUtil = require(axis.lib.axisUtil)
 ---------------------------------------------------------------------------------------------------
 
 local function setPlayerPartGroup(player, part)
-	print("Set part group server")
 	PhysicsService:SetPartCollisionGroup(part, "PlayerCharacters")
 	rx.Observable.timer(1):subscribe(function ()
 		net.CollisionGroupSet:FireClient(player, part)
