@@ -17,6 +17,7 @@ local multiswitch = genes.multiswitch
 -- modules
 local fx = require(axis.lib.fx)
 local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local fireplaceUtil = require(fireplace.util)
 local multiswitchUtil = require(multiswitch.util)
@@ -65,6 +66,9 @@ function powderSackUtil.poofSackInFire(sackInstance, fireplaceInstance)
 	-- Emit particles from both objects
 	local sackEmitter = sackInstance:FindFirstChild("PoofEmitter", true)
 	sackEmitter:Emit(sackInstance.config.powderSack.firePoofParticleCount.Value)
+
+	-- Play sound
+	soundUtil.playSound(env.res.genes.powderSack.sounds.Poof, fireplaceInstance.PrimaryPart)
 
 	-- Fire event
 	AnalyticsService:FireEvent("powderSackPoofedInFire", {
