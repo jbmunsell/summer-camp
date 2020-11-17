@@ -14,7 +14,7 @@ return {
 	config = {
 		fireplace = {
 			cookRadius = 10,
-			powderAffectRadius = 5,
+			powderAffectRadius = 8,
 			color = Color3.fromRGB(236, 139, 70),
 			colorChangeParticleCount = 20,
 		},
