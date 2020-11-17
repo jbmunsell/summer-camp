@@ -74,6 +74,11 @@ function axisUtil.getPlayerHumanoidRootPart(player)
 	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
 
+-- Square distance
+function axisUtil.squareMagnitude(vector)
+	return vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z
+end
+
 -- Get position
 function axisUtil.getPosition(instance)
 	if instance:IsA("Model") then
@@ -86,6 +91,8 @@ function axisUtil.getPosition(instance)
 		return instance.Position
 	elseif instance:IsA("Attachment") then
 		return instance.WorldPosition
+	else
+		error("Unable to get position for value of type " .. typeof(instance))
 	end
 end
 
