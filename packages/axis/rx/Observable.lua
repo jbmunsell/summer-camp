@@ -93,6 +93,18 @@ end
 -- 		EnumItem
 -- 			KeyCode (Observable connects to ContextActionService event with the KeyCode and fires
 -- 				all events with the UserInputState from ContextActionService)
+local connections = {}
+spawn(function ()
+	local runner = RunService:IsServer() and "server" or "client"
+	while wait(1) do
+		-- if runner == "client" then
+			print(runner, #connections)
+			-- if workspace.DistributedGameTime > 20 then
+				-- print(connections[#connections].trace)
+			-- end
+		-- end
+	end
+end)
 function Observable.from(o)
 	local t = typeof(o)
 	if t == "table" then
@@ -106,15 +118,23 @@ function Observable.from(o)
 		end)
 	elseif t == "RBXScriptSignal" then
 		return Observable.new(function (observer)
+			table.insert(connections, observer)
+			observer.trace = debug.traceback()
 			local connection = o:Connect(function (...)
 				observer:push(...)
 			end)
 			observer.bin:hold(connection)
-			observer.bin:hold(RunService.Heartbeat:Connect(function ()
-				if not connection.Connected then
-					observer:complete()
+			observer.bin:hold(function ()
+				local index = table.find(connections, observer)
+				if index then
+					table.remove(connections, index)
 				end
-			end))
+			end)
+			-- observer.bin:hold(RunService.Heartbeat:Connect(function ()
+			-- 	if not connection.Connected then
+			-- 		observer:complete()
+			-- 	end
+			-- end))
 		end)
 	elseif t == "Instance" then
 		if o:IsA("BindableEvent") then
@@ -122,7 +142,8 @@ function Observable.from(o)
 		elseif o:IsA("ValueBase") then
 			-- This is chosen instead of using :startWith because some ValueObjects have nil values
 			-- and still desire to fire with initial value (nil)
-			return Observable.just(o.Value):merge(Observable.from(o.Changed))
+			-- return Observable.just(o.Value):merge(Observable.from(o.Changed))
+			return Observable.from(o.Changed):startWithArgs(o.Value)
 		elseif o:IsA("RemoteEvent") then
 			if RunService:IsServer() then
 				return Observable.from(o.OnServerEvent)
@@ -712,7 +733,7 @@ function Observable:startWith(...)
 			observer:push(v)
 			if not observer:isSubscribed() then return end
 		end
-		return self:subscribe(observer:wrapAll())
+		observer.bin:hold(self:subscribe(observer:wrapAll()))
 	end)
 end
 
@@ -723,7 +744,7 @@ function Observable:startWithArgs(...)
 	local data = table.pack(...)
 	return Observable.new(function (observer)
 		observer:push(table.unpack(data))
-		return self:subscribe(observer:wrapAll())
+		observer.bin:hold(self:subscribe(observer:wrapAll()))
 	end)
 end
 
@@ -738,7 +759,7 @@ function Observable:startWithTable(t)
 				if not observer:isSubscribed() then return end
 			end
 		end
-		return self:subscribe(observer:wrapAll())
+		observer.bin:hold(self:subscribe(observer:wrapAll()))
 	end)
 end
 
@@ -905,13 +926,15 @@ function Observable:takeUntil(terminator)
 
 	return Observable.new(function (observer)
 		local primarySub = self:subscribe(observer:wrapAll())
+		observer.bin:hold(primarySub)
 
-		local terminatorSub = terminator:subscribe(function ()
+		local terminatorSub = terminator:first():subscribe(function ()
 			observer:complete()
 		end, observer:wrapFailComplete())
 
-		observer.bin:hold(primarySub)
-		observer.bin:hold(terminatorSub)
+		if observer:isSubscribed() then
+			observer.bin:hold(terminatorSub)
+		end
 	end)
 end
 
@@ -972,13 +995,14 @@ function Observable:delay(t)
 	assert(tt == "number" or tt == "function", "Observable:delay requires a number or a function")
 
 	return Observable.new(function (observer)
-		return self:subscribe(function (...)
+		local sub = self:subscribe(function (...)
 			local args = table.pack(...)
 			local d = (tt == "function" and t(...) or t)
 			delay(d, function ()
 				observer:push(table.unpack(args, 1, args.n))
 			end)
 		end, observer:wrapFailComplete())
+		observer.bin:hold(sub)
 	end)
 end
 
