@@ -105,9 +105,10 @@ scheduleStreams.scheduleChunk
 -- 	Game time changed
 -- 	(float gameTime)
 -- 		gameTime - the current time of day (hours since midnight) in the game; 0 thru 24
+local scale = schedule.interface.GameTimeScale
 rx.Observable.heartbeat()
 	:scan(function (t, dt)
-		return (t + dt * schedule.interface.GameTimeScale.Value) % 24
+		return (t + dt * scale.Value) % 24
 	end, scheduleConfig.StartingGameTime)
 	:subscribe(setGameTimeValue)
 

@@ -27,9 +27,6 @@ end
 local function getCooldownLabel(instance)
 	return instance:FindFirstChild("CooldownLabel", true)
 end
-local function hasLocalTeamStamp(instance)
-	return instance.state.activityInviteBoard.inviteStamps:FindFirstChild(env.LocalPlayer.Team.Name)
-end
 
 -- Setters
 local function setInviteButtonVisible(instance, visible)
@@ -37,12 +34,6 @@ local function setInviteButtonVisible(instance, visible)
 end
 local function setCooldownLabelText(instance, text)
 	getCooldownLabel(instance).Text = text
-end
-
--- Get local team's cooldown for an instance
-local function getLocalTeamCooldown(instance)
-	local stamp = instance.state.activityInviteBoard.inviteStamps[env.LocalPlayer.Team.Name].Value
-	return (stamp + instance.config.activityInviteBoard.inviteCooldown.Value) - os.time()
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -53,22 +44,33 @@ end
 local boards = genesUtil.initGene(genes.activityInviteBoard)
 
 -- Set cooldown text according to cooldown
-local cooldownStream = boards
-	:flatMap(function (instance)
-		return rx.Observable.heartbeat()
-			:map(dart.constant(instance))
-			:filter(hasLocalTeamStamp)
-			:map(getLocalTeamCooldown)
-			:map(math.floor)
-			:distinctUntilChanged()
-			:map(dart.carry(instance))
+local teamChanged = rx.Observable.fromProperty(env.LocalPlayer, "Team")
+boards:flatMap(function (instance)
+	local stamps = instance.state.activityInviteBoard.inviteStamps
+	return rx.Observable.from(stamps.ChildAdded):startWith(stamps:GetChildren())
+		:flatMap(function (stamp)
+			return rx.Observable.from(stamp):map(dart.constant(stamp))
+		end)
+		:merge(teamChanged:map(function (team)
+			return stamps[team.Name]
+		end))
+		:filter(function (stamp)
+			return stamp.Name == env.LocalPlayer.Team.Name
+		end)
+		:map(dart.carry(instance))
+end):subscribe(function (instance, stamp)
+	local hsub
+	local cooldown = instance.config.activityInviteBoard.inviteCooldown.Value
+	hsub = rx.Observable.heartbeat():subscribe(function ()
+		local t = (stamp.Value + cooldown) - os.time()
+		setInviteButtonVisible(instance, t <= 0)
+		if t > 0 then
+			setCooldownLabelText(instance, math.floor(t))
+		else
+			hsub:complete()
+		end
 	end)
-cooldownStream
-	:map(function (v, cooldown) return v, cooldown < 0 end)
-	:subscribe(setInviteButtonVisible)
-cooldownStream
-	:reject(function (_, cooldown) return cooldown < 0 end)
-	:subscribe(setCooldownLabelText)
+end)
 
 -- Forward input from invite button to server
 boards:flatMap(function (instance)

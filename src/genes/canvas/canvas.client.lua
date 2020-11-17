@@ -265,11 +265,13 @@ local collaborativeInRange = canvases
 		return instance.config.canvas.collaborative.Value
 	end)
 	:flatMap(function (instance)
+		local canvasPartPosition = instance:FindFirstChild("CanvasPart", true).Position
+		local drawingDistance = instance.config.canvas.drawingDistance.Value
 		return rx.Observable.heartbeat()
 			:map(function ()
-				return env.LocalPlayer:DistanceFromCharacter(instance:FindFirstChild("CanvasPart", true).Position)
+				local d = env.LocalPlayer:DistanceFromCharacter(canvasPartPosition)
+				return d ~= 0 and d <= drawingDistance
 			end)
-			:map(dart.lessThan(instance.config.canvas.drawingDistance.Value))
 			:distinctUntilChanged()
 			:map(dart.carry(instance))
 	end)

@@ -60,11 +60,6 @@ end
 -- 	and multiswitchUtil.all(instance, "interact")
 -- end
 
--- Get distance modifier
-local function getHoldPosition(hold)
-	return (hold:IsA("Attachment") and hold.WorldPosition or hold.Position)
-end
-
 -- Get best hold
 local function getBestHold()
 	local head = env.LocalPlayer.Character:FindFirstChild("Head")
@@ -79,7 +74,7 @@ local function getBestHold()
 	for _, package in pairs(holdPackages) do
 		local hold = package.hold
 		if package.isInteractable:getValue() then
-			local holdPosition = getHoldPosition(hold)
+			local holdPosition = hold.WorldPosition
 			local distanceFromCharacter = (charpos - holdPosition).magnitude
 			local threshold = package.threshold
 			if distanceFromCharacter <= threshold then
@@ -189,10 +184,18 @@ interactStream:subscribe(function (instance)
 		end
 	end
 	if not inserted then
-		if instance:IsA("Model") and not instance.PrimaryPart then
-			warn("Interactable model has no PrimaryPart or interact attachments: " .. instance:GetFullName())
-		else
-			insert((instance:IsA("BasePart") and instance or instance.PrimaryPart))
+		if instance:IsA("Model") then
+			if instance.PrimaryPart then
+				local att = Instance.new("Attachment", instance.PrimaryPart)
+				att.Name = "InteractionPromptAdornee"
+				insert(att)
+			else
+				warn("Interactable model has no PrimaryPart or interact attachments: " .. instance:GetFullName())
+			end
+		elseif instance:IsA("BasePart") then
+			local att = Instance.new("Attachment", instance)
+			att.Name = "InteractionPromptAdornee"
+			insert(att)
 		end
 	end
 end)

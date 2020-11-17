@@ -60,11 +60,13 @@ end
 genesUtil.initGene(playerIndicator)
 
 -- Reposition all indicators on heartbeat
-rx.Observable.heartbeat()
-	:map(dart.bind(genesUtil.getInstances, playerIndicator))
-	:flatMap(rx.Observable.from)
-	:filter(function (i) return i.state.playerIndicator.enabled.Value end)
-	:subscribe(renderIndicatorPosition)
+rx.Observable.heartbeat():subscribe(function ()
+	for _, indicator in pairs(genesUtil.getInstances(playerIndicator):raw()) do
+		if indicator.state.playerIndicator.enabled.Value then
+			renderIndicatorPosition(indicator)
+		end
+	end
+end)
 
 -- Render color on changed
 genesUtil.observeStateValue(playerIndicator, "color")

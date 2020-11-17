@@ -71,10 +71,8 @@ local function declareWinner(soccerInstance, team)
 end
 
 -- Ball manipulation
-local function isBallInBounds(soccerInstance)
-	local functional = soccerInstance.functional
-	local ball = functional:FindFirstChild("Ball")
-	return ball and axisUtil.isPointInPartXZ(ball.Position, functional.PitchBounds)
+local function isBallInBounds(soccerInstance, ball)
+	return ball and axisUtil.isPointInPartXZ(ball.Position, soccerInstance.functional.PitchBounds)
 end
 local function getBallInGoalScoringTeam(soccerInstance)
 	local functional = soccerInstance.functional
@@ -178,14 +176,23 @@ local volleyStartStream, _ = genesUtil.observeStateValue(soccer, "volleyActive")
 	:pipe(splitAndSelect)
 
 -- Heartbeat of soccer instances where volley is active
-local volleyActivePulse = rx.Observable.heartbeat()
-	:map(dart.bind(genesUtil.getInstances, soccer))
-	:flatMap(rx.Observable.from)
-	:filter(isVolleyActive)
+local volleyActiveBallMoved = genesUtil.getInstanceStream(soccer):flatMap(function (soccerInstance)
+	return rx.Observable.from(soccerInstance.functional.ChildAdded)
+		:filter(dart.isNamed("Ball"))
+		:flatMap(function (ball)
+			return rx.Observable.fromProperty(ball, "Position")
+				:map(dart.constant(ball))
+		end)
+		:map(function (ball)
+			if isVolleyActive(soccerInstance) then
+				return soccerInstance, ball
+			end
+		end)
+		:filter()
+end)
 
 -- Ball escaped bounds of its pitch
-local ballEscapedStream = volleyActivePulse
-	:reject(isBallInBounds)
+local ballEscapedStream = volleyActiveBallMoved:reject(isBallInBounds)
 
 -----------------------------------
 -- Eject players that are already in the thing when it starts
@@ -217,13 +224,13 @@ sessionEndStream:subscribe(destroyBall)
 -----------------------------------
 -- Score manipulation subscriptions
 -- Increase score when ball is in goal
-local ballInGoalStream = volleyActivePulse
-	:map(function (soccerInstance)
-		return soccerInstance, getBallInGoalScoringTeam(soccerInstance)
-	end)
-	:filter(dart.select(2))
-ballInGoalStream:subscribe(increaseScore)
-ballInGoalStream:subscribe(fireCannonsForTeam)
+volleyActiveBallMoved:subscribe(function (soccerInstance, ball)
+	local scoringTeam = getBallInGoalScoringTeam(soccerInstance, ball)
+	if scoringTeam then
+		increaseScore(soccerInstance, scoringTeam)
+		fireCannonsForTeam(soccerInstance, scoringTeam)
+	end
+end)
 
 -- Declare winner on winning goal
 local winneringTeamStream = winningGoalStream

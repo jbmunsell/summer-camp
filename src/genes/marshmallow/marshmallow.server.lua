@@ -55,10 +55,12 @@ genesUtil.getInstanceStream(marshmallow):subscribe(function (instance)
 end)
 rx.Observable.heartbeat():subscribe(function (dt)
 	for _, instance in pairs(genesUtil.getInstances(marshmallow):raw()) do
-		local state = instance.state.marshmallow
-		if state.isCooking.Value then
-			local fireTime = state.fireTime
-			fireTime.Value = fireTime.Value + dt
+		if instance:IsDescendantOf(workspace) then
+			local state = instance.state.marshmallow
+			if state.isCooking.Value then
+				local fireTime = state.fireTime
+				fireTime.Value = fireTime.Value + dt
+			end
 		end
 	end
 end)
