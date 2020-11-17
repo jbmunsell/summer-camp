@@ -65,9 +65,22 @@ local function showMatchResult(activityInstance)
 	frame.Visible = true
 end
 
+local function notifyZeroJoin()
+	local frame = coreGui.seeds.zeroJoinCase.Notification
+
+	rx.Observable.timer(7):subscribe(dart.bind(killFrame, frame))
+
+	glib.playAnimation(coreGui.animations.activityPrompt.show, frame)
+	frame.Parent = coreGui.Container
+	frame.Visible = true
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
+
+-- Listen for zero join case
+rx.Observable.from(genes.activity.net.ZeroJoinCase):subscribe(notifyZeroJoin)
 
 -- Listen to winner declared
 genesUtil.observeStateValue(genes.activity, "winningTeam")

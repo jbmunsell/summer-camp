@@ -8,6 +8,10 @@
 		{
 			"ClassName": "RemoteEvent",
 			"Name": "RosterJoinRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "ZeroJoinCase"
 		}
 	]
 }

@@ -121,6 +121,11 @@ local function startPlay(activityInstance)
 		end
 	end
 	if not hasBoth then
+		for _, folder in pairs(state.roster:GetChildren()) do
+			for _, value in pairs(folder:GetChildren()) do
+				activity.net.ZeroJoinCase:FireClient(value.Value)
+			end
+		end
 		stopSession(activityInstance)
 	end
 
