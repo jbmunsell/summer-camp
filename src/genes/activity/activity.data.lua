@@ -23,7 +23,7 @@ return {
 	config = {
 		activity = {
 			isCompetitive = false,
-			rosterCollectionTimer = 15,
+			rosterCollectionTimer = 25,
 			trophy = env.res.activities.PlaceholderTrophy,
 			teamCount = 1,
 			
