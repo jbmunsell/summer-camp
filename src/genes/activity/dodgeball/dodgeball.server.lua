@@ -34,8 +34,7 @@ local scheduleStreams = require(env.src.schedule.streams)
 
 -- Ball manipulation
 local function getBalls(dodgeballInstance)
-	return genesUtil.getInstances(dodgeballBall)
-		:filter(dart.isDescendantOf(dodgeballInstance))
+	return dodgeballInstance.functional.balls:GetChildren()
 end
 local function isBallInBounds(dodgeballInstance, ball)
 	return axisUtil.isPointInPartXZ(ball.Position, dodgeballInstance.functional.PitchBounds)
@@ -220,13 +219,7 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 			return instance, player
 		end
 	end)
-
--- Ball escaped
-local ballEscaped = rx.Observable.heartbeat()
-	:map(dart.bind(genesUtil.getInstances, dodgeball))
-	:flatMap(rx.Observable.from)
-	:pipe(dragBalls)
-	:reject(isBallInBounds)
+	:filter()
 
 ---------------------------------------------------------------------------------------------------
 -- Subscriptions
@@ -291,9 +284,18 @@ playStartStream:flatMap(function (instance)
 end):subscribe(spawnBall)
 
 -- When ball escapes, destroy and spawn
-ballEscaped:filter(activityUtil.isInPlay):subscribe(function (instance, ball)
-	destroyBall(instance, ball)
-	spawnBall(instance)
+-- Ball escaped
+rx.Observable.heartbeat():subscribe(function ()
+	for _, dodgeballInstance in pairs(genesUtil.getInstances(dodgeball):raw()) do
+		if activityUtil.isInPlay(dodgeballInstance) then
+			for _, ball in pairs(getBalls(dodgeballInstance)) do
+				if not isBallInBounds(dodgeballInstance, ball) then
+					destroyBall(dodgeballInstance, ball)
+					spawnBall(dodgeballInstance)
+				end
+			end
+		end
+	end
 end)
 
 -- Restore ragdolls on session end
