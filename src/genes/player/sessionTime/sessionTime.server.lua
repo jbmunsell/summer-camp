@@ -32,7 +32,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init
-playerUtil.initPlayerGene(sessionTime)
+playerUtil.softInitPlayerGene(sessionTime)
 
 -- Increase on heartbeat
 rx.Observable.heartbeat()
