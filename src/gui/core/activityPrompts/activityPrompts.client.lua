@@ -38,7 +38,7 @@ local function createStartupPrompt(activityInstance)
 	-- Get data
 	local config = activityInstance.config.activity
 	local state = activityInstance.state.activity
-	local finishTime = os.clock() + config.rosterCollectionTimer.Value
+	local finishTime = os.time() + config.rosterCollectionTimer.Value
 
 	-- Create prompt
 	local prompt = Core.seeds.activityPrompt.ActivityPrompt:Clone()
@@ -51,7 +51,7 @@ local function createStartupPrompt(activityInstance)
 
 	-- Timer updating
 	local pulse = rx.Observable.heartbeat():startWith(0):map(function ()
-		return finishTime - os.clock()
+		return finishTime - os.time()
 	end):takeUntil(rx.Observable.fromInstanceLeftGame(prompt))
 	pulse:map(math.floor):subscribe(function (t)
 		prompt.TimerLabel.Text = t

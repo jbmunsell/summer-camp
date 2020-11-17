@@ -42,7 +42,7 @@ end
 -- Get local team's cooldown for an instance
 local function getLocalTeamCooldown(instance)
 	local stamp = instance.state.activityInviteBoard.inviteStamps[env.LocalPlayer.Team.Name].Value
-	return (stamp + instance.config.activityInviteBoard.inviteCooldown.Value) - os.clock()
+	return (stamp + instance.config.activityInviteBoard.inviteCooldown.Value) - os.time()
 end
 
 ---------------------------------------------------------------------------------------------------

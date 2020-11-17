@@ -25,13 +25,13 @@ local function createStampEntry(instance, team)
 end
 
 local function updateStamp(instance, team)
-	instance.state.activityInviteBoard.inviteStamps[team.Name].Value = os.clock()
+	instance.state.activityInviteBoard.inviteStamps[team.Name].Value = os.time()
 end
 
 local function getCooldownForTeam(instance, team)
 	local state = instance.state.activityInviteBoard
 	local config = instance.config.activityInviteBoard
-	return (state.inviteStamps[team.Name].Value + config.inviteCooldown.Value) - os.clock()
+	return (state.inviteStamps[team.Name].Value + config.inviteCooldown.Value) - os.time()
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -62,6 +62,6 @@ validRequest
 	:flatMap(function (player, instance)
 		return rx.Observable.from(player.Team:GetPlayers())
 			:reject(dart.equals(player))
-			:map(dart.drag(instance))
+			:map(dart.drag(instance, player))
 	end)
 	:subscribe(dart.forward(genes.activityInviteBoard.net.InviteSent))
