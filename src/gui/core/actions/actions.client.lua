@@ -74,17 +74,17 @@ local function createButtonForObject(object)
 	}).Parent = button
 
 	-- Connect to button activated to trigger
-	local triggerSub = rx.Observable.from(button.Button.Activated)
+	local terminator = rx.Observable.fromInstanceLeftGame(button)
+	rx.Observable.from(button.Button.Activated)
 		:map(dart.constant(object))
+		:takeUntil(terminator)
 		:subscribe(toggleEquipped)
-	local ancestrySub = rx.Observable.from(object.AncestryChanged)
+	rx.Observable.from(object.AncestryChanged)
 		:startWith(object.Parent)
+		:takeUntil(terminator)
 		:subscribe(dart.bind(renderButtonEquipped, button))
 
 	-- Parent to container
-	local bin = Bin.new(triggerSub, ancestrySub)
-	rx.Observable.fromInstanceLeftGame(button)
-		:subscribe(dart.bind(Bin.destroy, bin))
 	button.Parent = actionsContainer
 
 	-- return button
