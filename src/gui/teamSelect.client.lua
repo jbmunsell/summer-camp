@@ -26,7 +26,7 @@ local activityUtil = require(genes.activity.util)
 local cameraTweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
 
 local coreGui = env.PlayerGui:WaitForChild("Core")
-local splashScreen = env.PlayerGui:WaitForChild("SplashScreen")
+local roleSelection = env.PlayerGui:WaitForChild("RoleSelection")
 local teamSelect = env.PlayerGui:WaitForChild("TeamSelect")
 local cameraParts = workspace.cabinCameraParts
 local teamImage = teamSelect:FindFirstChild("TeamImage", true)
@@ -104,20 +104,21 @@ arrowToShift("LeftArrow", -1)
 	:subscribe(shiftInspectingTeam)
 
 -- Connect to gui enabled
-local enableStream = rx.Observable.fromProperty(splashScreen, "Enabled")
-	:reject()
-	:first()
-	:merge(rx.Observable.from(coreGui:FindFirstChild("TeamDisplay", true).Button.Activated))
+rx.Observable.from(coreGui:FindFirstChild("TeamDisplay", true).Button.Activated)
 	:withLatestFrom(activityUtil.getPlayerCompetingStream(env.LocalPlayer))
 	:reject(dart.select(2))
 	:reject(function () return teamSelect.Enabled end)
-enableStream:subscribe(function ()
+	:subscribe(function ()
+		teamSelect.Enabled = true
+	end)
+
+-- Do things when it does become enabled
+rx.Observable.fromProperty(teamSelect, "Enabled"):filter():subscribe(function ()
 	-- Create terminator
-	teamSelect.Enabled = true
 	local terminator = rx.Observable.fromProperty(teamSelect, "Enabled"):reject():first()
 
 	-- Seize camera and hide core
-	coreGui.Enabled = false
+	-- coreGui.Enabled = false
 	workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
 	terminator:subscribe(function ()
 		workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
@@ -132,7 +133,7 @@ enableStream:subscribe(function ()
 		:mapToLatest(inspectingTeam)
 		:subscribe(function (...)
 			teamSelect.Enabled = false
-			coreGui.Enabled = true
+			-- coreGui.Enabled = true
 			env.src.genes.team.net.TeamChangeRequested:FireServer(...)
 		end)
 end)
