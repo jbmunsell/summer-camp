@@ -78,9 +78,9 @@ local function spawnPlayer(dodgeballInstance, player)
 end
 local function spawnAllPlayers(dodgeballInstance)
 	for i = 1, 2 do
-		local players = dodgeballInstance.state.activity.sessionTeams[i].Value:GetPlayers()
-		for _, player in pairs(players) do
-			spawnPlayer(dodgeballInstance, player)
+		local players = dodgeballInstance.state.activity.roster[i]:GetChildren()
+		for _, value in pairs(players) do
+			spawnPlayer(dodgeballInstance, value.Value)
 		end
 	end
 end
@@ -265,6 +265,9 @@ scoreChangedStream:subscribe(updateScoreboardScore)
 -- Declare a winner when one team has zero players
 playerRemovedFromRoster
 	:filter(activityUtil.isInPlay)
+	:reject(function (activityInstance)
+		return activityInstance.state.activity.winningTeam.Value
+	end)
 	:map(function (instance)
 		for i = 1, 2 do
 			if #instance.state.activity.roster[i]:GetChildren() == 0 then

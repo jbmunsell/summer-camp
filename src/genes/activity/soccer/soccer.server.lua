@@ -123,9 +123,9 @@ local function placePlayerOnPitch(soccerInstance, player)
 end
 local function placeAllPlayersOnPitch(soccerInstance)
 	for i = 1, 2 do
-		local players = soccerInstance.state.activity.sessionTeams[i].Value:GetPlayers()
-		for _, player in pairs(players) do
-			placePlayerOnPitch(soccerInstance, player)
+		local players = soccerInstance.state.activity.roster[i]:GetChildren()
+		for _, value in pairs(players) do
+			placePlayerOnPitch(soccerInstance, value.Value)
 		end
 	end
 end
