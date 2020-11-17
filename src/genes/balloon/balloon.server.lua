@@ -8,6 +8,7 @@
 --
 
 -- env
+local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -33,6 +34,13 @@ local function attachBalloon(balloonInstance, attachInstance, position)
 
 	-- Flip switch
 	multiswitchUtil.setSwitchEnabled(balloonInstance, "interact", "balloon", false)
+
+	-- Place it in the character if it's a descendant
+	for _, player in pairs(Players:GetPlayers()) do
+		if player.Character and attachInstance:IsDescendantOf(player.Character) then
+			balloonInstance.Parent = player.Character
+		end
+	end
 
 	-- Smooth attach balloonInstance to a new attachment
 	local stickAttachment = Instance.new("Attachment", attachInstance)
