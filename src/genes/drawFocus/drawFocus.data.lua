@@ -13,8 +13,7 @@ return {
 
 	config = {
 		drawFocus = {
+			tweenDuration = 0.3,
 		},
 	},
-
-	tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
 }

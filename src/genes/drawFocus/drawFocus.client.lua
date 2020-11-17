@@ -18,13 +18,14 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
-local drawFocusData = require(genes.drawFocus.data)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
 local function renderCamera(instance, isInRange)
+	local info = TweenInfo.new(instance.config.drawFocus.tweenDuration.Value,
+		Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
 	local camera = workspace.CurrentCamera
 	local focusPart = instance:FindFirstChild("CameraFocusPart", true)
 	local root = env.LocalPlayer.Character.HumanoidRootPart
@@ -35,11 +36,11 @@ local function renderCamera(instance, isInRange)
 		local offset = camera.CFrame.p - root.Position
 		instance.state.drawFocus.cameraHeadOffset.Value = CFrame.new(offset, offset + camera.CFrame.LookVector)
 		camera.CameraType = Enum.CameraType.Scriptable
-		TweenService:Create(camera, drawFocusData.tweenInfo, { CFrame = focusPart.CFrame }):Play()
+		TweenService:Create(camera, info, { CFrame = focusPart.CFrame }):Play()
 	else
 		local offset = instance.state.drawFocus.cameraHeadOffset.Value
 		local original = camera.CFrame
-		local tween = axisUtil.createDynamicTween(camera, drawFocusData.tweenInfo, {
+		local tween = axisUtil.createDynamicTween(camera, info, {
 			CFrame = function (d)
 				return original:lerp(offset + root.Position, d)
 			end,
