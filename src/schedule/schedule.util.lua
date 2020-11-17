@@ -7,11 +7,13 @@
 --
 
 -- env
-local env      = require(game:GetService("ReplicatedStorage").src.env)
+local env = require(game:GetService("ReplicatedStorage").src.env)
+local axis = env.packages.axis
 local schedule = env.src.schedule
-local gui      = env.src.gui
+local gui = env.src.gui
 
 -- modules
+local dart = require(axis.lib.dart)
 local scheduleConfig = require(schedule.config)
 local scheduleStreams = require(schedule.streams)
 local displayConfig  = require(gui.config)
@@ -39,6 +41,16 @@ function scheduleUtil.getChunkStartTime(chunk)
 end
 
 -- Get time of day stream
+function scheduleUtil.getLiveTimeOfDayStream(t)
+	return scheduleStreams.gameTime
+		:reject(dart.equals(0))
+		:map(function (time)
+			return time > t
+		end)
+		:distinctUntilChanged()
+		:skip(1)
+		:filter()
+end
 function scheduleUtil.getTimeOfDayStream(t)
 	return scheduleStreams.gameTime
 		:map(function (time)
