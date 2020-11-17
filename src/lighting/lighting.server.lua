@@ -14,6 +14,7 @@ local genes = env.src.genes
 
 -- modules
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local scheduleUtil = require(env.src.schedule.util)
 
@@ -35,3 +36,6 @@ for _, set in pairs(Lighting.config.propertySwitcher.propertySets:GetChildren())
 	local t = tonumber(set.Name)
 	scheduleUtil.getTimeOfDayStream(t):subscribe(dart.bind(setPropertySet, set))
 end
+
+local rooster = env.res.audio.sounds.Rooster
+scheduleUtil.getLiveTimeOfDayStream(6):subscribe(dart.bind(soundUtil.playGlobalSound, rooster))
