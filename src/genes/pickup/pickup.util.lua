@@ -153,7 +153,7 @@ function pickupUtil.stripObject(object)
 		tableau.from(object.state.pickup.holder.Value:GetDescendants())
 			:filter(function (instance)
 				return instance.Name == "RightGripWeld"
-				and (instance.Part1 == object or instance.Part1:IsDescendantOf(object))
+				and instance.Part1 and (instance.Part1 == object or instance.Part1:IsDescendantOf(object))
 			end)
 			:foreach(dart.destroy)
 	end
