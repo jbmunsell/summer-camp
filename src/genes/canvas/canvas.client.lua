@@ -53,6 +53,7 @@ local function connectDrawingInput(canvasInstance)
 		:merge(rx.Observable.from(canvasInstance.state.canvas.owner.Changed))
 	local terminator = rx.Observable.fromInstanceLeftGame(canvasInstance)
 		:merge(stoppedEditing)
+		:first()
 
 	-- Share until operator
 	local function shareUntil(o)
@@ -115,6 +116,7 @@ local function connectDrawingInput(canvasInstance)
 		:filter(isMouse)
 		:map(dart.constant(true))
 		:merge(rx.Observable.from(UserInputService.InputEnded):filter(isMouse):map(dart.constant(false)))
+		:takeUntil(terminator)
 		:multicast(rx.BehaviorSubject.new())
 
 	-- Stream for user clicking on a unique canvas cell
