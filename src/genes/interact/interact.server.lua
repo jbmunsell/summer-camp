@@ -10,16 +10,22 @@
 local CollectionService = game:GetService("CollectionService")
 local AnalyticsService = game:GetService("AnalyticsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
+local axis = env.packages.axis
 local genes = env.src.genes
 local interact = genes.interact
 
 -- modules
+local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local interactUtil = require(interact.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
+
+local function updateInteractStamp(instance)
+	instance.state.interact.stamp.Value = os.time()
+end
 
 local function fireInteractEvent(client, instance)
 	AnalyticsService:FireEvent("instanceInteracted", {
@@ -37,4 +43,6 @@ end
 genesUtil.initGene(interact)
 
 -- Fire event
-interactUtil.getInteractStream(interact):subscribe(fireInteractEvent)
+local stream = interactUtil.getInteractStream(interact)
+stream:subscribe(fireInteractEvent)
+stream:map(dart.select(2)):subscribe(updateInteractStamp)

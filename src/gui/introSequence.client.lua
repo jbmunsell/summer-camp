@@ -65,7 +65,7 @@ local playClicked = rx.Observable.from(splashScreen:FindFirstChild("PlayButton",
 -- Get other instances
 local camera = workspace.CurrentCamera
 local depth = Lighting.DepthOfField
-genesUtil.waitForState(depth, genes.propertySwitcher)
+genesUtil.waitForGene(depth, genes.propertySwitcher)
 
 -- Start camera tween and show splash screen
 depth.state.propertySwitcher.propertySet.Value = "intro"

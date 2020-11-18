@@ -33,7 +33,7 @@ function dataUtil.playerHasState(player, stateName)
 end
 
 -- Wait for state
-function dataUtil.waitForState(player, stateName)
+function dataUtil.waitForGene(player, stateName)
 	return player:WaitForChild("state"):WaitForChild(stateName)
 end
 
@@ -49,7 +49,7 @@ function dataUtil.registerPlayerState(stateName, state)
 	-- Create stream where state has been registered
 	return playerStream
 		:map(function (player)
-			dataUtil.waitForState(player, stateName)
+			dataUtil.waitForGene(player, stateName)
 			return player
 		end)
 end

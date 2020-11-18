@@ -31,7 +31,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Adjust time of day
-genesUtil.waitForState(Lighting, genes.propertySwitcher)
+genesUtil.waitForGene(Lighting, genes.propertySwitcher)
 for _, set in pairs(Lighting.config.propertySwitcher.propertySets:GetChildren()) do
 	local t = tonumber(set.Name)
 	scheduleUtil.getTimeOfDayStream(t):subscribe(dart.bind(setPropertySet, set))

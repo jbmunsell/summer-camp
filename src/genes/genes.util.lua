@@ -218,8 +218,9 @@ function genesUtil.hasFullState(instance, gene)
 	-- Chase all genes to see if they have the appropriate state folder
 	return checkGene(instance, gene)
 end
-function genesUtil.waitForState(instance, gene)
-	while not genesUtil.hasFullState(instance, gene) do
+function genesUtil.waitForGene(instance, gene)
+	local instanceList = getReadyInstances(gene)
+	while not table.find(instanceList, instance) do
 		wait()
 	end
 end

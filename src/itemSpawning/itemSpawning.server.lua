@@ -8,6 +8,7 @@
 --
 
 -- env
+local CollectionService = game:GetService("CollectionService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -85,17 +86,32 @@ local function placeRandomItemAtAttachment(attachment, itemList)
 
 	-- Randomize color
 	if RandomizeColor[itemSource] then
-		genesUtil.waitForState(item, genes.color)
+		genesUtil.waitForGene(item, genes.color)
 		item.state.color.color.Value = getRandomColor()
 	end
 
 	-- Track spawned
 	attachment.spawnedInstance.Value = item
-	genesUtil.waitForState(item, genes.pickup)
+	genesUtil.waitForGene(item, genes.pickup)
 	rx.Observable.from(item.state.pickup.holder):filter():first():subscribe(function ()
-		print("Item grabbed; clearing attachment")
+		-- Clear attachment value so that we can spawn again
 		attachment.spawnedInstance.Value = nil
+
+		-- Set interact timer and add tracker tag so that we can destroy if nobody wants it
+		genesUtil.waitForGene(item, genes.interact)
+		item.state.interact.stamp.Value = os.time()
+		CollectionService:AddTag(item, "SpawnedItem")
 	end)
+end
+
+-- Cull spawned items
+local function cullSpawnedItems()
+	local timer = env.config.itemSpawning.StillnessDestroyTimer.Value
+	for _, instance in pairs(CollectionService:GetTagged("SpawnedItem")) do
+		if os.time() - instance.state.interact.stamp.Value >= timer then
+			instance:Destroy()
+		end
+	end
 end
 
 -- Destroy balls
@@ -133,6 +149,9 @@ spawnItemsAtAttachments(dayStartStream, toyShop, "ShelfItemSpawn", {
 
 -- Destroy spawned balls at end of day
 dayEndStream:subscribe(destroyBalls)
+
+-- Destroy spawned items if they haven't been interacted with in 5 minutes
+rx.Observable.interval(10):subscribe(cullSpawnedItems)
 
 ---------------------------------------------------------------------------------------------------
 -- Marshmallow spawning

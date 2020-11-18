@@ -132,7 +132,7 @@ local function createTrophy(activityInstance, team)
 	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
 
 	-- Wait for full state
-	genesUtil.waitForState(trophy, genes.multiswitch.teamOnly)
+	genesUtil.waitForGene(trophy, genes.multiswitch.teamOnly)
 	trophy.config.teamOnly.team.Value = team
 end
 

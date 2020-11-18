@@ -6,6 +6,7 @@ return {
 	genes = {},
 	state = {
 		interact = {
+			stamp = 0,
 			switches = {
 				destroyed = true,
 			},

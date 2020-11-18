@@ -27,7 +27,7 @@ local function createIndicator(player)
 	local indicator = env.res.PlayerIndicator:Clone()
 	indicator.Parent = workspace
 	genesUtil.addGeneTag(indicator, playerIndicator)
-	genesUtil.waitForState(indicator, playerIndicator)
+	genesUtil.waitForGene(indicator, playerIndicator)
 	indicator.state.playerIndicator.player.Value = player
 end
 
