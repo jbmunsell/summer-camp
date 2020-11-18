@@ -119,10 +119,21 @@ local function connectDrawingInput(canvasInstance)
 		:takeUntil(terminator)
 		:multicast(rx.BehaviorSubject.new())
 
+	-- Is accepting input
+	local isAcceptingInput = mouseStateStream:filter()
+		:withLatestFrom(mouseRaycastStream)
+		:map(dart.select(2))
+		:map(dart.bind(canvasUtil.getCellIndexFromRaycastResult, canvasInstance))
+		:map(dart.boolify)
+		:merge(mouseStateStream:reject())
+		:takeUntil(terminator)
+		:multicast(rx.BehaviorSubject.new())
+
 	-- Stream for user clicking on a unique canvas cell
 	local canvasInteractStream = mouseRaycastStream
-		:withLatestFrom(mouseStateStream)
-		:filter(dart.select(2))
+		:filter(function ()
+			return mouseStateStream:getValue() and isAcceptingInput:getValue()
+		end)
 		-- :filter(function ()
 		-- 	return UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
 		-- end)
