@@ -51,6 +51,7 @@ local pollingPackages = {}
 ---------------------------------------------------------------------------------------------------
 
 -- Update polling list
+local pollingDistance = math.pow(env.config.interact.PollingDistance.Value, 2)
 local function updatePollingList()
 	-- Reset packages
 	pollingPackages = {}
@@ -59,14 +60,13 @@ local function updatePollingList()
 	local root = axisUtil.getLocalHumanoidRootPart()
 	if not root then return end
 	local playerPos = root.Position
-	local pollingThreshold = math.pow(50, 2)
 	local function getDistance(package)
 		return axisUtil.squareMagnitude(package.hold.WorldPosition - playerPos)
 	end
 
 	-- Build new list
 	for _, package in pairs(holdPackages) do
-		if getDistance(package) <= pollingThreshold then
+		if getDistance(package) <= pollingDistance then
 			table.insert(pollingPackages, package)
 		end
 	end
