@@ -83,9 +83,6 @@ local function spawnAllPlayers(dodgeballInstance)
 		end
 	end
 end
-local function declareWinner(dodgeballInstance, team)
-	dodgeballInstance.state.activity.winningTeam.Value = team
-end
 local function restoreRagdolls(dodgeballInstance)
 	local ragdolls = dodgeballInstance.state.dodgeball.ragdolls
 	tableau.from(ragdolls:GetChildren()):foreach(function (value)
@@ -147,16 +144,7 @@ local playStartStream = sessionStart:flatMap(function (activityInstance)
 end)
 
 -- Roster changed
-local playerRemovedFromRoster = dodgeballInstances:flatMap(function (dodgeballInstance)
-	local roster = dodgeballInstance.state.activity.roster
-	return rx.Observable.from(roster.ChildAdded):startWithTable(roster:GetChildren())
-		:flatMap(function (teamFolder)
-			return rx.Observable.from(teamFolder.ChildAdded)
-				:merge(rx.Observable.from(teamFolder.ChildRemoved))
-		end)
-		:map(dart.index("Value"))
-		:map(dart.carry(dodgeballInstance))
-end)
+local playerRemovedFromRoster = activityUtil.getPlayerRemovedFromRosterStream(dodgeball)
 
 -- Score changed
 local scoreChangedStream = dodgeballInstances:flatMap(function (dodgeballInstance)
@@ -256,20 +244,7 @@ scheduleStreams.chunkTimeLeft
 scoreChangedStream:subscribe(updateScoreboardScore)
 
 -- Declare a winner when one team has zero players
-playerRemovedFromRoster
-	:filter(activityUtil.isInPlay)
-	:reject(function (activityInstance)
-		return activityInstance.state.activity.winningTeam.Value
-	end)
-	:map(function (instance)
-		for i = 1, 2 do
-			if #instance.state.activity.roster[i]:GetChildren() == 0 then
-				return instance, instance.state.activity.sessionTeams[3 - i].Value
-			end
-		end
-	end)
-	:filter()
-	:subscribe(declareWinner)
+activityUtil.getSingleTeamLeftStream(dodgeball):subscribe(activityUtil.declareWinner)
 
 -- Destroy ball when it leaves
 sessionEnd

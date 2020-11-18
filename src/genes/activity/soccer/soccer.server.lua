@@ -66,9 +66,6 @@ local function increaseScore(soccerInstance, scoringTeam)
 		sound:Stop()
 	end)
 end
-local function declareWinner(soccerInstance, team)
-	soccerInstance.state.activity.winningTeam.Value = team
-end
 
 -- Ball manipulation
 local function isBallInBounds(soccerInstance, ball)
@@ -180,8 +177,8 @@ local volleyActiveBallMoved = genesUtil.getInstanceStream(soccer):flatMap(functi
 	return rx.Observable.from(soccerInstance.functional.ChildAdded)
 		:filter(dart.isNamed("Ball"))
 		:flatMap(function (ball)
-			return rx.Observable.fromProperty(ball, "Position")
-				:map(dart.constant(ball))
+			local terminator = rx.Observable.fromInstanceLeftGame(ball)
+			return rx.Observable.heartbeat():map(dart.constant(ball)):takeUntil(terminator)
 		end)
 		:map(function (ball)
 			if isVolleyActive(soccerInstance) then
@@ -197,6 +194,9 @@ local ballEscapedStream = volleyActiveBallMoved:reject(isBallInBounds)
 -----------------------------------
 -- Eject players that are already in the thing when it starts
 sessionStartStream:subscribe(activityUtil.ejectPlayers)
+
+-- Kill the session with a technical zero join case if one team all leaves
+activityUtil.getSingleTeamLeftStream(soccer):subscribe(activityUtil.zeroJoinTerminate)
 
 -----------------------------------
 -- Volley state subscriptions
@@ -237,7 +237,7 @@ local winneringTeamStream = winningGoalStream
 	:map(function (soccerInstance, teamIndex)
 		return soccerInstance, soccerInstance.state.activity.sessionTeams[teamIndex].Value
 	end)
-winneringTeamStream:subscribe(declareWinner)
+winneringTeamStream:subscribe(activityUtil.declareWinner)
 
 -----------------------------------
 -- Scoreboard subscriptions

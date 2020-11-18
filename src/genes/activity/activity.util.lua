@@ -79,7 +79,7 @@ function activityUtil.getPlayerCompetingStream(player)
 			:merge(rx.Observable.from(roster.DescendantRemoving)
 				:pipe(isPlayer)
 				:map(dart.constant(false)))
-	end)
+	end):takeUntil(rx.Observable.from(Players.PlayerRemoving):filter(dart.equals(player)))
 end
 
 -- Get player added to roster stream
@@ -107,6 +107,63 @@ function activityUtil.getPlayerAddedToRosterStream(gene)
 			:filter()
 			:map(dart.carry(activityInstance))
 	end)
+end
+function activityUtil.getPlayerRemovedFromRosterStream(gene)
+	return genesUtil.getInstanceStream(gene):flatMap(function (activityInstance)
+		local roster = activityInstance.state.activity.roster
+		return rx.Observable.from(roster.ChildAdded):startWithTable(roster:GetChildren())
+			:flatMap(function (teamFolder)
+				return rx.Observable.from(teamFolder.ChildAdded)
+					:merge(rx.Observable.from(teamFolder.ChildRemoved))
+			end)
+			:map(dart.index("Value"))
+			:map(dart.carry(activityInstance))
+	end)
+end
+function activityUtil.getSingleTeamLeftStream(gene)
+	return activityUtil.getPlayerRemovedFromRosterStream(gene)
+		:filter(activityUtil.isInPlay)
+		:reject(function (activityInstance)
+			return activityInstance.state.activity.winningTeam.Value
+		end)
+		:map(function (instance)
+			for i = 1, 2 do
+				if #instance.state.activity.roster[i]:GetChildren() == 0 then
+					return instance, instance.state.activity.sessionTeams[3 - i].Value
+				end
+			end
+		end)
+		:filter()
+end
+
+-- Declare winner
+function activityUtil.declareWinner(activityInstance, team)
+	activityInstance.state.activity.winningTeam.Value = team
+end
+
+-- Stop a session
+function activityUtil.stopSession(activityInstance)
+	local state = activityInstance.state.activity
+	collection.clear(state.enrolledTeams)
+	state.inSession.Value = false
+	state.winningTeam.Value = nil
+	collection.clear(state.sessionTeams)
+	for _, folder in pairs(state.roster:GetChildren()) do
+		collection.clear(folder)
+	end
+	for _, value in pairs(state.score:GetChildren()) do
+		value.Value = 0
+	end
+end
+
+-- Zero join terminate
+function activityUtil.zeroJoinTerminate(activityInstance)
+	for _, folder in pairs(activityInstance.state.activity.roster:GetChildren()) do
+		for _, value in pairs(folder:GetChildren()) do
+			activity.net.ZeroJoinCase:FireClient(value.Value)
+		end
+	end
+	activityUtil.stopSession(activityInstance)
 end
 
 -- Spawn players in plane

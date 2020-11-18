@@ -43,21 +43,6 @@ local function removePlayerFromRosters(player)
 	end)
 end
 
--- Handy self-explanatory stream utility functions
-local function stopSession(activityInstance)
-	local state = activityInstance.state.activity
-	collection.clear(state.enrolledTeams)
-	state.inSession.Value = false
-	state.winningTeam.Value = nil
-	collection.clear(state.sessionTeams)
-	for _, folder in pairs(state.roster:GetChildren()) do
-		collection.clear(folder)
-	end
-	for _, value in pairs(state.score:GetChildren()) do
-		value.Value = 0
-	end
-end
-
 -- Start collecting roster
 local function getRosterTimerLabel(activityInstance)
 	local timerLabel = activityInstance:FindFirstChild("RosterTimerLabel", true)
@@ -121,12 +106,7 @@ local function startPlay(activityInstance)
 		end
 	end
 	if not hasBoth then
-		for _, folder in pairs(state.roster:GetChildren()) do
-			for _, value in pairs(folder:GetChildren()) do
-				activity.net.ZeroJoinCase:FireClient(value.Value)
-			end
-		end
-		stopSession(activityInstance)
+		activityUtil.zeroJoinTerminate(activityInstance)
 	end
 
 	-- Either way, we are no longer collecting roster
