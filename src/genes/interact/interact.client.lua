@@ -169,6 +169,11 @@ spawn(function ()
 		print("interactables: ", #holdPackages)
 	end
 end)
+local function placeAttachmentInPart(part)
+	local att = Instance.new("Attachment", part)
+	att.Name = "InteractAttachment"
+	return att
+end
 interactStream:subscribe(function (instance)
 	local inserted
 	local stream
@@ -184,23 +189,19 @@ interactStream:subscribe(function (instance)
 			threshold = instance.config.interact.distanceThreshold.Value })
 	end
 	for _, d in pairs(instance:GetDescendants()) do
-		if d.Name == "InteractionPromptAdornee" then
+		if d.Name == "InteractAttachment" then
 			insert(d)
 		end
 	end
 	if not inserted then
 		if instance:IsA("Model") then
 			if instance.PrimaryPart then
-				local att = Instance.new("Attachment", instance.PrimaryPart)
-				att.Name = "InteractionPromptAdornee"
-				insert(att)
+				insert(placeAttachmentInPart(instance.PrimaryPart))
 			else
 				warn("Interactable model has no PrimaryPart or interact attachments: " .. instance:GetFullName())
 			end
 		elseif instance:IsA("BasePart") then
-			local att = Instance.new("Attachment", instance)
-			att.Name = "InteractionPromptAdornee"
-			insert(att)
+			insert(placeAttachmentInPart(instance))
 		end
 	end
 end)

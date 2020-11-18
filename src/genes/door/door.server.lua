@@ -40,7 +40,7 @@ local interacted = interactUtil.getInteractStream(door)
 	:map(dart.select(2)) -- drop the client, keep just the door
 interacted:subscribe(genesUtil.toggleStateValue(door, "open"))
 interacted:subscribe(function (instance)
-	local attachment = instance:FindFirstChild("InteractionPromptAdornee", true)
+	local attachment = instance:FindFirstChild("InteractAttachment", true)
 	if attachment then
 		soundUtil.playRandom(env.res.genes.door.sounds, attachment)
 	end

@@ -38,7 +38,7 @@ local interacted = interactUtil.getInteractStream(lightGroup)
 	:map(dart.select(2))
 interacted:subscribe(dart.follow(multiswitchUtil.toggleSwitch, "lightGroup", "primary"))
 interacted:subscribe(function (instance)
-	local attachment = instance:FindFirstChild("InteractionPromptAdornee", true)
+	local attachment = instance:FindFirstChild("InteractAttachment", true)
 	if attachment then
 		soundUtil.playRandom(env.res.genes.lightGroup.sounds, attachment)
 	end
