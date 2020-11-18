@@ -45,9 +45,7 @@ end
 -- Fire activated event
 local function fireActivatedEvent(character, instance)
 	local player = Players:GetPlayerFromCharacter(character)
-	print("pre player")
 	if not player then return end
-	print("Firing activated event")
 	AnalyticsService:FireEvent("objectActivated", {
 		instanceName = instance.Name,
 		instanceTags = CollectionService:GetTags(instance),

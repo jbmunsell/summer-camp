@@ -40,7 +40,7 @@ end
 
 -- unplant
 local function unplant(instance)
-	axisUtil.destroyChild(instance, "PlantWeld")
+	axisUtil.destroyChildren(instance, "StationaryWeld")
 end
 
 -- Try planting object in the ground
@@ -75,7 +75,7 @@ local function tryPlant(instance)
 
 	-- Smooth attach the things
 	local weld = axisUtil.smoothAttach(workspace.Terrain, instance, attachmentName)
-	weld.Name = "PlantWeld"
+	weld.Name = "StationaryWeld"
 	weld.Parent = instance
 end
 
@@ -91,9 +91,3 @@ plants:filter(function (instance) return instance.config.plantInGround.initPlant
 	:merge(pickupUtil.getActivatedStream(plantInGround)
 		:map(dart.select(2)))
 	:subscribe(tryPlant)
-
--- On pickup, destroy plant weld
-genesUtil.crossObserveStateValue(plantInGround, pickup, "holder")
-	:filter(dart.select(2))
-	:map(dart.select(1))
-	:subscribe(unplant)

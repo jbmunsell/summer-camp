@@ -73,7 +73,7 @@ end
 -- 	Attaches an object to a character, smoothly if it's already in workspace
 function pickupUtil.equip(character, object)
 	-- Destroy any stationary welds
-	axisUtil.destroyChild(object, "StationaryWeld")
+	axisUtil.destroyChildren(object, "StationaryWeld")
 
 	-- If in workspace already, then smooth attach
 	-- Otherwise, snap attach

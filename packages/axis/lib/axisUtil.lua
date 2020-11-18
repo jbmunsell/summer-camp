@@ -46,6 +46,13 @@ function axisUtil.destroyChild(instance, childName)
 		child:Destroy()
 	end
 end
+function axisUtil.destroyChildren(instance, childName)
+	for _, child in pairs(instance:GetChildren()) do
+		if child.Name == childName then
+			child:Destroy()
+		end
+	end
+end
 
 -- Get player humanoid
 function axisUtil.getPlayerCharacterStream()
