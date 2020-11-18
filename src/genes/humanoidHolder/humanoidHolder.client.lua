@@ -7,6 +7,7 @@
 --
 
 -- env
+local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -50,14 +51,4 @@ holders
 	:subscribe(setSwitch)
 
 -- Local humanoid jumped, pass to server
-rx.Observable.from(env.LocalPlayer.CharacterAdded)
-	:startWith(env.LocalPlayer.Character)
-	:filter()
-	:map(function (character)
-		return character:WaitForChild("Humanoid")
-	end)
-	:flatMap(function (humanoid)
-		return rx.Observable.from(humanoid.Jumping)
-	end)
-	:filter()
-	:subscribe(dart.forward(humanoidHolder.net.Jumped))
+rx.Observable.from(UserInputService.JumpRequest):subscribe(dart.forward(humanoidHolder.net.Jumped))
