@@ -83,12 +83,16 @@ local function spawnAllPlayers(dodgeballInstance)
 		end
 	end
 end
+local function releasePlayerRagdoll(dodgeballInstance, player)
+	ragdoll.net.Pop:FireClient(player)
+	collection.removeValue(dodgeballInstance.state.dodgeball.ragdolls, player.Character)
+end
 local function restoreRagdolls(dodgeballInstance)
 	local ragdolls = dodgeballInstance.state.dodgeball.ragdolls
 	tableau.from(ragdolls:GetChildren()):foreach(function (value)
 		local player = value.Value and Players:GetPlayerFromCharacter(value.Value)
 		if player then
-			ragdoll.net.Pop:FireClient(player)
+			releasePlayerRagdoll(dodgeballInstance, player)
 		end
 	end)
 	collection.clear(ragdolls)
@@ -228,6 +232,18 @@ playerDied
 	:merge(playerHitByBall)
 	:filter(activityUtil.isInSession)
 	:subscribe(dropPlayer)
+
+-- Teleport them outside the court after 2 seconds if they're still there
+playerHitByBall
+	:map(function (di, p) return di, p.Character end)
+	:delay(2)
+	:subscribe(function (dodgeballInstance, character)
+		local player = Players:GetPlayerFromCharacter(character)
+		if character and character:IsDescendantOf(workspace) and player then
+			releasePlayerRagdoll(dodgeballInstance, player)
+			activityUtil.ejectPlayerFromActivity(dodgeballInstance, player)
+		end
+	end)
 
 -- Update the scoreboard teams when the session starts, and update the score when roster changes
 sessionStart:subscribe(updateScoreboardTeams)
