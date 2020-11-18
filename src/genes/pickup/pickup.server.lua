@@ -96,6 +96,9 @@ local touchPickupStream = pickupInstanceStream
 	:map(function (instance, player)
 		return player, instance
 	end)
+	:reject(function (player)
+		return player.Character.Humanoid:GetState() == Enum.HumanoidStateType.Physics
+	end)
 
 -- Server equip and unequip streams
 -- 	NOT implemented yet so we swap with Observable.never()
@@ -174,6 +177,25 @@ dropStream:subscribe(function (character)
 	fireDropEvent(character)
 	pickupUtil.disownHeldObjects(character)
 	pickupUtil.releaseHeldObjects(character)
+end)
+
+-- Set an object's network owner according to who OWNS it
+genesUtil.observeStateValue(pickup, "owner"):subscribe(function (instance, owner)
+	-- local root = instance
+	if not instance:IsDescendantOf(workspace) then return end
+	local root = instance
+	if instance:IsA("Model") then
+		root = instance.PrimaryPart
+	end
+	pcall(function ()
+		if owner then
+			print("setting owner to ", owner.Name)
+			root:SetNetworkOwner(owner)
+		else
+			print("Setting ownership auto")
+			root:SetNetworkOwnershipAuto()
+		end
+	end)
 end)
 
 -- Destroy all of a player's stowed items when they leave the server

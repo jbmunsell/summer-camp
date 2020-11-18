@@ -48,12 +48,10 @@ end):subscribe(createStampEntry)
 
 -- Connect to invite request
 local validRequest = rx.Observable.from(genes.activityInviteBoard.net.InviteSendRequested)
-	:tap(print)
 	:filter(dart.boolAnd)
 	:reject(function (player, instance)
 		return getCooldownForTeam(instance, player.Team) > 0
 	end)
-	:tap(print)
 	:share()
 validRequest
 	:map(function (p, instance) return instance, p.Team end)

@@ -24,6 +24,7 @@ local axisUtil = require(axis.lib.axisUtil)
 local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
+local pickupUtil = require(genes.pickup.util)
 local activityUtil = require(activity.util)
 local scoreboardUtil = require(genes.scoreboard.util)
 local scheduleStreams = require(env.src.schedule.streams)
@@ -63,6 +64,15 @@ local function dropPlayer(dodgeballInstance, player)
 	if not value then return end
 
 	if player.Character then
+		print("Attempting to strip balls")
+		for _, ball in pairs(dodgeballInstance.functional.balls:GetChildren()) do
+			print("checking ball")
+			if ball.state.pickup.holder.Value == player.Character then
+				print("Character is holding ball; stripping")
+				pickupUtil.stripObject(ball)
+				print("stripped")
+			end
+		end
 		soundUtil.playSound(env.res.audio.sounds.Whistle, player.Character.PrimaryPart)
 	end
 	value:Destroy()
@@ -169,7 +179,6 @@ local playerDied = axisUtil.getHumanoidDiedStream()
 local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 	:flatMap(function (ball)
 		return rx.Observable.from(ball.interface.dodgeballBall.TouchedNonThrowerPart)
-			:tap(print)
 			:map(dart.drag(ball))
 	end)
 	:map(function (hit, ball)
@@ -212,6 +221,7 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 		end
 	end)
 	:filter()
+	:share()
 
 ---------------------------------------------------------------------------------------------------
 -- Subscriptions

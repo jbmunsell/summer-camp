@@ -155,6 +155,7 @@ function pickupUtil.stripObject(object)
 			end)
 			:foreach(dart.destroy)
 	end
+	pushDropDebounce(object)
 	clearOwner(object)
 	clearHolder(object)
 end
