@@ -20,6 +20,7 @@ local multiswitch = genes.multiswitch
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local axisUtil = require(axis.lib.axisUtil)
 local inputUtil = require(input.util)
 local genesUtil = require(genes.util)
 local interactData = require(interact.data)
@@ -43,23 +44,33 @@ local SpritesheetScale = 128
 
 -- caches
 local holdPackages = {}
+local pollingPackages = {}
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
--- Mouse event filtering
-local function mouseFilter(inputObject, processed)
-	return not processed
-	and (inputObject.UserInputType == Enum.UserInputType.MouseButton1
-		or inputObject.UserInputType == Enum.UserInputType.Touch)
-end
+-- Update polling list
+local function updatePollingList()
+	-- Reset packages
+	pollingPackages = {}
 
--- Is interactable
--- local function isinteractable(instance)
--- 	return instance:IsDescendantOf(workspace)
--- 	and multiswitchUtil.all(instance, "interact")
--- end
+	-- data
+	local root = axisUtil.getLocalHumanoidRootPart()
+	if not root then return end
+	local playerPos = root.Position
+	local pollingThreshold = math.pow(50, 2)
+	local function getDistance(package)
+		return axisUtil.squareMagnitude(package.hold.WorldPosition - playerPos)
+	end
+
+	-- Build new list
+	for _, package in pairs(holdPackages) do
+		if getDistance(package) <= pollingThreshold then
+			table.insert(pollingPackages, package)
+		end
+	end
+end
 
 -- Get best hold
 local function getBestHold()
@@ -72,7 +83,7 @@ local function getBestHold()
 	local bestModifier = -math.huge
 	local bestHoldPosition = nil
 	local cameraCFrame = workspace.CurrentCamera.CFrame
-	for _, package in pairs(holdPackages) do
+	for _, package in pairs(pollingPackages) do
 		local hold = package.hold
 		if package.isInteractable:getValue() then
 			local holdPosition = hold.WorldPosition
@@ -164,11 +175,16 @@ local function getInteractableSubject(instance)
 		:multicast(rx.BehaviorSubject.new())
 end
 
+-- Poll all interactables at 2hz
+rx.Observable.interval(0.5):subscribe(updatePollingList)
+
 -- Maintain hold packages cache list
 spawn(function ()
-	local tracker = ReplicatedStorage.data.TotalInteractables
+	local totalTracker = ReplicatedStorage.data.TotalInteractables
+	local pollingTracker = ReplicatedStorage.data.PollingInteractables
 	while wait(1) do
-		tracker.Value = #holdPackages
+		totalTracker.Value = #holdPackages
+		pollingTracker.Value = #pollingPackages
 	end
 end)
 local function placeAttachmentInPart(part)
@@ -207,13 +223,17 @@ interactStream:subscribe(function (instance)
 		end
 	end
 end)
+local function cull(list, instance)
+	for i = #list, 1, -1 do
+		if list[i].instance == instance then
+			table.remove(list, i)
+		end
+	end
+end
 rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.data).instanceTag))
 	:subscribe(function (instance)
-		for i = #holdPackages, 1, -1 do
-			if holdPackages[i].instance == instance then
-				table.remove(holdPackages, i)
-			end
-		end
+		cull(holdPackages, instance)
+		cull(pollingPackages, instance)
 	end)
 
 -- 	Merge E up/down to true/false stream
