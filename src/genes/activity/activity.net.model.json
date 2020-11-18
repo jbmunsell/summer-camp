@@ -11,6 +11,10 @@
 		},
 		{
 			"ClassName": "RemoteEvent",
+			"Name": "LeaveActivityRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
 			"Name": "ZeroJoinCase"
 		}
 	]

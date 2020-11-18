@@ -15,6 +15,7 @@ local notifications = env.src.gui.notifications
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
+local activityUtil = require(env.src.genes.activity.util)
 local notificationsConfig = require(notifications.config)
 
 -- instances
@@ -54,4 +55,5 @@ end
 -- Notification factory stream
 rx.Observable.from(notifications.net.Push)
 	:filter(isCoreEnabled)
+	:reject(dart.bind(activityUtil.isPlayerCompeting, env.LocalPlayer))
 	:subscribe(notify)

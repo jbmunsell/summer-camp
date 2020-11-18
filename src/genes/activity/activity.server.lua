@@ -200,15 +200,25 @@ rx.Observable.from(activity.net.RosterJoinRequested)
 		local state = activityInstance.state.activity
 		return state.isCollectingRoster.Value and collection.getValue(state.sessionTeams, player.Team)
 	end)
-	:reject(activityUtil.isPlayerInAnyRoster)
+	:reject(activityUtil.isPlayerCompeting)
 	:map(function (p, a) return a, p end)
 	:subscribe(addPlayerToRoster)
 
 -- Remove players from roster when they leave the game or die
+local leaveRequested = rx.Observable.from(activity.net.LeaveActivityRequested)
 axisUtil.getPlayerCharacterStream():flatMap(function (_, character)
 	return rx.Observable.from(character:WaitForChild("Humanoid").Died)
 end):merge(rx.Observable.from(Players.PlayerRemoving))
 	:subscribe(removePlayerFromRosters)
+leaveRequested:subscribe(function (player)
+	local activityInstance = activityUtil.getPlayerActivity(player)
+	if activityInstance then
+		activityUtil.ejectPlayerFromActivity(activityInstance, player)
+		removePlayerFromRosters(player)
+	else
+		warn("Player attempted to leave an activity but is not on any rosters")
+	end
+end)
 
 -- Stop session when a winner is declared from the inside
 local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")
@@ -216,7 +226,7 @@ local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")
 
 -- Create trophy when a winner is declared
 winnerDeclared:subscribe(createTrophy)
-winnerDeclared:map(dart.select(1)):delay(1.0):subscribe(stopSession)
+winnerDeclared:map(dart.select(1)):delay(1.0):subscribe(activityUtil.stopSession)
 
 -- Hard switch gates on activity session
 activities:subscribe(initGates)

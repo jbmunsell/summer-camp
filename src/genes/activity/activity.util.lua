@@ -58,10 +58,13 @@ function activityUtil.getTeamIndex(activityInstance, team)
 end
 
 -- is player competing
-function activityUtil.isPlayerCompeting(player)
+function activityUtil.getPlayerActivity(player)
 	return genesUtil.getInstances(activity):first(function (activityInstance)
-		return activityUtil.isPlayerInRoster(activityInstance, player) and true or nil
+		return activityUtil.isPlayerInRoster(activityInstance, player)
 	end)
+end
+function activityUtil.isPlayerCompeting(player)
+	return activityUtil.getPlayerActivity(player) and true or nil
 end
 
 -- Get player competing stream
@@ -86,9 +89,6 @@ end
 function activityUtil.getPlayerTeamIndex(activityInstance, player)
 	local value = collection.getValue(activityInstance.state.activity.sessionTeams, player.Team)
 	return value and tonumber(value.Name)
-end
-function activityUtil.isPlayerInAnyRoster(player)
-	return genesUtil.getInstances(activity):first(dart.follow(activityUtil.isPlayerInRoster, player))
 end
 function activityUtil.isPlayerInRoster(activityInstance, player)
 	local roster = activityInstance.state.activity.roster
@@ -186,18 +186,20 @@ function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
 end
 
 -- Eject players from instance
-function activityUtil.ejectPlayers(activityInstance)
+function activityUtil.ejectPlayerFromActivity(activityInstance, player)
 	local ejectionSpawnPlane = activityInstance:FindFirstChild("EjectionSpawnPlane", true)
+	activityUtil.spawnPlayersInPlane({ player }, ejectionSpawnPlane)
+end
+function activityUtil.ejectPlayers(activityInstance)
 	local pitchBounds = activityInstance:FindFirstChild("PitchBounds", true)
-	assert(ejectionSpawnPlane and pitchBounds, activityInstance:GetFullName() .. " does not have ejection "
-		.. "spawn plane or pitch bounds.")
+	assert(pitchBounds, activityInstance:GetFullName() .. " does not have pitch bounds.")
 
-	local players = tableau.from(Players:GetPlayers())
-		:filter(function (p)
-			local root = axisUtil.getPlayerHumanoidRootPart(p)
-			return root and axisUtil.isPointInPartXZ(root.Position, pitchBounds)
-		end)
-	activityUtil.spawnPlayersInPlane(players:raw(), ejectionSpawnPlane)
+	for _, player in pairs(Players:GetPlayers()) do
+		local root = axisUtil.getPlayerHumanoidRootPart(player)
+		if root and axisUtil.isPointInPartXZ(root.Position, pitchBounds) then
+			activityUtil.ejectPlayerFromActivity(activityInstance, player)
+		end
+	end
 end
 
 -- return lib

@@ -23,12 +23,17 @@ local activityUtil = require(genes.activity.util)
 ---------------------------------------------------------------------------------------------------
 
 local Core = env.PlayerGui:WaitForChild("Core")
+local leaveButton = Core:FindFirstChild("LeaveActivityButton", true)
 
 local localPlayerCompeting = activityUtil.getPlayerCompetingStream(env.LocalPlayer)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
+
+local function setLeaveButtonVisible(visible)
+	leaveButton.Visible = visible
+end
 
 local function killPrompt(prompt)
 	glib.playAnimation(Core.animations.activityPrompt.hide, prompt):subscribe(dart.destroy)
@@ -81,6 +86,9 @@ genesUtil.observeStateValue(genes.activity, "isCollectingRoster")
 	:filter(function (activityInstance)
 		return activityUtil.getTeamIndex(activityInstance, env.LocalPlayer.Team)
 	end)
-	:withLatestFrom(localPlayerCompeting)
-	:reject(dart.select(2))
+	:reject(dart.bind(activityUtil.isPlayerCompeting, env.LocalPlayer))
 	:subscribe(createStartupPrompt)
+
+-- Bind activity leave buton
+localPlayerCompeting:startWith(false):subscribe(setLeaveButtonVisible)
+rx.Observable.from(leaveButton.Activated):subscribe(dart.forward(genes.activity.net.LeaveActivityRequested))
