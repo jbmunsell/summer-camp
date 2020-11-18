@@ -136,6 +136,19 @@ function activityUtil.getSingleTeamLeftStream(gene)
 		:filter()
 end
 
+-- Team roster streams
+function activityUtil.getTeamRoster(activityInstance, team)
+	local index = activityUtil.getTeamIndex(activityInstance, team)
+	return activityInstance.state.activity.roster[index]
+end
+function activityUtil.getTeamRosterChangedStream(activityInstance, team, init)
+	return collection.observeChanged(activityUtil.getTeamRoster(activityInstance, team), init)
+end
+function activityUtil.isTeamRosterFull(activityInstance, team)
+	local maxPlayers = activityInstance.config.activity.maxPlayersPerTeam.Value
+	return #activityUtil.getTeamRoster(activityInstance, team):GetChildren() == maxPlayers
+end
+
 -- Declare winner
 function activityUtil.declareWinner(activityInstance, team)
 	activityInstance.state.activity.winningTeam.Value = team

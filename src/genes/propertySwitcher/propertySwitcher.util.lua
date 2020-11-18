@@ -9,12 +9,10 @@
 -- env
 local TweenService = game:GetService("TweenService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
-local axis = env.packages.axis
 local genes = env.src.genes
 local propertySwitcher = genes.propertySwitcher
 
 -- modules
-local tableau = require(axis.lib.tableau)
 local genesUtil = require(genes.util)
 
 -- lib
@@ -42,9 +40,17 @@ function propertySwitcherUtil.tweenToPropertySet(instance, setName)
 		instance:GetFullName(), setName)) end
 
 	-- Tween
+	local goals = {}
+	for _, value in pairs(set:GetChildren()) do
+		if value:IsA("StringValue") or value:IsA("BoolValue") then
+			instance[value.Name] = value.Value
+		else
+			goals[value.Name] = value.Value
+		end
+	end
 	local tweenInfo = TweenInfo.new(config.tweenDuration.Value,
 		Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
-	TweenService:Create(instance, tweenInfo, tableau.valueObjectsToTable(set)):Play()
+	TweenService:Create(instance, tweenInfo, goals):Play()
 end
 
 -- return lib

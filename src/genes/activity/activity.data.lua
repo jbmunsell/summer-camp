@@ -26,6 +26,7 @@ return {
 			rosterCollectionTimer = 25,
 			trophy = env.res.activities.PlaceholderTrophy,
 			teamCount = 1,
+			maxPlayersPerTeam = 100,
 			
 			displayName = "Activity",
 			analyticsName = "activity",

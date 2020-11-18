@@ -44,6 +44,7 @@ local function createStartupPrompt(activityInstance)
 	local config = activityInstance.config.activity
 	local state = activityInstance.state.activity
 	local finishTime = os.time() + config.rosterCollectionTimer.Value
+	local team = env.LocalPlayer.Team
 
 	-- Create prompt
 	local prompt = Core.seeds.activityPrompt.ActivityPrompt:Clone()
@@ -54,16 +55,32 @@ local function createStartupPrompt(activityInstance)
 		prompt:FindFirstChild("Team" .. value.Name, true).Image = teamConfig.imageNoBackground.Value
 	end
 
+	-- Create streams
+	local terminator = rx.Observable.fromInstanceLeftGame(prompt)
+	local exitStream = glib.getExitStream(prompt)
+	local rosterCollectionStopped = rx.Observable.from(state.isCollectingRoster)
+		:reject()
+		:first()
+	local rosterFull = activityUtil.getTeamRosterChangedStream(activityInstance, team, true)
+		:map(dart.bind(activityUtil.isTeamRosterFull, activityInstance, team))
+		:takeUntil(terminator)
+
+	-- Set join button according to roster full
+	rosterFull:subscribe(function (isFull)
+		prompt.JoinButton.state.propertySwitcher.propertySet.Value = (isFull and "full" or "open")
+	end)
+
 	-- Timer updating
 	local pulse = rx.Observable.heartbeat():startWith(0):map(function ()
 		return finishTime - os.time()
-	end):takeUntil(rx.Observable.fromInstanceLeftGame(prompt))
+	end):takeUntil(terminator)
 	pulse:map(math.floor):subscribe(function (t)
 		prompt.TimerLabel.Text = t
 	end)
 	pulse
-		:filter(dart.lessThan(0)):first()
-		:merge(glib.getExitStream(prompt), localPlayerCompeting:filter())
+		:filter(dart.lessThan(0))
+		:merge(exitStream, localPlayerCompeting:filter(), rosterCollectionStopped)
+		:first()
 		:subscribe(dart.bind(killPrompt, prompt))
 
 	-- Connect to join button text

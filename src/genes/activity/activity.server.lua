@@ -90,7 +90,7 @@ local function startCollectingRoster(activityInstance)
 	})
 end
 
--- Start PLAY
+-- Start PLAY (called after roster collection is completed)
 local function startPlay(activityInstance)
 	-- Get state
 	local state = activityInstance.state.activity
@@ -176,6 +176,22 @@ genesUtil.observeStateValue(activity, "isCollectingRoster"):subscribe(setRosterT
 -- Listen to enrolled list changed and begin activity when it's full
 -- We have to spawn the subscription to this because it is subscribes to the collection's ChildRemoved event
 -- 	and will create an infinite loop if single-threaded
+local rosterFullStream = activities
+	:flatMap(function (activityInstance)
+		return rx.Observable.from(activityInstance.state.activity.roster:GetChildren()):flatMap(collection.observeChanged)
+			:map(dart.constant(activityInstance))
+	end)
+	:filter(function (activityInstance)
+		local config = activityInstance.config.activity
+		local roster = activityInstance.state.activity.roster
+		local maxPlayers = config.maxPlayersPerTeam.Value
+		for i = 1, config.teamCount.Value do
+			if #roster[i]:GetChildren() < maxPlayers then
+				return false
+			end
+		end
+		return true
+	end)
 local rosterCollectingStart = activities
 	:flatMap(function (activityInstance)
 		local enrolled = activityInstance.state.activity.enrolledTeams
@@ -190,9 +206,18 @@ rosterCollectingStart
 	:map(dart.carry(startCollectingRoster))
 	:map(dart.bind)
 	:subscribe(spawn)
-rosterCollectingStart:delay(function (activityInstance)
-	return activityInstance.config.activity.rosterCollectionTimer.Value
-end):subscribe(startPlay)
+
+-- Start play when ALL teams are full OR the roster collection period is over
+rosterCollectingStart
+	:delay(function (activityInstance)
+		return activityInstance.config.activity.rosterCollectionTimer.Value
+	end)
+	:merge(rosterFullStream)
+	:filter(function (activityInstance)
+		local state = activityInstance.state.activity
+		return state.inSession.Value and state.isCollectingRoster.Value
+	end)
+	:subscribe(startPlay)
 
 -- Add players to roster upon request
 rx.Observable.from(activity.net.RosterJoinRequested)

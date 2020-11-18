@@ -14,6 +14,7 @@ return {
 	config = {
 		propertySwitcher = {
 			propertySets = {},
+			tweenDuration = 0.3,
 		},
 	},
 }

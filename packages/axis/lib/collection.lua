@@ -43,10 +43,11 @@ function collection.clear(folder)
 end
 
 -- observe values changed
-function collection.observeChanged(folder)
-	return rx.Observable.from(folder.ChildAdded)
+function collection.observeChanged(folder, init)
+	local stream = rx.Observable.from(folder.ChildAdded)
 		:merge(rx.Observable.from(folder.ChildRemoved))
 		:map(dart.constant(nil))
+	return init and stream:startWithArgs(nil) or stream
 end
 
 -- return lib
