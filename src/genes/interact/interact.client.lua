@@ -8,6 +8,7 @@
 
 -- env
 local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -165,8 +166,9 @@ end
 
 -- Maintain hold packages cache list
 spawn(function ()
+	local tracker = ReplicatedStorage.data.TotalInteractables
 	while wait(1) do
-		print("interactables: ", #holdPackages)
+		tracker.Value = #holdPackages
 	end
 end)
 local function placeAttachmentInPart(part)

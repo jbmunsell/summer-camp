@@ -95,14 +95,10 @@ end
 -- 				all events with the UserInputState from ContextActionService)
 local connections = {}
 spawn(function ()
-	local runner = RunService:IsServer() and "server" or "client"
+	local trackerName = RunService:IsServer() and "Server" or "Client"
+	local tracker = game:GetService("ReplicatedStorage").data[trackerName .. "EventSubscriptions"]
 	while wait(1) do
-		-- if runner == "client" then
-			print(runner, #connections)
-			-- if workspace.DistributedGameTime > 20 then
-				-- print(connections[#connections].trace)
-			-- end
-		-- end
+		tracker.Value = #connections
 	end
 end)
 function Observable.from(o)
@@ -119,7 +115,7 @@ function Observable.from(o)
 	elseif t == "RBXScriptSignal" then
 		return Observable.new(function (observer)
 			table.insert(connections, observer)
-			observer.trace = debug.traceback()
+			-- observer.trace = debug.traceback()
 			local connection = o:Connect(function (...)
 				observer:push(...)
 			end)
