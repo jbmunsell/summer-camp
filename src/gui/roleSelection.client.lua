@@ -62,7 +62,6 @@ end
 
 local function clearViewportFrame(frame)
 	axisUtil.destroyChild(frame, "Character")
-	axisUtil.destroyChild(frame, "Camera")
 end
 
 local function createCharacters()
@@ -75,36 +74,32 @@ local function createCharacters()
 	-- Clear
 	local camperFrame = roleSelection:FindFirstChild("CamperFrame", true)
 	local leaderFrame = roleSelection:FindFirstChild("LeaderFrame", true)
-	clearViewportFrame(camperFrame)
-	clearViewportFrame(leaderFrame)
+	-- clearViewportFrame(camperFrame)
+	-- clearViewportFrame(leaderFrame)
 
 	-- Create new camper character and new counselor character
-	for _, d in pairs(character:GetDescendants()) do
-		d.Archivable = true
-	end
+	-- for _, d in pairs(character:GetDescendants()) do
+	-- 	d.Archivable = true
+	-- end
 	character.Archivable = true
-	local function createCharacter(frame)
+	local function createCharacter(frame, isLeader)
 		local copy = character:Clone()
 		copy.Name = "Character"
-		copy:SetPrimaryPartCFrame(CFrame.new())
+		copy:SetPrimaryPartCFrame(CFrame.new(0, -100, 0))
+		copy.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		copy.Parent = workspace
+		leaderUtil.forceRenderCharacterSize(copy, isLeader)
+		wait()
+		copy:SetPrimaryPartCFrame(frame.WorldModel.Character:GetPrimaryPartCFrame())
+		frame.WorldModel.Character:Destroy()
 		copy.Parent = frame
-
-		local camera = Instance.new("Camera", frame)
-		camera.CFrame = CFrame.new(Vector3.new(0, 2, -8), Vector3.new())
-
-		local anim = Instance.new("Animator", copy.Humanoid)
-		anim:LoadAnimation(previewAnimation):Play()
 
 		return copy
 	end
 
-	-- Create leader character
-	local leaderCharacter = createCharacter(leaderFrame)
-	leaderUtil.forceRenderCharacterSize(leaderCharacter, true)
-
-	-- Create camper character
-	local camperCharacter = createCharacter(camperFrame)
-	leaderUtil.forceRenderCharacterSize(camperCharacter, false)
+	-- Create characters
+	createCharacter(leaderFrame, true)
+	createCharacter(camperFrame, false)
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -113,9 +108,9 @@ end
 
 -- Clone character whenever appearance loads
 -- 	or after one 10 second timer upon joining just for safety
--- rx.Observable.from(env.LocalPlayer.CharacterAppearanceLoaded)
--- 	:merge(rx.Observable.just(env.LocalPlayer:HasAppearanceLoaded()):filter())
--- 	:subscribe(createCharacters)
+rx.Observable.from(env.LocalPlayer.CharacterAppearanceLoaded)
+	:merge(rx.Observable.just(env.LocalPlayer:HasAppearanceLoaded()):filter())
+	:subscribe(createCharacters)
 
 -- Enable gui stream
 rx.Observable.from(coreGui:FindFirstChild("CharacterSelect", true).Button.Activated)
