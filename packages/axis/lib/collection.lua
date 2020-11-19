@@ -44,8 +44,8 @@ end
 
 -- observe values changed
 function collection.observeChanged(folder, init)
-	local stream = rx.Observable.from(folder.ChildAdded)
-		:merge(rx.Observable.from(folder.ChildRemoved))
+	local stream = rx.Observable.fromInstanceEvent(folder, "ChildAdded")
+		:merge(rx.Observable.fromInstanceEvent(folder, "ChildRemoved"))
 		:map(dart.constant(nil))
 	return init and stream:startWithArgs(nil) or stream
 end

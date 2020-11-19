@@ -69,7 +69,7 @@ pickupUtil.getPlayerObjectActionRequestStream(dodgeballBall.net.ThrowRequested, 
 -- Cool down hot dodgeballs when they hit something
 dodgeballStream
 	:flatMap(function (dodgeballInstance)
-		return rx.Observable.from(dodgeballInstance.Touched)
+		return rx.Observable.fromInstanceEvent(dodgeballInstance, "Touched")
 			:filter(function () return dodgeballInstance:IsDescendantOf(game) end)
 			:filter(function () return dodgeballInstance.state.dodgeballBall.hot.Value end)
 			:map(dart.carry(dodgeballInstance))

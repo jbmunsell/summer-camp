@@ -134,7 +134,7 @@ function Observable.from(o)
 		end)
 	elseif t == "Instance" then
 		if o:IsA("BindableEvent") then
-			return Observable.from(o.Event)
+			return Observable.fromInstanceEvent(o, "Event")
 		elseif o:IsA("ValueBase") then
 			-- This is chosen instead of using :startWith because some ValueObjects have nil values
 			-- and still desire to fire with initial value (nil)
@@ -168,6 +168,12 @@ function Observable.from(o)
 	end
 end
 
+-- From instance event
+function Observable.fromInstanceEvent(instance, eventName)
+	return Observable.from(instance[eventName])
+		:takeUntil(Observable.fromInstanceLeftGame(instance))
+end
+
 -- From property
 -- 	Returns an observable that fires each time a specific property of an instance is changed.
 function Observable.fromProperty(instance, property, init)
@@ -177,6 +183,7 @@ function Observable.fromProperty(instance, property, init)
 		:map(function ()
 			return instance[property]
 		end)
+		:takeUntil(Observable.fromInstanceLeftGame(instance))
 	return (init and o:startWith(instance[property]) or o)
 end
 
@@ -225,7 +232,7 @@ function Observable.fromPlayerTouchedDescendant(instance, debounce)
 	local instances = (instance:IsA("BasePart") and { instance } or instance:GetDescendants())
 	local observable = Observable.from(instances)
 		:filter(function (d) return d:IsA("BasePart") end)
-		:flatMap(function (d) return Observable.from(d.Touched) end)
+		:flatMap(function (d) return Observable.fromInstanceEvent(d, "Touched") end)
 		:map(function (hit) return hit.Parent and Players:GetPlayerFromCharacter(hit.Parent) end)
 		:filter()
 		:map(function (player)
@@ -237,7 +244,7 @@ function Observable.fromHumanoidTouchedDescendant(instance, debounce)
 	local instances = (instance:IsA("BasePart") and { instance } or instance:GetDescendants())
 	local observable = Observable.from(instances)
 		:filter(function (d) return d:IsA("BasePart") end)
-		:flatMap(function (d) return Observable.from(d.Touched) end)
+		:flatMap(function (d) return Observable.fromInstanceEvent(d, "Touched") end)
 		:map(function (hit) return hit.Parent and hit.Parent:FindFirstChildWhichIsA("Humanoid") end)
 		:filter()
 		:map(function (humanoid)

@@ -164,7 +164,7 @@ local interactStream = genesUtil.initGene(interact)
 
 -- Get interactable stream
 local function getInteractableSubject(instance)
-	local ancestry = rx.Observable.from(instance.AncestryChanged)
+	local ancestry = rx.Observable.fromInstanceEvent(instance, "AncestryChanged")
 		:startWith(0)
 		:map(function () return instance:IsDescendantOf(workspace) end)
 	local switches = multiswitchUtil.observeSwitches(instance, "interact")

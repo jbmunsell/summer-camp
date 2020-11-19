@@ -39,7 +39,7 @@ end
 -- Set character descendants
 axisUtil.getPlayerCharacterStream()
 	:flatMap(function (p, c)
-		return rx.Observable.from(c.DescendantAdded)
+		return rx.Observable.fromInstanceEvent(c, "DescendantAdded")
 			:startWithTable(c:GetDescendants())
 			:filter(dart.isa("BasePart"))
 			:map(dart.carry(p))

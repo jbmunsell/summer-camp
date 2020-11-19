@@ -20,7 +20,7 @@ local characterCollisionsUtil = {}
 -- Get character descendants
 function characterCollisionsUtil.getPartDescendants(obs)
 	return obs:flatMap(function (c)
-		return rx.Observable.from(c.DescendantAdded)
+		return rx.Observable.fromInstanceEvent(c, "DescendantAdded")
 			:startWithTable(c:GetDescendants())
 			:filter(dart.isa("BasePart"))
 	end)

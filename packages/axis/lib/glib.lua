@@ -151,7 +151,7 @@ end
 function glib.getExitStream(instance)
 	local exitButton = instance:FindFirstChild("ExitButton", true)
 	if exitButton then
-		return rx.Observable.from(exitButton.Activated)
+		return rx.Observable.from(exitButton.Activated):first()
 	end
 end
 

@@ -64,7 +64,7 @@ local function createBackpack(player)
 	-- 	and ReplicatedStorage otherwise
 	-- local competingStream = activityUtil.getPlayerCompetingStream(player)
 	local competingStream = rx.Observable.just(false)
-	local enabledStream = rx.Observable.from(player.CharacterAdded)
+	local enabledStream = rx.Observable.fromInstanceEvent(player, "CharacterAdded")
 		:startWith(player.Character)
 		:combineLatest(competingStream, function (character, competing)
 			return (character and not competing), character

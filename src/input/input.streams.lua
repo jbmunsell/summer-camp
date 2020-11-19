@@ -7,12 +7,12 @@
 --
 
 -- env
-local env              = require(game:GetService("ReplicatedStorage").src.env)
 local UserInputService = game:GetService("UserInputService")
-local axis             = env.packages.axis
+local env = require(game:GetService("ReplicatedStorage").src.env)
+local axis = env.packages.axis
 
 -- modules
-local rx   = require(axis.lib.rx)
+local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 
 -- streams
@@ -20,7 +20,10 @@ local clickStream = rx.Observable.from(UserInputService.InputBegan)
 	:filter(function (input, processed)
 		return not processed and input.UserInputType == Enum.UserInputType.MouseButton1
 	end)
-	:merge(rx.Observable.from(UserInputService.TouchTap):reject(dart.select(2)))
+	-- :merge(rx.Observable.from(UserInputService.TouchTap):tap(print):reject(dart.select(2)))
+	:merge(rx.Observable.from(UserInputService.TouchTap):reject(function (_, processed)
+		return processed
+	end))
 	:map(dart.constant(nil))
 
 -- return lib

@@ -535,7 +535,7 @@ function fx.driveEffects()
 	for effectType, effectClass in pairs(InstanceEffects) do
 		rx.Observable.fromInstanceTag(effectType)
 			:flatMap(function (effect)
-				return rx.Observable.from(effect.Changed)
+				return rx.Observable.fromInstanceEvent(effect, "Changed")
 					:map(dart.carry(effect.Parent))
 			end)
 			:subscribe(effectClass.render)

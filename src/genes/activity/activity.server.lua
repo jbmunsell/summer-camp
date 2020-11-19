@@ -232,7 +232,7 @@ rx.Observable.from(activity.net.RosterJoinRequested)
 -- Remove players from roster when they leave the game or die
 local leaveRequested = rx.Observable.from(activity.net.LeaveActivityRequested)
 axisUtil.getPlayerCharacterStream():flatMap(function (_, character)
-	return rx.Observable.from(character:WaitForChild("Humanoid").Died)
+	return rx.Observable.fromInstanceEvent(character:WaitForChild("Humanoid"), "Died")
 end):merge(rx.Observable.from(Players.PlayerRemoving))
 	:subscribe(removePlayerFromRosters)
 leaveRequested:subscribe(function (player)

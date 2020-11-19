@@ -135,7 +135,7 @@ local playerHitByBall = smashballInstances
 	:flatMap(function (instance)
 		return rx.Observable.from(instance.functional.balls.ChildAdded)
 			:flatMap(function (ball)
-				return rx.Observable.from(ball.Touched)
+				return rx.Observable.fromInstanceEvent(ball, "Touched")
 					:map(dart.carry(instance))
 			end)
 	end)

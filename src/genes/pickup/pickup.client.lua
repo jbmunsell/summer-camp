@@ -57,6 +57,7 @@ inputStreams.click
 		return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character):first(),
 			inputUtil.getMouseHit()
 	end)
+	:filter()
 	:subscribe(dart.forward(pickup.net.ObjectActivated))
 
 -- Drop on backspace

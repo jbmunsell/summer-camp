@@ -97,6 +97,7 @@ local function placePreview(raycastData, stack)
 	local distance = (raycastData.position and env.LocalPlayer:DistanceFromCharacter(raycastData.position) or 0)
 	if not raycastData.instance
 	or distance == 0
+	or not UserInputService.MouseEnabled
 	or distance >= stack.config.stickyNoteStack.placementDistanceThreshold.Value then
 		preview.Parent = ReplicatedStorage
 		return

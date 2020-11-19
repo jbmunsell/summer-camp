@@ -14,7 +14,6 @@ local genes = env.src.genes
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
-local tableau = require(axis.lib.tableau)
 local genesUtil = require(genes.util)
 
 -- lib
@@ -52,10 +51,12 @@ end
 -- 	Observes the switches for a single instance
 function multiswitchUtil.observeSwitches(instance, setName)
 	local switches = instance.state[setName].switches
-	return rx.Observable.from(switches.ChildAdded)
+	return rx.Observable.fromInstanceEvent(switches, "ChildAdded")
 		:startWithTable(switches:GetChildren())
 		:flatMap(function (c)
-			return rx.Observable.from(c.Changed) -- skip the first one so we don't push a bunch of init events
+			-- Go directly to the changed event to skip the first one
+			-- 	so we don't push a bunch of init events
+			return rx.Observable.fromInstanceEvent(c, "Changed")
 		end)
 end
 

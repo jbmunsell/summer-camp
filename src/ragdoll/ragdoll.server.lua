@@ -34,7 +34,7 @@ end
 rx.Observable.from(Players.PlayerAdded)
 	:startWithTable(Players:GetPlayers())
 	:flatMap(function (player)
-		return rx.Observable.from(player.CharacterAdded)
+		return rx.Observable.fromInstanceEvent(player, "CharacterAdded")
 			:startWith(player.Character)
 			:filter()
 			:map(dart.carry(player))

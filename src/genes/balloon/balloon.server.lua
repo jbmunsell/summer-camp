@@ -108,6 +108,6 @@ rx.Observable.heartbeat():subscribe(function ()
 end)
 
 -- When a balloon is held by a character, make the handle massless
-genesUtil.crossObserveStateValue(genes.balloon, pickup, "holder")
-	:filter(dart.select(2))
-	:subscribe(removeHandleMass)
+-- genesUtil.crossObserveStateValue(genes.balloon, pickup, "holder")
+-- 	:filter(dart.select(2))
+-- 	:subscribe(removeHandleMass)

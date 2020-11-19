@@ -7,6 +7,7 @@
 --
 
 -- env
+local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -19,7 +20,6 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local tableau = require(axis.lib.tableau)
-local Bin = require(axis.classes.Bin)
 local pickupStreams = require(pickup.streams)
 local actionsConfig = require(actions.config)
 
@@ -67,6 +67,7 @@ local function createButtonForObject(object)
 	button.Icon.Image = object.config.pickup.buttonImage.Value
 	button.Icon.ImageColor3 = object.config.pickup.buttonColor.Value
 	button.Visible = true
+	button.Hotkey.Visible = UserInputService.KeyboardEnabled
 
 	-- Create state
 	tableau.tableToValueObjects("state", {
