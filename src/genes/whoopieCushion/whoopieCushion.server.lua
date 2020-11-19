@@ -36,7 +36,7 @@ local dropped, pickedUp = genesUtil.crossObserveStateValue(whoopieCushion, picku
 	:partition(genesUtil.stateValueEquals(pickup, "holder", nil))
 
 -- Set hot value to true when dropped (slight delay), and false when picked up
-dropped:delay(0.2):map(dart.drag(true))
+dropped:delay(0.5):map(dart.drag(true))
 	:merge(pickedUp:map(dart.drag(false)))
 	:subscribe(genesUtil.setStateValue(whoopieCushion, "hot"))
 
