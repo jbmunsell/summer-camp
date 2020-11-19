@@ -38,11 +38,6 @@ local function createId(instance)
 	attachment.Name = attachment.Name .. instance.state.plantInGround.plantId.Value
 end
 
--- unplant
-local function unplant(instance)
-	axisUtil.destroyChildren(instance, "StationaryWeld")
-end
-
 -- Try planting object in the ground
 local function tryPlant(instance)
 	pickupUtil.stripObject(instance)
@@ -88,6 +83,7 @@ local plants = genesUtil.initGene(plantInGround)
 
 -- Stick on activated or optional init
 plants:filter(function (instance) return instance.config.plantInGround.initPlant.Value end)
-	:merge(pickupUtil.getActivatedStream(plantInGround)
-		:map(dart.select(2)))
+	:merge(genesUtil.crossObserveStateValue(plantInGround, pickup, "holder")
+		:reject(dart.select(2))
+		:map(dart.select(1)))
 	:subscribe(tryPlant)

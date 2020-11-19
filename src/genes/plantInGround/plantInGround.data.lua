@@ -5,7 +5,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 return {
 	instanceTag = "gene_plantInGround",
 	name = "plantInGround",
-	genes = { env.src.genes.pickup },
+	genes = { env.src.genes.throw },
 	state = {
 		plantInGround = {
 			plantId = -1,
@@ -13,6 +13,10 @@ return {
 	},
 	
 	config = {
+		throw = {
+			throwMagnitude = 0,
+		},
+
 		plantInGround = {
 			initPlant = true,
 		},
