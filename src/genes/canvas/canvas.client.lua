@@ -65,49 +65,6 @@ local function connectDrawingInput(canvasInstance)
 		:map(dart.constant(nil))
 		:map(inputUtil.raycastMouse)
 		:pipe(shareUntil)
-
-	-- Stream for adjusting the sliders
-	local function mapInputEventToConstant(event, constant)
-		return rx.Observable.from(event)
-			:filter(function (inputObject, processed)
-				return not processed and (inputObject.UserInputType == Enum.UserInputType.MouseButton1
-					or inputObject.UserInputType == Enum.UserInputType.Touch)
-			end)
-			:map(dart.constant(constant))
-	end
-	local function createSliderManipulationStream(slider, initialValue)
-		-- Tag part real quick
-		local colorSelectorPart = canvasInstance.ColorSelector
-
-		-- Create stream to indicate grab state
-		local sliderDownStream = mapInputEventToConstant(slider.Circle.InputBegan, true)
-		local sliderUpStream = mapInputEventToConstant(UserInputService.InputEnded, false)
-		local sliderGrabbedStream = sliderDownStream:merge(sliderUpStream)
-
-		-- return a stream that emits the place from 0 to 1 along the slider that the cursor is at
-		return mouseRaycastStream
-			:filter(function (result) return result and result.Instance == colorSelectorPart end)
-			:withLatestFrom(sliderGrabbedStream)
-			:filter(function (_, grabbed) return grabbed end)
-			:map(function (result)
-				-- NOTE: These calculations currently rely on the slider's container frame having an X size of 1,
-				-- 	and the slider itself being aligned by its center within the container frame,
-				-- 	and the slider itself only using size scale, NOT offset scale
-				local offset = colorSelectorPart.CFrame:toObjectSpace(CFrame.new(result.Position)).p
-				local partX = offset.X + colorSelectorPart.Size.X * 0.5
-				local guiStartX = (1 - slider.Size.X.Scale) * 0.5 * colorSelectorPart.Size.X
-				local guiSizeX  = slider.Size.X.Scale * colorSelectorPart.Size.X
-				local guiProportion = (partX - guiStartX) / guiSizeX
-				return math.max(0, math.min(1, guiProportion))
-			end)
-			:pipe(shareUntil)
-			:startWith(initialValue)
-	end
-	local sliders = canvasInstance.ColorSelector.SurfaceGui.Sliders
-	local hueAdjustedStream = createSliderManipulationStream(sliders.Hue, 1)
-	local satAdjustedStream = createSliderManipulationStream(sliders.Saturation, 1)
-	local valAdjustedStream = createSliderManipulationStream(sliders.Brightness, 1)
-
 	local function isMouse(inputObject)
 		return inputObject.UserInputType == Enum.UserInputType.Touch
 		or inputObject.UserInputType == Enum.UserInputType.MouseButton1
@@ -174,6 +131,51 @@ local function connectDrawingInput(canvasInstance)
 		:takeUntil(terminator)
 		:multicast(activeTool)
 
+	-- Stream for adjusting the sliders
+	local function mapInputEventToConstant(event, constant)
+		return rx.Observable.from(event)
+			:filter(function (inputObject, processed)
+				return not processed and (inputObject.UserInputType == Enum.UserInputType.MouseButton1
+					or inputObject.UserInputType == Enum.UserInputType.Touch)
+			end)
+			:map(dart.constant(constant))
+	end
+	local function createSliderManipulationStream(slider, hsvSelector, initialValue)
+		-- Tag part real quick
+		local colorSelectorPart = canvasInstance.ColorSelector
+
+		-- Create stream to indicate grab state
+		local sliderDownStream = mapInputEventToConstant(slider.Circle.InputBegan, true)
+		local sliderUpStream = mapInputEventToConstant(UserInputService.InputEnded, false)
+		local sliderGrabbedStream = sliderDownStream:merge(sliderUpStream)
+
+		-- return a stream that emits the place from 0 to 1 along the slider that the cursor is at
+		return mouseRaycastStream
+			:filter(function (result) return result and result.Instance == colorSelectorPart end)
+			:withLatestFrom(sliderGrabbedStream)
+			:filter(function (_, grabbed) return grabbed end)
+			:map(function (result)
+				-- NOTE: These calculations currently rely on the slider's container frame having an X size of 1,
+				-- 	and the slider itself being aligned by its center within the container frame,
+				-- 	and the slider itself only using size scale, NOT offset scale
+				local offset = colorSelectorPart.CFrame:toObjectSpace(CFrame.new(result.Position)).p
+				local partX = offset.X + colorSelectorPart.Size.X * 0.5
+				local guiStartX = (1 - slider.Size.X.Scale) * 0.5 * colorSelectorPart.Size.X
+				local guiSizeX  = slider.Size.X.Scale * colorSelectorPart.Size.X
+				local guiProportion = (partX - guiStartX) / guiSizeX
+				return math.max(0, math.min(1, guiProportion))
+			end)
+			:merge(colorPickedStream:map(function (c)
+				return table.pack(c:ToHSV())[hsvSelector]
+			end))
+			:pipe(shareUntil)
+			:startWith(initialValue)
+	end
+	local sliders = canvasInstance.ColorSelector.SurfaceGui.Sliders
+	local hueAdjustedStream = createSliderManipulationStream(sliders.Hue, 1, 1)
+	local satAdjustedStream = createSliderManipulationStream(sliders.Saturation, 2, 1)
+	local valAdjustedStream = createSliderManipulationStream(sliders.Brightness, 3, 1)
+
 	-- Stream for whether tool buttons should be active
 	local toolButtonActiveStream = activeTool
 		:flatMap(function (toolName)
@@ -183,10 +185,9 @@ local function connectDrawingInput(canvasInstance)
 		end)
 
 	-- Color changing streams
-	local colorChangedStream = colorPickedStream
-		:merge(hueAdjustedStream:combineLatest(satAdjustedStream, valAdjustedStream, Color3.fromHSV))
+	local colorChangedStream = hueAdjustedStream
+		:combineLatest(satAdjustedStream, valAdjustedStream, Color3.fromHSV)
 		:pipe(shareUntil)
-		:startWith(Color3.new(1, 1, 1))
 
 	-- Paint application stream and erase stream
 	-- Erase stream is just a stream that applies white color to target cell
