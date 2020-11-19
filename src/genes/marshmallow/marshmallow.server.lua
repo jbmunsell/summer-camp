@@ -10,23 +10,23 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local marshmallow = genes.marshmallow
 
 -- modules
 local rx = require(axis.lib.rx)
+local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local fireplaceUtil = require(genes.fireplace.util)
-local marshmallowUtil = require(marshmallow.util)
+local marshmallowUtil = require(genes.marshmallow.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
 -- Init gene
-genesUtil.initGene(marshmallow)
+genesUtil.initGene(genes.marshmallow)
 
 -- Render when their fire time changes
-local fireTimeChanged = genesUtil.observeStateValue(marshmallow, "fireTime")
+local fireTimeChanged = genesUtil.observeStateValue(genes.marshmallow, "fireTime")
 fireTimeChanged
 	:filter(function (instance, fireTime)
 		return fireTime > instance.config.marshmallow.fireTimeMax.Value
@@ -36,29 +36,19 @@ fireTimeChanged
 fireTimeChanged:subscribe(marshmallowUtil.updateMarshmallowStage)
 
 -- When the stage changes, render
-genesUtil.observeStateValue(marshmallow, "stage"):subscribe(marshmallowUtil.renderMarshmallowStage)
+genesUtil.observeStateValue(genes.marshmallow, "stage"):subscribe(marshmallowUtil.renderMarshmallowStage)
 
 -- Increase fire time for all marshmallows that are either burning or near fire
-genesUtil.getInstanceStream(marshmallow):subscribe(function (instance)
-	rx.Observable.fromProperty(instance, "Position"):subscribe(function ()
-		local fire = fireplaceUtil.getFireWithinRadius(instance, "cookRadius")
-		local isCooking = instance.state.marshmallow.isCooking
-		if fire then
-			isCooking.Value = true
-		else
-			local config = instance.config.marshmallow
-			local fireTime = instance.state.marshmallow.fireTime
-			local isBurning = (fireTime.Value >= config.stages.burnt.time.Value)
-			isCooking.Value = isBurning
-		end
-	end)
-end)
-rx.Observable.heartbeat():subscribe(function (dt)
-	for _, instance in pairs(genesUtil.getInstances(marshmallow):raw()) do
+local instances = genesUtil.getInstances(genes.marshmallow):raw()
+local int = 0.2
+rx.Observable.interval(int):map(dart.constant(int)):subscribe(function (dt)
+	for _, instance in pairs(instances) do
 		if instance:IsDescendantOf(workspace) then
 			local state = instance.state.marshmallow
-			if state.isCooking.Value then
-				local fireTime = state.fireTime
+			local config = instance.config.marshmallow
+			local fireTime = state.fireTime
+			local fire = fireplaceUtil.getFireWithinRadius(instance, "cookRadius")
+			if fire or (fireTime.Value >= config.stages.burnt.time.Value) then
 				fireTime.Value = fireTime.Value + dt
 			end
 		end

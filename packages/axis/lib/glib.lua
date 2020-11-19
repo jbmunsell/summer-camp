@@ -294,7 +294,7 @@ function glib.playAnimation(animationModule, instance, instant, ...)
 		end
 		observable = rx.Observable.never()
 	else
-		observable = (instant and rx.Observable.just() or rx.Observable.from(tween.Completed))
+		observable = (instant and rx.Observable.just() or rx.Observable.from(tween.Completed):first())
 		tween:Play()
 	end
 	return observable:map(dart.constant(instance))

@@ -66,7 +66,7 @@ local function showMatchResult(activityInstance)
 end
 
 local function notifyZeroJoin()
-	local frame = coreGui.seeds.zeroJoinCase.Notification
+	local frame = coreGui.seeds.zeroJoinCase.Notification:Clone()
 
 	rx.Observable.timer(7):subscribe(dart.bind(killFrame, frame))
 

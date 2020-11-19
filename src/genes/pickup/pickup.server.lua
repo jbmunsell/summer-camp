@@ -189,10 +189,8 @@ genesUtil.observeStateValue(pickup, "owner"):subscribe(function (instance, owner
 	end
 	pcall(function ()
 		if owner then
-			print("setting owner to ", owner.Name)
 			root:SetNetworkOwner(owner)
 		else
-			print("Setting ownership auto")
 			root:SetNetworkOwnershipAuto()
 		end
 	end)

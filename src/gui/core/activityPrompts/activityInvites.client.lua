@@ -52,9 +52,10 @@ local function showActivityInvite(boardInstance, sender)
 	end
 
 	-- Subscribe to join click
-	local joinClicked = rx.Observable.from(invite:FindFirstChild("JoinButton", true).Activated)
+	local joinClicked = rx.Observable.from(invite:FindFirstChild("JoinButton", true).Activated):first()
 	joinClicked
 		:merge(glib.getExitStream(invite), rx.Observable.timer(10))
+		:first()
 		:subscribe(dart.bind(killInvite, invite))
 	joinClicked:subscribe(dart.bind(teleportPlayer, boardInstance))
 

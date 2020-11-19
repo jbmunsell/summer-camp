@@ -139,7 +139,8 @@ function Observable.from(o)
 			-- This is chosen instead of using :startWith because some ValueObjects have nil values
 			-- and still desire to fire with initial value (nil)
 			-- return Observable.just(o.Value):merge(Observable.from(o.Changed))
-			return Observable.from(o.Changed):startWithArgs(o.Value)
+			local terminator = Observable.fromInstanceLeftGame(o)
+			return Observable.from(o.Changed):startWithArgs(o.Value):takeUntil(terminator)
 		elseif o:IsA("RemoteEvent") then
 			if RunService:IsServer() then
 				return Observable.from(o.OnServerEvent)

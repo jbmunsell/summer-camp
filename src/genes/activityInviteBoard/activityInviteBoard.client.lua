@@ -47,7 +47,7 @@ local boards = genesUtil.initGene(genes.activityInviteBoard)
 local teamChanged = rx.Observable.fromProperty(env.LocalPlayer, "Team")
 boards:flatMap(function (instance)
 	local stamps = instance.state.activityInviteBoard.inviteStamps
-	return rx.Observable.from(stamps.ChildAdded):startWith(stamps:GetChildren())
+	return rx.Observable.from(stamps.ChildAdded):startWithTable(stamps:GetChildren())
 		:flatMap(function (stamp)
 			return rx.Observable.from(stamp):map(dart.constant(stamp))
 		end)

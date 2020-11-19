@@ -9,7 +9,6 @@ return {
 	genes = { genes.edible, genes.skewerable },
 	state = {
 		marshmallow = {
-			isCooking = false,
 			fireTime = 0,
 			stage = "normal",
 			destroyed = false,

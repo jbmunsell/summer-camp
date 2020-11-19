@@ -13,7 +13,6 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local pickup = genes.pickup
-local balloon = genes.balloon
 
 -- modules
 local rx = require(axis.lib.rx)
@@ -22,6 +21,7 @@ local axisUtil = require(axis.lib.axisUtil)
 local pickupUtil = require(pickup.util)
 local genesUtil = require(genes.util)
 local multiswitchUtil = require(genes.multiswitch.util)
+local balloonData = require(genes.balloon.data)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -78,15 +78,15 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Balloon object stream
-local balloonObjectStream = genesUtil.initGene(balloon)
+genesUtil.initGene(genes.balloon)
 
 -- Render color
-genesUtil.crossObserveStateValue(balloon, genes.color, "color"):subscribe(function (instance, color)
+genesUtil.crossObserveStateValue(genes.balloon, genes.color, "color"):subscribe(function (instance, color)
 	instance.Balloon.Color = color
 end)
 
 -- Place on request
-pickupUtil.getPlayerObjectActionRequestStream(balloon.net.PlacementRequested, balloon)
+pickupUtil.getPlayerObjectActionRequestStream(genes.balloon.net.PlacementRequested, genes.balloon)
 	:filter(function (_, _, attachInstance)
 		return attachInstance
 		and attachInstance ~= workspace.Terrain
@@ -96,23 +96,18 @@ pickupUtil.getPlayerObjectActionRequestStream(balloon.net.PlacementRequested, ba
 	:subscribe(attachBalloon)
 
 -- Update balloon velocity
-balloonObjectStream:subscribe(function (instance)
-	rx.Observable.fromProperty(instance.Balloon, "Position")
-		:subscribe(dart.bind(updateBalloonAirResistance, instance))
+local destroyHeight = balloonData.config.balloon.destroyHeight
+local balloons = genesUtil.getInstances(genes.balloon):raw()
+rx.Observable.heartbeat():subscribe(function ()
+	for _, balloonInstance in pairs(balloons) do
+		updateBalloonAirResistance(balloonInstance)
+		if balloonInstance.Balloon.Position.Y > destroyHeight then
+			balloonInstance:Destroy()
+		end
+	end
 end)
 
--- When a balloon is moved, destroy it if it's too high
-balloonObjectStream
-	:flatMap(function (balloonInstance)
-		return rx.Observable.fromProperty(balloonInstance.Balloon, "Position")
-			:filter(function (position)
-				return position.Y > balloonInstance.config.balloon.destroyHeight.Value
-			end)
-			:map(dart.constant(balloonInstance))
-	end)
-	:subscribe(dart.destroy)
-
 -- When a balloon is held by a character, make the handle massless
-genesUtil.crossObserveStateValue(balloon, pickup, "holder")
+genesUtil.crossObserveStateValue(genes.balloon, pickup, "holder")
 	:filter(dart.select(2))
 	:subscribe(removeHandleMass)

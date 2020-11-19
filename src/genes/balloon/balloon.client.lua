@@ -28,7 +28,9 @@ genesUtil.initGene(balloon)
 pickupUtil.getClickWhileHoldingStream(balloon)
 	:map(function ()
 		local raycastResult = inputUtil.raycastMouse()
+		if not raycastResult then return end
 		return raycastResult.Instance, raycastResult.Position
 	end)
+	:filter()
 	:subscribe(dart.forward(balloon.net.PlacementRequested))
 	

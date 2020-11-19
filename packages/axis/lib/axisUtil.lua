@@ -300,59 +300,14 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 
 	local info = axisUtil.computeAttachInfo(att_a, att_b)
 
-	local wasAnchored = info.att_b.Parent.Anchored
-	info.att_b.Parent.Anchored = true
-
 	local weld = Instance.new("Weld", a)
-	weld.C0 = info.target
+	weld.C0 = info.current
+	weld.Part0 = info.att_a.Parent
+	weld.Part1 = info.att_b.Parent
 
-	-- local collisionGroups = {}
-	-- local instances = (b:IsA("BasePart") and { b } or b:GetDescendants())
-	-- for _, d in pairs(instances) do
-	-- 	if d:IsA("BasePart") then
-	-- 		collisionGroups[d] = d.CollisionGroupId
-	-- 		PhysicsService:SetPartCollisionGroup(d, "FXParts")
-	-- 	end
-	-- end
-
-	-- If B is a part, then tween the part. If it's a model, tween entire model
-	local originalCFrame
-	local tween, proxy
-	if b:IsA("Model") then
-		assert(b.PrimaryPart, "Cannot smoothAttach a model with no assigned PrimaryPart")
-
-		originalCFrame = b:GetPrimaryPartCFrame()
-		local primaryPartOffset = info.att_b.WorldCFrame:toObjectSpace(originalCFrame)
-		proxy = Instance.new("NumberValue", ReplicatedStorage)
-		proxy.Value = 0
-		proxy.Changed:Connect(function (d)
-			local cf = originalCFrame:lerp(info.att_a.WorldCFrame:toWorldSpace(primaryPartOffset), d)
-			b:SetPrimaryPartCFrame(cf)
-		end)
-		tween = TweenService:Create(proxy, tweenInfo or SmoothAttachTweenInfo, { Value = 1 })
-
-	elseif b:IsA("BasePart") then
-		originalCFrame = info.att_b.Parent.CFrame
-		tween = axisUtil.createDynamicTween(b, tweenInfo or SmoothAttachTweenInfo, {
-			CFrame = function (d)
-				return originalCFrame:lerp(info.att_a.WorldCFrame:toWorldSpace(info.att_b.CFrame:inverse()), d)
-			end,
-		})
-	end
+	local tween = TweenService:Create(weld, tweenInfo or SmoothAttachTweenInfo, { C0 = info.target })
 
 	tween.Completed:Connect(function ()
-		if proxy then proxy:Destroy() end
-
-		info.att_b.Parent.Anchored = wasAnchored
-
-		-- for part, group in pairs(collisionGroups) do
-		-- 	part.CollisionGroupId = group
-		-- end
-
-		if weld:IsDescendantOf(game) then
-			weld.Part0 = info.att_a.Parent
-			weld.Part1 = info.att_b.Parent
-		end
 	end)
 	tween:Play()
 
