@@ -79,6 +79,7 @@ function stickyNoteStackUtil.stickNote(note, raycastData)
 		:map(function ()
 			return stickAttachment:IsDescendantOf(game) and stickAttachment
 		end)
+		:filter()
 		:subscribe(dart.destroy)
 end
 

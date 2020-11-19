@@ -30,7 +30,8 @@ local multiswitchUtil = require(multiswitch.util)
 local function setSwitch(enabled)
 	genesUtil.getInstances(humanoidHolder)
 		:foreach(function (instance)
-			multiswitchUtil.setSwitchEnabled(instance, "interact", "humanoidHolder", enabled)
+			local combined = enabled and not instance.state.humanoidHolder.owner.Value
+			multiswitchUtil.setSwitchEnabled(instance, "interact", "humanoidHolder", combined)
 		end)
 end
 

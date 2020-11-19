@@ -74,10 +74,10 @@ local function dropPlayer(dodgeballInstance, player)
 			end
 		end
 		soundUtil.playSound(env.res.audio.sounds.Whistle, player.Character.PrimaryPart)
+		collection.addValue(dodgeballInstance.state.dodgeball.ragdolls, player.Character)
 	end
 	value:Destroy()
 	ragdoll.net.Push:FireClient(player)
-	collection.addValue(dodgeballInstance.state.dodgeball.ragdolls, player.Character)
 end
 local function spawnPlayer(dodgeballInstance, player)
 	local functional = dodgeballInstance.functional
