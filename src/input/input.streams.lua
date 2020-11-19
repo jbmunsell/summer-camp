@@ -20,10 +20,7 @@ local clickStream = rx.Observable.from(UserInputService.InputBegan)
 	:filter(function (input, processed)
 		return not processed and input.UserInputType == Enum.UserInputType.MouseButton1
 	end)
-	-- :merge(rx.Observable.from(UserInputService.TouchTap):tap(print):reject(dart.select(2)))
-	:merge(rx.Observable.from(UserInputService.TouchTap):reject(function (_, processed)
-		return processed
-	end))
+	:merge(rx.Observable.from(UserInputService.TouchTapInWorld):tap(print):reject(dart.select(2)))
 	:map(dart.constant(nil))
 
 -- return lib
