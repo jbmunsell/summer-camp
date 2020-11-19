@@ -9,6 +9,7 @@
 
 -- env
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -181,3 +182,21 @@ local function shuffleTip()
 	tipLabel.Text = tip.Value
 end
 rx.Observable.interval(20):subscribe(shuffleTip)
+
+---------------------------------------------------------------------------------------------------
+-- Flashlight respawning after players leave with them in backpack
+---------------------------------------------------------------------------------------------------
+
+local flashlights = workspace.Flashlights
+local flashlightStorage = Instance.new("Folder", ReplicatedStorage)
+flashlightStorage.Name = "FlashlightSeeds"
+rx.Observable.from(flashlights.ChildAdded):startWithTable(flashlights:GetChildren())
+	:flatMap(function (instance)
+		local copy = instance:Clone()
+		copy.Parent = flashlightStorage
+		return rx.Observable.fromInstanceLeftGame(instance)
+			:map(dart.constant(copy))
+	end)
+	:subscribe(function (instance)
+		instance.Parent = workspace.Flashlights
+	end)
