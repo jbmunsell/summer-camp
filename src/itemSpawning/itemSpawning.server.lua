@@ -187,16 +187,20 @@ rx.Observable.interval(20):subscribe(shuffleTip)
 -- Flashlight respawning after players leave with them in backpack
 ---------------------------------------------------------------------------------------------------
 
-local flashlights = workspace.Flashlights
-local flashlightStorage = Instance.new("Folder", ReplicatedStorage)
-flashlightStorage.Name = "FlashlightSeeds"
-rx.Observable.from(flashlights.ChildAdded):startWithTable(flashlights:GetChildren())
-	:flatMap(function (instance)
-		local copy = instance:Clone()
-		copy.Parent = flashlightStorage
-		return rx.Observable.fromInstanceLeftGame(instance)
-			:map(dart.constant(copy))
-	end)
-	:subscribe(function (instance)
-		instance.Parent = workspace.Flashlights
-	end)
+local function maintainCirculation(folder)
+	local storage = Instance.new("Folder", ReplicatedStorage)
+	storage.Name = folder.Name .. "Storage"
+	rx.Observable.from(folder.ChildAdded):startWithTable(folder:GetChildren())
+		:flatMap(function (instance)
+			local copy = instance:Clone()
+			copy.Parent = storage
+			return rx.Observable.fromInstanceLeftGame(instance)
+				:map(dart.constant(copy))
+		end)
+		:subscribe(function (instance)
+			instance.Parent = folder
+		end)
+end
+
+maintainCirculation(workspace.flashlights)
+maintainCirculation(workspace.megaphones)
