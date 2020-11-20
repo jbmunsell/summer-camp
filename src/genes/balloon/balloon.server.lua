@@ -46,7 +46,7 @@ local function attachBalloon(balloonInstance, attachInstance, position)
 	local stickAttachment = Instance.new("Attachment", attachInstance)
 	stickAttachment.Name = "StickAttachment"
 	stickAttachment.CFrame = attachInstance.CFrame:toObjectSpace(CFrame.new(position))
-	local weld = axisUtil.smoothAttach(attachInstance, balloonInstance, "StickAttachment")
+	local weld = axisUtil.smoothAttachAttachments(attachInstance, stickAttachment, balloonInstance, "StickAttachment")
 	weld.Name = "BalloonAttachWeld"
 	weld.Parent = balloonInstance
 

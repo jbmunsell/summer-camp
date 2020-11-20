@@ -86,9 +86,10 @@ function pickupUtil.equip(character, object)
 
 	-- Place in workspace if not already
 	-- 	This is for equipping stowed objects
-	if not isInWorkspace then
-		object.Parent = workspace
-	end
+	-- if not isInWorkspace then
+	-- 	object.Parent = workspace
+	-- end
+	object.Parent = character
 
 	-- Set holder value
 	object.state.pickup.holder.Value = character
@@ -155,6 +156,7 @@ function pickupUtil.stripObject(object)
 			end)
 			:foreach(dart.destroy)
 	end
+	object.Parent = workspace
 	pushDropDebounce(object)
 	clearOwner(object)
 	clearHolder(object)
@@ -188,7 +190,12 @@ function pickupUtil.releaseHeldObjects(character)
 
 	-- Clear holder
 	pickupUtil.getCharacterHeldObjects(character)
-		:foreach(clearHolder)
+		:foreach(function (instance)
+			clearHolder(instance)
+			if instance:IsDescendantOf(workspace) then
+				instance.Parent = workspace
+			end
+		end)
 end
 
 -- Update hold animation
