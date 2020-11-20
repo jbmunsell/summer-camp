@@ -10,12 +10,14 @@
 local PhysicsService = game:GetService("PhysicsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
+local genes = env.src.genes
 local net = env.src.characterCollisions.net
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
+local genesUtil = require(genes.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -39,8 +41,12 @@ end
 -- Set character descendants
 axisUtil.getPlayerCharacterStream()
 	:flatMap(function (p, c)
-		return rx.Observable.fromInstanceEvent(c, "DescendantAdded")
-			:startWithTable(c:GetDescendants())
+		return rx.Observable.fromInstanceEvent(c, "ChildAdded")
+			:startWithTable(c:GetChildren())
+			:reject(dart.follow(genesUtil.hasGeneTag, genes.pickup))
+			:flatMap(function (instance)
+				return rx.Observable.from(instance:GetDescendants())
+			end)
 			:filter(dart.isa("BasePart"))
 			:map(dart.carry(p))
 	end)

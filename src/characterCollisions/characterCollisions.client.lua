@@ -7,6 +7,7 @@
 --
 
 -- env
+local PhysicsService = game:GetService("PhysicsService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -20,16 +21,13 @@ local genesUtil = require(genes.util)
 -- Variables
 ---------------------------------------------------------------------------------------------------
 
-local localCharacterGroupId = env.src.characterCollisions.net.GetLocalCharacterGroupId:InvokeServer()
-local defaultGroupId = 0
-
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
 -- Set character group
-local function setPartGroup(part, groupId)
-	part.CollisionGroupId = groupId
+local function setPartGroup(part, groupName)
+	PhysicsService:SetPartCollisionGroup(part, groupName)
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -39,7 +37,7 @@ end
 -- Set collision group on character added
 rx.Observable.from(env.src.characterCollisions.net.CollisionGroupSet)
 	:filter()
-	:map(dart.drag(localCharacterGroupId))
+	:map(dart.drag("LocalCharacter"))
 	:subscribe(setPartGroup)
 
 -- Place local character held objects into collision group when they are picked up
@@ -50,9 +48,9 @@ genesUtil.getInstanceStream(genes.pickup):flatMap(function (instance)
 		:skip(1)
 		:map(function (oldHolder, newHolder)
 			if oldHolder == env.LocalPlayer.Character then
-				return defaultGroupId
+				return "Default"
 			elseif newHolder == env.LocalPlayer.Character then
-				return localCharacterGroupId
+				return "LocalCharacter"
 			else
 				return nil
 			end
