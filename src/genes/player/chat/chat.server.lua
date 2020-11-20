@@ -41,9 +41,9 @@ local function updateChatColor(player)
 	player.state.chat.color.Value = (megaphone and megaphone.state.color.color.Value or White)
 end
 
-local function renderChatColor(player, chatColor)
+local function renderChatColor(player)
 	local speaker = ChatService:GetSpeaker(player.Name)
-	speaker:SetExtraData("ChatColor", chatColor)
+	speaker:SetExtraData("ChatColor", player.state.chat.color.Value)
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -54,7 +54,17 @@ end
 playerUtil.hardInitPlayerGene(genes.player.chat)
 
 -- Update on changed
-genesUtil.observeStateValue(genes.player.chat, "color"):subscribe(renderChatColor)
+genesUtil.observeStateValue(genes.player.chat, "color")
+	:filter(function (player)
+		return ChatService:GetSpeaker(player.Name)
+	end)
+	:merge(rx.Observable.from(ChatService.SpeakerAdded)
+		:map(function (speakerName)
+			local player = Players:FindFirstChild(speakerName)
+			return player and genesUtil.hasFullState(player, genes.player.chat) and player
+		end)
+		:filter())
+	:subscribe(renderChatColor)
 
 -- Connect to megaphone holding
 genesUtil.crossObserveStateValue(genes.megaphone, genes.pickup, "holder", function (obs)
