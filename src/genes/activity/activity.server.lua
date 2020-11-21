@@ -133,6 +133,7 @@ local function createTrophy(activityInstance, team)
 	-- Tag and apply functionality
 	genesUtil.addGeneTag(trophy, genes.pickup)
 	genesUtil.addGeneTag(trophy, genes.multiswitch.teamOnly)
+	trophy.TeamRing.Color = team.config.color.Value
 
 	-- Play sound inside the trophy
 	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
