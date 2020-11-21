@@ -21,6 +21,7 @@ local axisUtil = require(axis.lib.axisUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local scheduleStreams = require(env.src.schedule.streams)
+local pickupUtil = require(genes.pickup.util)
 
 -- lib
 local activityUtil = {}
@@ -197,7 +198,8 @@ function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
 			humanoid.Sit = false
 			wait()
 		end
-		character:SetPrimaryPartCFrame(CFrame.new(point, lookAtPosition or point + cf.LookVector))
+		local cframe = CFrame.new(point, lookAtPosition or point + cf.LookVector)
+		pickupUtil.teleportCharacterWithHeldObjects(character, cframe)
 	end
 
 	tableau.from(players)

@@ -16,6 +16,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local activityUtil = require(genes.activity.util)
+local pickupUtil = require(genes.pickup.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Instances
@@ -30,7 +31,8 @@ local coreGui = env.PlayerGui:WaitForChild("Core")
 local function teleportPlayer(boardInstance)
 	local character = env.LocalPlayer.Character
 	if not character then return end
-	character:SetPrimaryPartCFrame(boardInstance:FindFirstChild("TeleportSpawn", true).CFrame)
+	local cframe = boardInstance:FindFirstChild("TeleportSpawn", true).CFrame
+	pickupUtil.teleportCharacterWithHeldObjects(character, cframe)
 end
 
 local function killInvite(invite)

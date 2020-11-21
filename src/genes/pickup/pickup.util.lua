@@ -86,10 +86,10 @@ function pickupUtil.equip(character, object)
 
 	-- Place in workspace if not already
 	-- 	This is for equipping stowed objects
-	-- if not isInWorkspace then
-	-- 	object.Parent = workspace
-	-- end
-	object.Parent = character
+	if not isInWorkspace then
+		object.Parent = workspace
+	end
+	-- object.Parent = character
 
 	-- Set holder value
 	object.state.pickup.holder.Value = character
@@ -156,7 +156,7 @@ function pickupUtil.stripObject(object)
 			end)
 			:foreach(dart.destroy)
 	end
-	object.Parent = workspace
+	-- object.Parent = workspace
 	pushDropDebounce(object)
 	clearOwner(object)
 	clearHolder(object)
@@ -192,9 +192,9 @@ function pickupUtil.releaseHeldObjects(character)
 	pickupUtil.getCharacterHeldObjects(character)
 		:foreach(function (instance)
 			clearHolder(instance)
-			if instance:IsDescendantOf(workspace) then
-				instance.Parent = workspace
-			end
+			-- if instance:IsDescendantOf(workspace) then
+			-- 	instance.Parent = workspace
+			-- end
 		end)
 end
 
@@ -295,6 +295,19 @@ function pickupUtil.getActivatedStream(gene)
 			end)
 			:filter(dart.boolAnd)
 	end
+end
+
+-- Teleport player with held objects
+function pickupUtil.teleportCharacterWithHeldObjects(character, cframe)
+	local delta = character:GetPrimaryPartCFrame():toObjectSpace(cframe)
+	for _, instance in pairs(pickupUtil.getCharacterHeldObjects(character):raw()) do
+		if instance:IsA("BasePart") then
+			instance.CFrame = instance.CFrame * delta
+		elseif instance:IsA("Model") then
+			instance:SetPrimaryPartCFrame(instance:GetPrimaryPartCFrame() * delta)
+		end
+	end
+	character:SetPrimaryPartCFrame(cframe)
 end
 
 -- return lib
