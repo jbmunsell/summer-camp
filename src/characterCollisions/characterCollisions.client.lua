@@ -41,26 +41,26 @@ rx.Observable.from(env.src.characterCollisions.net.CollisionGroupSet)
 	:subscribe(setPartGroup)
 
 -- Place local character held objects into collision group when they are picked up
-genesUtil.getInstanceStream(genes.pickup):flatMap(function (instance)
-	return rx.Observable.from(instance.state.pickup.holder)
-		:merge(rx.Observable.fromInstanceLeftGame(instance):map(dart.constant(nil)))
-		:replay(2)
-		:skip(1)
-		:map(function (oldHolder, newHolder)
-			if oldHolder == env.LocalPlayer.Character then
-				return "Default"
-			elseif newHolder == env.LocalPlayer.Character then
-				return "LocalCharacter"
-			else
-				return nil
-			end
-		end)
-		:filter()
-		:flatMap(function (groupId)
-			return rx.Observable.from(instance:GetDescendants())
-				:startWith(instance)
-				:filter(dart.isa("BasePart"))
-				:map(dart.drag(groupId))
-		end)
-end):subscribe(setPartGroup)
+-- genesUtil.getInstanceStream(genes.pickup):flatMap(function (instance)
+-- 	return rx.Observable.from(instance.state.pickup.holder)
+-- 		:merge(rx.Observable.fromInstanceLeftGame(instance):map(dart.constant(nil)))
+-- 		:replay(2)
+-- 		:skip(1)
+-- 		:map(function (oldHolder, newHolder)
+-- 			if oldHolder == env.LocalPlayer.Character then
+-- 				return "Default"
+-- 			elseif newHolder == env.LocalPlayer.Character then
+-- 				return "LocalCharacter"
+-- 			else
+-- 				return nil
+-- 			end
+-- 		end)
+-- 		:filter()
+-- 		:flatMap(function (groupId)
+-- 			return rx.Observable.from(instance:GetDescendants())
+-- 				:startWith(instance)
+-- 				:filter(dart.isa("BasePart"))
+-- 				:map(dart.drag(groupId))
+-- 		end)
+-- end):subscribe(setPartGroup)
 
