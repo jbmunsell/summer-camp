@@ -34,7 +34,7 @@ local ReturnLaterText = "Come back later."
 
 -- Basic setters
 local function setJoinButtonVisible(enrollmentInstance, visible)
-	enrollmentInstance:FindFirstChild("JoinButton", true).Visible = visible
+	enrollmentInstance:FindFirstChild("JoinButton", true).Parent.Visible = visible
 end
 local function setStatusText(enrollmentInstance, text)
 	enrollmentInstance:FindFirstChild("StatusDisplay", true).TextLabel.Text = text

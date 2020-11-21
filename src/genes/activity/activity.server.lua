@@ -32,14 +32,20 @@ local activityUtil = require(activity.util)
 -- Roster management
 local function addPlayerToRoster(activityInstance, player)
 	local teamIndex = activityUtil.getPlayerTeamIndex(activityInstance, player)
-	collection.addValue(activityInstance.state.activity.roster[teamIndex], player)
+	local state = activityInstance.state.activity
+	collection.addValue(state.roster[teamIndex], player)
+	collection.addValue(state.fullRoster[teamIndex], player)
 end
 local function removePlayerFromRosters(player)
-	genesUtil.getInstances(activity):foreach(function (activityInstance)
-		local roster = activityInstance.state.activity.roster
+	local function pluck(roster)
 		for _, folder in pairs(roster:GetChildren()) do
 			collection.removeValue(folder, player)
 		end
+	end
+	genesUtil.getInstances(activity):foreach(function (activityInstance)
+		local state = activityInstance.state.activity
+		pluck(state.fullRoster)
+		pluck(state.roster)
 	end)
 end
 

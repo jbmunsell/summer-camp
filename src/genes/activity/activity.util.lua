@@ -86,18 +86,23 @@ function activityUtil.getPlayerCompetingStream(player)
 end
 
 -- Get player added to roster stream
-function activityUtil.getPlayerTeamIndex(activityInstance, player)
-	local value = collection.getValue(activityInstance.state.activity.sessionTeams, player.Team)
-	return value and tonumber(value.Name)
-end
-function activityUtil.isPlayerInRoster(activityInstance, player)
-	local roster = activityInstance.state.activity.roster
+local function getPlayerRosterValue(roster, player)
 	for _, folder in pairs(roster:GetChildren()) do
 		if collection.getValue(folder, player) then
 			return true
 		end
 	end
 	return false
+end
+function activityUtil.getPlayerTeamIndex(activityInstance, player)
+	local value = collection.getValue(activityInstance.state.activity.sessionTeams, player.Team)
+	return value and tonumber(value.Name)
+end
+function activityUtil.isPlayerInRoster(activityInstance, player)
+	return getPlayerRosterValue(activityInstance.state.activity.roster, player)
+end
+function activityUtil.isPlayerInFullRoster(activityInstance, player)
+	return getPlayerRosterValue(activityInstance.state.activity.fullRoster, player)
 end
 function activityUtil.getPlayerAddedToRosterStream(gene)
 	return genesUtil.getInstanceStream(gene):flatMap(function (activityInstance)
@@ -162,6 +167,9 @@ function activityUtil.stopSession(activityInstance)
 	state.winningTeam.Value = nil
 	collection.clear(state.sessionTeams)
 	for _, folder in pairs(state.roster:GetChildren()) do
+		collection.clear(folder)
+	end
+	for _, folder in pairs(state.fullRoster:GetChildren()) do
 		collection.clear(folder)
 	end
 	for _, value in pairs(state.score:GetChildren()) do

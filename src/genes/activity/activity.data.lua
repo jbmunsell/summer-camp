@@ -14,6 +14,7 @@ return {
 			enrolledTeams = {},
 			sessionTeams = {},
 			roster = { {}, {}, {}, {} },
+			fullRoster = { {}, {}, {}, {} },
 			score = { 0, 0, 0, 0 },
 			isCollectingRoster = false,
 			winningTeam = tableau.null,
