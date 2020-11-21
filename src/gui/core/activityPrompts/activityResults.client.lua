@@ -38,7 +38,8 @@ local function showMatchResult(activityInstance)
 	local winningTeam = state.winningTeam.Value
 
 	-- Create window
-	local frame = coreGui.seeds.activityResult.ActivityResult:Clone()
+	local container = coreGui.seeds.activityResult.ActivityContainer:Clone()
+	local frame = container.ActivityResult
 	for i = 1, 2 do
 		local team = state.sessionTeams[i].Value
 		local didWin = (team == winningTeam)
@@ -55,9 +56,13 @@ local function showMatchResult(activityInstance)
 	end
 	frame.ScoreLabel.Text = string.format("%d - %d", state.score[1].Value, state.score[2].Value)
 	frame.WinningTeamLabel.Text = string.format("%s win!", winningTeam.Name)
+	frame.ActivityLabel.Text = activityInstance.config.activity.displayName.Value
 
 	-- Kill after 10 seconds
-	rx.Observable.timer(10):subscribe(dart.bind(killFrame, frame))
+	rx.Observable.timer(10)
+		:merge(glib.getExitStream(frame))
+		:first()
+		:subscribe(dart.bind(killFrame, frame))
 
 	-- Play animation
 	glib.playAnimation(coreGui.animations.activityPrompt.show, frame)
