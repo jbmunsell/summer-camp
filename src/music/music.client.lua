@@ -22,7 +22,8 @@ local VolumeTweenInfo = TweenInfo.new(5.0)
 
 -- Clone sounds into workspace
 env.res.audio.ambientTracks:Clone().Parent = workspace
-tableau.from(workspace.ambientTracks:GetChildren()):foreach(function (sound)
+local tracks = workspace.ambientTracks
+tableau.from(tracks:GetChildren()):foreach(function (sound)
 	sound:Play()
 	sound.Volume = 0
 end)
@@ -32,7 +33,7 @@ local function fade(sound, up)
 	TweenService:Create(sound, VolumeTweenInfo, { Volume = (up and sound.FullVolume.Value or 0) }):Play()
 end
 local function playTrack(track)
-	tableau.from(workspace.ambientTracks:GetChildren())
+	tableau.from(tracks:GetChildren())
 		:reject(dart.equals(track))
 		:foreach(dart.follow(fade, false))
 	fade(track, true)
@@ -51,16 +52,11 @@ end
 local dayStartStream = fromTimeStream(8)
 local dayEndStream = fromTimeStream(18)
 
-local matchStartStream, matchStopStream = activityUtil.getPlayerCompetingStream(env.LocalPlayer)
-	:partition()
+local isDayStream = dayStartStream:map(dart.constant(true))
+	:merge(dayEndStream:map(dart.constant(false)))
 
-local dayTrackStream = dayStartStream
-	:merge(matchStopStream)
-	:map(dart.constant(workspace.ambientTracks.DayTrack))
-local nightTrackStream = dayEndStream:map(dart.constant(workspace.ambientTracks.NightTrack))
-local competitiveTrackStream = matchStartStream:map(dart.constant(workspace.ambientTracks.CompetitiveTrack))
-
-dayTrackStream
-	:merge(nightTrackStream)
-	:merge(competitiveTrackStream)
-	:subscribe(playTrack)
+local isCompetingStream = activityUtil.getPlayerCompetingStream(env.LocalPlayer):startWith(false)
+isCompetingStream:combineLatest(isDayStream, function (isCompeting, isDay)
+	return (isCompeting and tracks.CompetitiveTrack
+		or (isDay and tracks.DayTrack or tracks.NightTrack))
+end):subscribe(playTrack)
