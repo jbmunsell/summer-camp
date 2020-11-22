@@ -27,6 +27,10 @@ local scheduleUtil = require(env.src.schedule.util)
 ---------------------------------------------------------------------------------------------------
 
 local toyShop = workspace:FindFirstChild("ToyShop", true)
+if not toyShop then
+	warn("Toy shop not found; quitting")
+	return
+end
 
 local objects = env.res.objects
 local RandomizeColor = {

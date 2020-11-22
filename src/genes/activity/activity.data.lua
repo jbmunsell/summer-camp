@@ -25,7 +25,7 @@ return {
 		activity = {
 			isCompetitive = false,
 			rosterCollectionTimer = 25,
-			trophy = env.res.activities.PlaceholderTrophy,
+			trophy = tableau.null,
 			teamCount = 1,
 			maxPlayersPerTeam = 100,
 			

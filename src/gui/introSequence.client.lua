@@ -7,6 +7,7 @@
 --
 
 -- env
+local StarterGui = game:GetService("StarterGui")
 local Lighting = game:GetService("Lighting")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -16,6 +17,14 @@ local genes = env.src.genes
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
+
+-- Quick lab check
+if StarterGui:FindFirstChild("config") then
+	if StarterGui.config.disableIntro.Value then
+		warn("Gui disabled; returning")
+		return
+	end
+end
 
 ---------------------------------------------------------------------------------------------------
 -- Instances

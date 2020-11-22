@@ -18,7 +18,11 @@ local genesUtil = require(genes.util)
 ---------------------------------------------------------------------------------------------------
 
 local leaderboard = workspace:FindFirstChild("TeamLeaderboard", true)
-local teamsList = leaderboard:FindFirstChild("TeamsList", true)
+local teamsList = leaderboard and leaderboard:FindFirstChild("TeamsList", true)
+if not leaderboard then
+	warn("Leaderboard not found; quitting")
+	return
+end
 
 ---------------------------------------------------------------------------------------------------
 -- Functions

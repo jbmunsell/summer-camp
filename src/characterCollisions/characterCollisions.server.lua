@@ -19,6 +19,18 @@ local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 
+-- Lab check
+do
+	local function check()
+		return PhysicsService:GetCollisionGroupId("PlayerCharacters")
+		and PhysicsService:GetCollisionGroupId("LocalCharacter")
+	end
+	if not pcall(check) then
+		warn("Character collision groups not found; quitting")
+		return
+	end
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
