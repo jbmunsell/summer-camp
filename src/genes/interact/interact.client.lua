@@ -66,7 +66,7 @@ local function updatePollingList()
 
 	-- Build new list
 	for _, package in pairs(holdPackages) do
-		if getDistance(package) <= pollingDistance then
+		if package.isInteractable:getValue() and getDistance(package) <= pollingDistance then
 			table.insert(pollingPackages, package)
 		end
 	end
