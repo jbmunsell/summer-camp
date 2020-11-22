@@ -28,7 +28,12 @@ local humanoidHolderUtil = require(humanoidHolder.util)
 ---------------------------------------------------------------------------------------------------
 
 -- Basic init class
-genesUtil.initGene(humanoidHolder)
+local holders = genesUtil.initGene(humanoidHolder)
+holders:subscribe(function (instance)
+	if not instance:FindFirstChild("WaistBackAttachment", true) then
+		error(string.format("humanoidHolder %s does not have WaistBackAttachment", instance:GetFullName()))
+	end
+end)
 
 -- When a humanoid holder owner changes, render it
 local ownerStream = genesUtil.observeStateValue(humanoidHolder, "owner")

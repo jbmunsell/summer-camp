@@ -11,8 +11,8 @@ local StartMessages = {
 local scheduleConfig = {
 	-- DaytimeScale = 0.2,
 	DaytimeScale = 0.01,
-	NightScaleFlat = 0.1,
-	NightScaleFull = 0.2, 	-- This number is conversion from GAME HOURS to REAL LIFE SECONDS. i.e. if the number is .01,
+	NightScaleFlat = 0.05,
+	NightScaleFull = 0.3, 	-- This number is conversion from GAME HOURS to REAL LIFE SECONDS. i.e. if the number is .01,
 	-- then each REAL LIFE SECOND will pass 0.01 game hours; 100 seconds to pass an entire hour
 	StartingGameTime = game:GetService("ReplicatedStorage").config.schedule.GameStartTime.Value,
 	TimeScaleTweenInfo = TweenInfo.new(2, Enum.EasingStyle.Cubic, Enum.EasingDirection.InOut),

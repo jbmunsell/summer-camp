@@ -60,14 +60,14 @@ local function showMatchResult(activityInstance)
 
 	-- Kill after 10 seconds
 	rx.Observable.timer(10)
-		:merge(glib.getExitStream(frame))
+		:merge(glib.getExitStream(container))
 		:first()
-		:subscribe(dart.bind(killFrame, frame))
+		:subscribe(dart.bind(killFrame, container))
 
 	-- Play animation
-	glib.playAnimation(coreGui.animations.activityPrompt.show, frame)
-	frame.Parent = coreGui.Container
-	frame.Visible = true
+	glib.playAnimation(coreGui.animations.activityPrompt.show, container)
+	container.Parent = coreGui.Container
+	container.Visible = true
 end
 
 local function notifyZeroJoin()

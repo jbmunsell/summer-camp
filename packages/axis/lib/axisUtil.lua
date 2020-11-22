@@ -292,12 +292,22 @@ local function assertAttachment(attachment, name, instance)
 		error(string.format("Unable to find attachment named '%s' in %s", name, instance:GetFullName()))
 	end
 end
-function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
-	local att_a = (type(aName == "string") and a:FindFirstChild(aName, true) or aName)
-	local att_b = (type(bName == "string") and b:FindFirstChild(bName, true) or bName)
-
+local function getAttachment(x, xName)
+	if typeof(xName) == "string" then
+		return x:FindFirstChild(xName, true)
+	else
+		return xName
+	end
+end
+local function getAttachments(a, aName, b, bName)
+	local att_a = getAttachment(a, aName)
+	local att_b = getAttachment(b, bName)
 	assertAttachment(att_a, aName, a)
 	assertAttachment(att_b, bName, b)
+	return att_a, att_b
+end
+function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
+	local att_a, att_b = getAttachments(a, aName, b, bName)
 
 	local info = axisUtil.computeAttachInfo(att_a, att_b)
 
@@ -315,11 +325,7 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 	return weld, tween, info
 end
 function axisUtil.snapAttachAttachments(a, aName, b, bName)
-	local att_a = (type(aName == "string") and a:FindFirstChild(aName, true) or aName)
-	local att_b = (type(bName == "string") and b:FindFirstChild(bName, true) or bName)
-
-	assertAttachment(att_a, aName, a)
-	assertAttachment(att_b, bName, b)
+	local att_a, att_b = getAttachments(a, aName, b, bName)
 
 	local info = axisUtil.computeAttachInfo(att_a, att_b)
 	local weld = Instance.new("Weld")

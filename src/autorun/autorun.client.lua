@@ -22,10 +22,10 @@ local axisUtil = require(axis.lib.axisUtil)
 
 local runningChanged = env.src.autorun.net.RunningChanged
 
-local RunningFOV = 80
+local RunningFOV = 75
 local WalkingFOV = 70
-local RunningSpeed = 32
-local WalkingSpeed = 20
+local RunningSpeed = 28
+local WalkingSpeed = 16
 local AutorunTimer = 3
 local SpeedTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 
