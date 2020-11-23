@@ -36,18 +36,6 @@ local function addPlayerToRoster(activityInstance, player)
 	collection.addValue(state.roster[teamIndex], player)
 	collection.addValue(state.fullRoster[teamIndex], player)
 end
-local function removePlayerFromRosters(player)
-	local function pluck(roster)
-		for _, folder in pairs(roster:GetChildren()) do
-			collection.removeValue(folder, player)
-		end
-	end
-	genesUtil.getInstances(activity):foreach(function (activityInstance)
-		local state = activityInstance.state.activity
-		pluck(state.fullRoster)
-		pluck(state.roster)
-	end)
-end
 
 -- Start collecting roster
 local function getRosterTimerLabel(activityInstance)
@@ -159,6 +147,24 @@ local function renderGates(activityInstance)
 	work("GateClosed", inSession)
 end
 
+-- Lock the pitch to only players in the roster
+local function lockPitch(activityInstance)
+	for _, player in pairs(Players:GetPlayers()) do
+		local root = axisUtil.getPlayerHumanoidRootPart(player)
+		if root then
+			local inRoster = activityUtil.isPlayerInRoster(activityInstance, player)
+			local inPitch = axisUtil.isPointInPartXZ(root.Position, activityInstance.functional.PitchBounds)
+			if inRoster ~= inPitch then
+				if inRoster then
+					activityUtil.spawnPlayer(activityInstance, player)
+				else
+					activityUtil.ejectPlayerFromActivity(activityInstance, player)
+				end
+			end
+		end
+	end
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
@@ -203,6 +209,15 @@ rosterCollectingStart
 	:map(dart.bind)
 	:subscribe(spawn)
 
+-- When a session starts, poll at 2hz to remove glitchers from inside and bring
+-- 	back glitchers from outside
+genesUtil.observeStateValue(activity, "inSession"):filter():subscribe(function (activityInstance)
+	if not activityInstance.config.activity.lockPitch then return end
+	rx.Observable.interval(0.5)
+		:takeUntil(rx.Observable.from(activityInstance.state.activity.inSession):reject())
+		:subscribe(dart.bind(lockPitch, activityInstance))
+end)
+
 -- Start play when ALL teams are full OR the roster collection period is over
 rosterCollectingStart
 	:delay(function (activityInstance)
@@ -230,12 +245,12 @@ local leaveRequested = rx.Observable.from(activity.net.LeaveActivityRequested)
 axisUtil.getPlayerCharacterStream():flatMap(function (_, character)
 	return rx.Observable.fromInstanceEvent(character:WaitForChild("Humanoid"), "Died")
 end):merge(rx.Observable.from(Players.PlayerRemoving))
-	:subscribe(removePlayerFromRosters)
+	:subscribe(activityUtil.removePlayerFromRosters)
 leaveRequested:subscribe(function (player)
 	local activityInstance = activityUtil.getPlayerActivity(player)
 	if activityInstance then
 		activityUtil.ejectPlayerFromActivity(activityInstance, player)
-		removePlayerFromRosters(player)
+		activityUtil.removePlayerFromRosters(player)
 	else
 		warn("Player attempted to leave an activity but is not on any rosters")
 	end

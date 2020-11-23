@@ -68,6 +68,20 @@ function activityUtil.isPlayerCompeting(player)
 	return activityUtil.getPlayerActivity(player) and true or nil
 end
 
+-- Remove player from roster
+function activityUtil.removePlayerFromRosters(player)
+	local function pluck(roster)
+		for _, folder in pairs(roster:GetChildren()) do
+			collection.removeValue(folder, player)
+		end
+	end
+	genesUtil.getInstances(activity):foreach(function (activityInstance)
+		local state = activityInstance.state.activity
+		pluck(state.fullRoster)
+		pluck(state.roster)
+	end)
+end
+
 -- Get player competing stream
 function activityUtil.getPlayerCompetingStream(player)
 	return genesUtil.getInstanceStream(activity):flatMap(function (activityInstance)
@@ -206,6 +220,13 @@ function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
 		:map(dart.index("Character"))
 		:filter()
 		:foreach(place)
+end
+function activityUtil.spawnPlayer(activityInstance, player)
+	local teamIndex = activityUtil.getTeamIndex(activityInstance, player.Team)
+	if teamIndex then
+		local plane = activityInstance.functional["Team" .. teamIndex .. "SpawnPlane"]
+		activityUtil.spawnPlayersInPlane({ player }, plane)
+	end
 end
 
 -- Eject players from instance

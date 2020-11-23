@@ -18,6 +18,7 @@ return {
 	config = {
 		activity = {
 			isCompetitive = true,
+			lockPitch = true,
 			trophy = env.res.activities.SoccerTrophy,
 			displayName = "Soccer",
 			analyticsName = "soccer",

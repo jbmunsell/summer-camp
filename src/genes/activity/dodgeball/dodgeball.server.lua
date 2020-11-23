@@ -54,14 +54,8 @@ end
 
 -- Roster manipulation
 local function dropPlayer(dodgeballInstance, player)
-	-- Push ragdoll and remove from roster
-	local state = dodgeballInstance.state.activity
-	local value
-	for i = 1, 2 do
-		value = collection.getValue(state.roster[i], player)
-		if value then break end
-	end
-	if not value then return end
+	-- Push ragdoll and strip balls
+	if not activityUtil.isPlayerInRoster(dodgeballInstance, player) then return end
 
 	if player.Character then
 		print("Attempting to strip balls")
@@ -76,7 +70,6 @@ local function dropPlayer(dodgeballInstance, player)
 		soundUtil.playSound(env.res.audio.sounds.Whistle, player.Character.PrimaryPart)
 		collection.addValue(dodgeballInstance.state.dodgeball.ragdolls, player.Character)
 	end
-	value:Destroy()
 	ragdoll.net.Push:FireClient(player)
 end
 local function spawnPlayer(dodgeballInstance, player)
@@ -252,6 +245,7 @@ playerHitByBall
 		if character and character:IsDescendantOf(workspace) and player then
 			releasePlayerRagdoll(dodgeballInstance, player)
 			activityUtil.ejectPlayerFromActivity(dodgeballInstance, player)
+			activityUtil.removePlayerFromRosters(player)
 		end
 	end)
 

@@ -16,6 +16,7 @@ return {
 	config = {
 		activity = {
 			isCompetitive = true,
+			lockPitch = true,
 			trophy = env.res.activities.DodgeballTrophy,
 			displayName = "Dodgeball",
 			analyticsName = "dodgeball",
