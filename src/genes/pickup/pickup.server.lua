@@ -154,9 +154,14 @@ end)
 -- 	Composed of client unequip request from backpack, server unequips,
 -- 	and a different item is equipped. Unequip will stow in inventory if
 -- 	stowable, OR drop back into workspace if not stowable.
+local playerCharacterDiedStream = axisUtil.getPlayerCharacterStream()
+	:flatMap(function (player, character)
+		return rx.Observable.fromInstanceEvent(character:WaitForChild("Humanoid"), "Died")
+			:map(dart.constant(player))
+	end)
 local unequipStream = unequipRequestStream
 	-- :merge(serverUnequipPlayerStream, playerEquipStream)
-	:merge(serverUnequipPlayerStream)
+	:merge(serverUnequipPlayerStream, playerCharacterDiedStream)
 	:map(dart.index("Character"))
 	:filter()
 unequipStream:subscribe(pickupUtil.unequipCharacter)
@@ -164,10 +169,10 @@ unequipStream:subscribe(pickupUtil.unequipCharacter)
 -- Drop stream
 -- 	Composed of humanoid died events. Drops an item back
 -- 	into the world instead of stowing in inventory.
-local characterDiedStream = axisUtil.getHumanoidDiedStream()
-	:map(dart.index("Parent"))
-	:filter()
-characterDiedStream:subscribe(pickupUtil.releaseHeldObjects)
+-- local characterDiedStream = axisUtil.getHumanoidDiedStream()
+-- 	:map(dart.index("Parent"))
+-- 	:filter()
+-- characterDiedStream:subscribe(pickupUtil.releaseHeldObjects)
 
 -- Disown and drop items on request
 local dropStream = rx.Observable.from(pickup.net.DropRequested)
