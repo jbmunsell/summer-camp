@@ -36,11 +36,6 @@ local function setBackpackTeam(instance, team, isLeader)
 	instance.DecalPart.Decal.Texture = image
 end
 
--- Set backpack scale
-local function setBackpackScale(instance, scale)
-	instance.ScaleEffect.Value = scale
-end
-
 -- Set backpack enabled
 local function setBackpackEnabled(instance, enabled, character)
 	axisUtil.destroyChild(instance, "AttachWeld")
@@ -56,6 +51,7 @@ end
 -- Create backpack
 local function createBackpack(player)
 	-- Create backpack instance
+	genesUtil.waitForGene(player, genes.player.job)
 	local backpack = env.res.character.PlayerBackpack:Clone()
 	fx.new("ScaleEffect", backpack)
 	player.state.characterBackpack.instance.Value = backpack
@@ -72,22 +68,11 @@ local function createBackpack(player)
 	enabledStream:subscribe(dart.bind(setBackpackEnabled, backpack))
 
 	-- Set color according to team
-	local isLeader = rx.Observable.from(player.state.leader.isLeader)
+	local isLeader = rx.Observable.from(player.state.job.job):map(dart.equals(env.res.jobs.teamLeader))
 	rx.Observable.fromProperty(player, "Team", true)
 		:combineLatest(isLeader, dart.identity)
+		:filter(function (team) return genesUtil.hasGeneTag(team, genes.team) end)
 		:subscribe(dart.bind(setBackpackTeam, backpack))
-
-	-- Set size according to leader
-	isLeader
-		:map(function (v)
-			local pre = (v and "leader" or "camper")
-			return env.config.roles[pre .. "BackpackScale"].Value
-		end)
-		:withLatestFrom(enabledStream)
-		:subscribe(function (scale, enabled)
-			setBackpackScale(backpack, scale)
-			setBackpackEnabled(backpack, enabled, player.Character)
-		end)
 end
 
 -- Destroy player backpack

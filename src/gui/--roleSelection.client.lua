@@ -30,8 +30,6 @@ local roleSelection = env.PlayerGui:WaitForChild("RoleSelection")
 local blur = Lighting.Blur
 local blurTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
 
-local previewAnimation = env.res.pickup.ToolHoldAnimation
-
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------

@@ -80,20 +80,14 @@ genesUtil.waitForGene(depth, genes.propertySwitcher)
 depth.state.propertySwitcher.propertySet.Value = "intro"
 camera.CameraType = Enum.CameraType.Scriptable
 rx.Observable.heartbeat()
-	:takeUntil(roleSelected)
+	:takeUntil(playClicked)
 	:subscribe(function (dt)
 		pivot = pivot * CFrame.Angles(0, dt * rotationSpeed, 0)
 		camera.CFrame = pivot:toWorldSpace(cameraOffset)
 	end)
 
--- Show role selection and hide splash screen on clicked
-playClicked:subscribe(function ()
-	roleSelection.Enabled = true
-	splashScreen.Enabled = false
-end)
-
 -- When role selection hides, hide depth and show team selection
-roleSelected:subscribe(function ()
+playClicked:subscribe(function ()
 	-- camera.CameraType = Enum.CameraType.Custom
 	depth.state.propertySwitcher.propertySet.Value = "gameplay"
 	teamSelect.Enabled = true
