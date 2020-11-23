@@ -49,7 +49,7 @@ local function fromTimeStream(t)
 		:distinctUntilChanged()
 		:filter()
 end
-local dayStartStream = fromTimeStream(8)
+local dayStartStream = fromTimeStream(6)
 local dayEndStream = fromTimeStream(18)
 
 local isDayStream = dayStartStream:map(dart.constant(true))

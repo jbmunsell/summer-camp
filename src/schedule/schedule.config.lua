@@ -6,6 +6,8 @@ local StartMessages = {
 
 	FreeTime = "head to the campfire for roasting marshmallows.",
 	Activity = "go play some games!",
+
+	RiseAndShine = "Morning! Time to get the day started."
 }
 
 local scheduleConfig = {
@@ -20,17 +22,23 @@ local scheduleConfig = {
 	agenda = {
 		{
 			Name = "LightsOut",
-			Duration = 8.0,
+			Duration = 6.0,
 			StartingTime = 0,
 			DisplayName = "Lights Out",
 			StartMessage = StartMessages.LightsOut
 		},
-		-- {
-		-- 	Name = "MorningRun",
-		-- 	Duration = 0.25,
-		-- 	DisplayName = "Morning Run",
-		-- 	StartMessage = StartMessages.MorningRun
-		-- },
+		{
+			Name = "RiseAndShine",
+			Duration = 0.25,
+			DisplayName = "Rise and Shine!",
+			StartMessage = StartMessages.RiseAndShine,
+		},
+		{
+			Name = "Morning",
+			Duration = 1.75,
+			DisplayName = "Morning",
+			-- StartMessage = StartMessages.RiseAndShine,
+		},
 		{
 			Name = "Breakfast",
 			Duration = 1.0,
