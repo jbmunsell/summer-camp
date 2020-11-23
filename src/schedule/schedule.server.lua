@@ -84,7 +84,6 @@ end
 -- 	Using instant setting is very jarring in the transition from night to day
 -- 	and day to night.
 local function tweenTimeScale(target)
-	print("Tweening to " .. target)
 	TweenService:Create(schedule.interface.GameTimeScale, scheduleConfig.TimeScaleTweenInfo, { Value = target }):Play()
 end
 
@@ -118,7 +117,6 @@ local nightStart, nightStop = scheduleStreams.scheduleChunk
 	:partition(isNight)
 
 nightStart = nightStart
-	:tap(dart.printConstant("night start"))
 	:map(getNightTimeScaleModifier)
 nightStop = nightStop
 	:distinctUntilChanged()
