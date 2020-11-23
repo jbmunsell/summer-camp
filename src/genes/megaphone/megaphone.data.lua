@@ -4,7 +4,7 @@ local genes = env.src.genes
 return {
 	instanceTag = "gene_megaphone",
 	name = "megaphone",
-	genes = { genes.pickup, genes.color },
+	genes = { genes.pickup },
 	state = {
 	},
 

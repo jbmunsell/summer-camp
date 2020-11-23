@@ -16,6 +16,8 @@ local genes = env.src.genes
 
 -- modules
 local rx = require(axis.lib.rx)
+local dart = require(axis.lib.dart)
+local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local playerUtil = require(genes.player.util)
 local pickupUtil = require(genes.pickup.util)
@@ -30,15 +32,9 @@ local White = Color3.new(1, 1, 1)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
-local function updateChatColor(player)
-	-- Get character
-	local character = player.Character
-	if not character then return end
-
-	-- Get held megaphone
-	local megaphone = pickupUtil.characterHoldsObject(player.Character, genes.megaphone)
+local function setPlayerChatColor(player, color)
 	genesUtil.waitForGene(player, genes.player.chat)
-	player.state.chat.color.Value = (megaphone and megaphone.state.color.color.Value or White)
+	player.state.chat.color.Value = color
 end
 
 local function renderChatColor(player)
@@ -67,10 +63,11 @@ genesUtil.observeStateValue(genes.player.chat, "color")
 	:subscribe(renderChatColor)
 
 -- Connect to megaphone holding
-genesUtil.crossObserveStateValue(genes.megaphone, genes.pickup, "holder", function (obs)
-	return obs:replay(2)
-end):flatMap(function (_, old, new)
-	old = Players:GetPlayerFromCharacter(old)
-	new = Players:GetPlayerFromCharacter(new)
-	return rx.Observable.from({ old, new })
-end):filter():delay(0):subscribe(updateChatColor)
+axisUtil.getPlayerCharacterStream():flatMap(function (player, character)
+	return pickupUtil.getCharacterHeldObjectsStream(character):switchMap(function ()
+		local megaphone = pickupUtil.characterHoldsObject(character, genes.megaphone)
+		return megaphone
+		and rx.Observable.from(megaphone.state.color.color)
+		or rx.Observable.just(White)
+	end):map(dart.carry(player))
+end):subscribe(setPlayerChatColor)

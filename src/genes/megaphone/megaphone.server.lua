@@ -19,8 +19,3 @@ local genesUtil = require(genes.util)
 
 -- init
 genesUtil.initGene(genes.megaphone)
-
--- Render color
-genesUtil.crossObserveStateValue(genes.megaphone, genes.color, "color"):subscribe(function (instance, color)
-	instance.MegaphoneColor.Color = color
-end)
