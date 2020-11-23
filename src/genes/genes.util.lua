@@ -31,6 +31,12 @@ end
 function genesUtil.hasGeneTag(instance, gene)
 	return CollectionService:HasTag(instance, require(gene.data).instanceTag)
 end
+function genesUtil.removeGeneTag(instance, gene)
+	local tag = require(gene.data).instanceTag
+	if CollectionService:HasTag(instance, tag) then
+		CollectionService:RemoveTag(instance, tag)
+	end
+end
 function genesUtil.addGeneTag(instance, gene)
 	local tag = require(gene.data).instanceTag
 	if not CollectionService:HasTag(instance, tag) then
