@@ -8,6 +8,7 @@
 
 -- env
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
@@ -126,7 +127,10 @@ end
 function pickupUtil.trackCharacterHeldObjects(character)
 	_characterHeldObjects[character] = rx.BehaviorSubject.new({})
 	rx.Observable.fromInstanceLeftGame(character):subscribe(function ()
-		_characterHeldObjects[character] = nil
+		if _characterHeldObjects[character] then
+			_characterHeldObjects[character]:destroy()
+			_characterHeldObjects[character] = nil
+		end
 	end)
 end
 function pickupUtil.getCharacterHeldObjectsStream(character)
@@ -201,12 +205,16 @@ end
 -- Update hold animation
 function pickupUtil.updateHoldAnimation(character)
 	local humanoid = character:FindFirstChild("Humanoid")
-	local numHeld = pickupUtil.getCharacterHeldObjects(character):size()
-	if numHeld > 0 then
-		humanoid:LoadAnimation(env.res.pickup.ToolHoldAnimation):Play()
+	local held = pickupUtil.getCharacterHeldObjects(character):first()
+	if held then
+		local animation = held.config.pickup.holdAnimation.Value
+		if not CollectionService:HasTag(animation, "holdAnimation") then
+			CollectionService:AddTag(animation, "holdAnimation")
+		end
+		humanoid:LoadAnimation(animation):Play()
 	else
 		for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
-			if track.Animation == env.res.pickup.ToolHoldAnimation then
+			if CollectionService:HasTag(track.Animation, "holdAnimation") then
 				track:Stop()
 			end
 		end

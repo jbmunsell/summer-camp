@@ -65,14 +65,14 @@ local pickupInstanceStream = genesUtil.initGene(pickup)
 
 -- Track all character held objects
 pickupUtil.initHeldObjectTracking()
-axisUtil.getPlayerCharacterStream()
-	:map(dart.select(2))
-	:subscribe(function (character)
-		pickupUtil.trackCharacterHeldObjects(character)
-		pickupUtil.getCharacterHeldObjectsStream(character)
-			:map(dart.constant(character))
-			:subscribe(pickupUtil.updateHoldAnimation)
-	end)
+axisUtil.getPlayerCharacterStream():map(dart.select(2)):subscribe(function (character)
+	pickupUtil.trackCharacterHeldObjects(character)
+	pickupUtil.getCharacterHeldObjectsStream(character)
+		:merge(rx.Observable.fromInstanceEvent(character:WaitForChild("Humanoid"), "StateChanged")
+			:filter(dart.equals(Enum.HumanoidStateType.Physics)))
+		:map(dart.constant(character))
+		:subscribe(pickupUtil.updateHoldAnimation)
+end)
 
 -- We should only be able to interact with an object if it has no holder and is enabled
 pickupInstanceStream

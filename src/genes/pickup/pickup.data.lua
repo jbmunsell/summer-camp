@@ -22,6 +22,7 @@ return {
 
 	config = {
 		pickup = {
+			holdAnimation = env.res.pickup.DefaultHoldAnimation,
 			dropDebounce = 1.0,
 			stowable = false,
 			touchPickupEnabled = false,
