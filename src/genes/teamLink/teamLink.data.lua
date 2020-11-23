@@ -15,6 +15,7 @@ return {
 	config = {
 		teamLink = {
 			team = tableau.null,
+			linkFromOwnerTeam = false,
 			linkColor = false,
 			linkImage = false,
 			linkInteract = false,
