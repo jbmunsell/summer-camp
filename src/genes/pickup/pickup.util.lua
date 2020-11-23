@@ -233,6 +233,18 @@ function pickupUtil.disownHeldObjects(character)
 		:foreach(clearOwner)
 end
 
+-- Try drop held objects
+function pickupUtil.tryDropHeldObjects(character)
+	pickupUtil.getCharacterHeldObjects(character):foreach(function (object)
+		if object.config.pickup.canDrop.Value then
+			clearOwner(object)
+		else
+			stowObject(object)
+		end
+	end)
+	pickupUtil.releaseHeldObjects(character)
+end
+
 -- Destroy player owned objects
 -- 	This is called when a player leaves the game
 function pickupUtil.destroyPlayerOwnedObjects(player)

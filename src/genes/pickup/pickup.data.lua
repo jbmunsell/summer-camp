@@ -27,7 +27,7 @@ return {
 			stowable = false,
 			touchPickupEnabled = false,
 			interactPickupEnabled = true,
-			-- canDrop = true, -- Not currently functional because everything can be dropped
+			canDrop = true,
 			buttonImage = "",
 			buttonColor = Color3.new(1, 1, 1)
 		},

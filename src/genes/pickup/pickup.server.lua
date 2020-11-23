@@ -9,8 +9,6 @@
 
 -- env
 local Players = game:GetService("Players")
-local AnalyticsService = game:GetService("AnalyticsService")
-local CollectionService = game:GetService("CollectionService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -29,29 +27,6 @@ local multiswitchUtil = require(multiswitch.util)
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
-
--- Fire drop event
-local function fireDropEvent(character)
-	local instance = pickupUtil.getCharacterHeldObjects(character):first()
-	local player = Players:GetPlayerFromCharacter(character)
-	if not player or not instance then return end
-	AnalyticsService:FireEvent("objectDropped", {
-		instanceName = instance.Name,
-		instanceTags = CollectionService:GetTags(instance),
-		playerId = player.UserId,
-	})
-end
-
--- Fire activated event
-local function fireActivatedEvent(character, instance)
-	local player = Players:GetPlayerFromCharacter(character)
-	if not player then return end
-	AnalyticsService:FireEvent("objectActivated", {
-		instanceName = instance.Name,
-		instanceTags = CollectionService:GetTags(instance),
-		playerId = player.UserId,
-	})
-end
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
@@ -168,23 +143,11 @@ local unequipStream = unequipRequestStream
 	:filter()
 unequipStream:subscribe(pickupUtil.unequipCharacter)
 
--- Drop stream
--- 	Composed of humanoid died events. Drops an item back
--- 	into the world instead of stowing in inventory.
--- local characterDiedStream = axisUtil.getHumanoidDiedStream()
--- 	:map(dart.index("Parent"))
--- 	:filter()
--- characterDiedStream:subscribe(pickupUtil.releaseHeldObjects)
-
 -- Disown and drop items on request
 local dropStream = rx.Observable.from(pickup.net.DropRequested)
 	:map(dart.index("Character"))
 	:filter()
-dropStream:subscribe(function (character)
-	fireDropEvent(character)
-	pickupUtil.disownHeldObjects(character)
-	pickupUtil.releaseHeldObjects(character)
-end)
+dropStream:subscribe(pickupUtil.tryDropHeldObjects)
 
 -- Set an object's network owner according to who OWNS it
 genesUtil.observeStateValue(pickup, "owner"):subscribe(function (instance, owner)
