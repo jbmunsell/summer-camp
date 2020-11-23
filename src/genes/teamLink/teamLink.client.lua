@@ -1,46 +1,42 @@
 --
 --	Jackson Munsell
---	11 Nov 2020
---	teamOnly.client.lua
+--	22 Nov 2020
+--	teamLink.client.lua
 --
---	teamOnly gene client driver
+--	teamLink gene client driver
 --
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local multiswitch = genes.multiswitch
-local teamOnly = multiswitch.teamOnly
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
-local multiswitchUtil = require(multiswitch.util)
+local multiswitchUtil = require(genes.multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
--- Update switch
 local function updateSwitch(instance)
-	local targetTeam = instance.config.teamOnly.team.Value
-	local enabled = (not targetTeam or (targetTeam == env.LocalPlayer.Team))
-	multiswitchUtil.setSwitchEnabled(instance, "interact", "teamOnly", enabled)
+	local targetTeam = instance.state.teamLink.team.Value
+	local enabled = (not targetTeam or targetTeam == env.LocalPlayer.Team)
+	multiswitchUtil.setSwitchEnabled(instance, "interact", "teamLink", enabled)
 end
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
--- Apply interact lock for teams when the unlocked team changes
--- OR the localplayer team changes
-local instances = genesUtil.initGene(teamOnly)
-instances
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.config.teamOnly.team)
+-- init gene
+genesUtil.initGene(genes.teamLink):subscribe(function (instance)
+	if instance.config.teamLink.linkInteract.Value then
+		multiswitchUtil.createSwitch(instance, "interact", "teamLink")
+		rx.Observable.from(instance.state.teamLink.team)
 			:merge(rx.Observable.fromProperty(env.LocalPlayer, "Team"))
-			:map(dart.constant(instance))
-	end)
-	:subscribe(updateSwitch)
+			:subscribe(dart.bind(updateSwitch, instance))
+	end
+end)

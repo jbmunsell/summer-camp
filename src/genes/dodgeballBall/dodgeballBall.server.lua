@@ -56,12 +56,6 @@ end
 -- Stream representing all dodgeballs
 local dodgeballStream = genesUtil.initGene(dodgeballBall)
 
--- Render color
-genesUtil.crossObserveStateValue(dodgeballBall, genes.color, "color")
-	:subscribe(function (instance, color)
-		instance.Color = color
-	end)
-
 -- Throw dodgeballBall on request
 pickupUtil.getPlayerObjectActionRequestStream(dodgeballBall.net.ThrowRequested, dodgeballBall)
 	:subscribe(throwBall)

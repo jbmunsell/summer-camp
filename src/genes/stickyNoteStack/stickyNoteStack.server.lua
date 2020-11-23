@@ -86,10 +86,6 @@ local stacks = genesUtil.initGene(stickyNoteStack)
 -- Set stack count on init
 stacks:subscribe(setStackCount)
 
--- Set color
-genesUtil.crossObserveStateValue(stickyNoteStack, genes.color, "color")
-	:subscribe(stickyNoteStackUtil.renderColor)
-
 -- Destroy stacks that are used up
 genesUtil.observeStateValue(stickyNoteStack, "count")
 	:map(dart.select(1))

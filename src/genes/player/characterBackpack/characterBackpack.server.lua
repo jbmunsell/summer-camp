@@ -56,7 +56,7 @@ end
 -- Create backpack
 local function createBackpack(player)
 	-- Create backpack instance
-	local backpack = env.res.roles.PlayerBackpack:Clone()
+	local backpack = env.res.character.PlayerBackpack:Clone()
 	fx.new("ScaleEffect", backpack)
 	player.state.characterBackpack.instance.Value = backpack
 

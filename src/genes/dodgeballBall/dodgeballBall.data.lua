@@ -6,7 +6,7 @@ local tableau = require(env.packages.axis.lib.tableau)
 return {
 	instanceTag = "gene_dodgeballBall",
 	name = "dodgeballBall",
-	genes = { env.src.genes.pickup, env.src.genes.color },
+	genes = { env.src.genes.pickup },
 	state = {
 		dodgeballBall = {
 			hot = false,

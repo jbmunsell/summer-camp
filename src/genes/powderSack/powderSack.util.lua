@@ -31,14 +31,6 @@ function powderSackUtil.setPoofed(instance, poofed)
 	instance.state.powderSack.poofed.Value = poofed
 end
 
--- Render color
-function powderSackUtil.renderColor(instance)
-	local color = instance.state.color.color.Value
-	instance.Sack.Color = color
-	instance.Sack.PoofEmitter.Color = ColorSequence.new(color)
-	instance.config.pickup.buttonColor.Value = color
-end
-
 -- Poof sack in fire
 function powderSackUtil.poofSackInFire(sackInstance, fireplaceInstance)
 	-- Set poofed, hide, and set fire color

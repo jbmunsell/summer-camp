@@ -126,21 +126,10 @@ local function createTrophy(activityInstance, team)
 	local trophy = activityInstance.config.activity.trophy.Value:Clone()
 	trophy:SetPrimaryPartCFrame(activityInstance.functional.TrophySpawn.CFrame)
 	trophy.Parent = workspace
-
-	-- Set decal part texture id
-	trophy.DecalPart.Decal.Texture = team.config.team.image.Value
-
-	-- Tag and apply functionality
-	genesUtil.addGeneTag(trophy, genes.pickup)
-	genesUtil.addGeneTag(trophy, genes.multiswitch.teamOnly)
-	trophy.TeamRing.Color = team.config.team.color.Value
+	trophy.state.teamLink.team.Value = team
 
 	-- Play sound inside the trophy
 	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
-
-	-- Wait for full state
-	genesUtil.waitForGene(trophy, genes.multiswitch.teamOnly)
-	trophy.config.teamOnly.team.Value = team
 end
 
 -- Render gates

@@ -5,7 +5,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 return {
 	name = "powderSack",
 	instanceTag = "gene_powderSack",
-	genes = { env.src.genes.throw, env.src.genes.color },
+	genes = { env.src.genes.throw },
 	state = {
 		powderSack = {
 			poofed = false,

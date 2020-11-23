@@ -24,10 +24,6 @@ local powderSackUtil = require(genes.powderSack.util)
 -- init
 genesUtil.initGene(genes.powderSack)
 
--- Render color on init
-genesUtil.crossObserveStateValue(genes.powderSack, genes.color, "color")
-	:subscribe(powderSackUtil.renderColor)
-
 -- Check positions on heartbeat
 local instances = genesUtil.getInstances(genes.powderSack):raw()
 rx.Observable.interval(0.2):subscribe(function ()

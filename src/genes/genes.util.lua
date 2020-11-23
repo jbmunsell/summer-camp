@@ -248,6 +248,14 @@ function genesUtil.addInterface(instance, gene)
 	end
 end
 
+-- Read config into state
+function genesUtil.readConfigIntoState(instance, geneName, valueName)
+	local v = instance.config[geneName][valueName].Value
+	if v then
+		instance.state[geneName][valueName].Value = v
+	end
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Factory functions
 ---------------------------------------------------------------------------------------------------

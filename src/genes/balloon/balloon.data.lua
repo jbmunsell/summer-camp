@@ -5,7 +5,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 return {
 	instanceTag = "gene_balloon",
 	name = "balloon",
-	genes = { env.src.genes.pickup, env.src.genes.color },
+	genes = { env.src.genes.pickup },
 	state = {
 		balloon = {
 

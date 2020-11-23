@@ -80,11 +80,6 @@ end
 -- Balloon object stream
 genesUtil.initGene(genes.balloon)
 
--- Render color
-genesUtil.crossObserveStateValue(genes.balloon, genes.color, "color"):subscribe(function (instance, color)
-	instance.Balloon.Color = color
-end)
-
 -- Place on request
 pickupUtil.getPlayerObjectActionRequestStream(genes.balloon.net.PlacementRequested, genes.balloon)
 	:filter(function (_, _, attachInstance)

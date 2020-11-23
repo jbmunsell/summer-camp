@@ -1,9 +1,9 @@
 --
 --	Jackson Munsell
---	12 Nov 2020
---	color.server.lua
+--	22 Nov 2020
+--	image.server.lua
 --
---	color gene server driver
+--	image gene server driver
 --
 
 -- env
@@ -12,11 +12,11 @@ local genes = env.src.genes
 
 -- modules
 local genesUtil = require(genes.util)
-local colorUtil = require(genes.color.util)
+local imageUtil = require(genes.image.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
 -- init gene
-genesUtil.initGene(genes.color):subscribe(colorUtil.initInstance)
+genesUtil.initGene(genes.image):subscribe(imageUtil.initInstance)
