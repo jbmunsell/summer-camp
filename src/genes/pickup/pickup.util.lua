@@ -70,6 +70,12 @@ function pickupUtil.setEquipOverride(object, equip)
 	object.state.pickup.equipOverride.OnInvoke = equip
 end
 
+-- Stow object for player
+function pickupUtil.stowObjectForPlayer(player, object)
+	object.state.pickup.owner.Value = player
+	stowObject(object)
+end
+
 -- Equip
 -- 	Attaches an object to a character, smoothly if it's already in workspace
 function pickupUtil.equip(character, object)

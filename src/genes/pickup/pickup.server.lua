@@ -139,6 +139,8 @@ local characterEquipStream = playerEquipStream
 		and character and not instance.state.pickup.holder.Value
 		and instance.state.pickup.enabled.Value
 		and not instance.state.pickup.dropDebounce.Value
+		and character:FindFirstChild("Humanoid")
+		and character.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead
 	end)
 characterEquipStream:subscribe(function (character, instance)
 	if instance.state.pickup:FindFirstChild("equipOverride") then
