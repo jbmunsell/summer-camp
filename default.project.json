@@ -19,6 +19,10 @@
 
         "boot": {
           "$path": "boot/boot.client.lua"
+        },
+
+        "PlayerModule": {
+          "$path": "PlayerModule.rbxmx"
         }
       }
     },
