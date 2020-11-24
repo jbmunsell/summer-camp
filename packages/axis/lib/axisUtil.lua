@@ -80,6 +80,13 @@ end
 function axisUtil.getPlayerHumanoidRootPart(player)
 	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
+function axisUtil.getPlayerFromCharacterDescendant(d)
+	for _, player in pairs(Players:GetPlayers()) do
+		if player.Character and d:IsDescendantOf(player.Character) then
+			return player
+		end
+	end
+end
 
 -- Square distance
 function axisUtil.squareMagnitude(vector)
@@ -87,20 +94,23 @@ function axisUtil.squareMagnitude(vector)
 end
 
 -- Get position
-function axisUtil.getPosition(instance)
+function axisUtil.getCFrame(instance)
 	if instance:IsA("Model") then
 		local primary = instance.PrimaryPart
 		if not primary then
 			error("Attempt to call getPosition on a model with no PrimaryPart: " .. instance:GetFullName())
 		end
-		return primary.Position
+		return primary.CFrame
 	elseif instance:IsA("BasePart") then
-		return instance.Position
+		return instance.CFrame
 	elseif instance:IsA("Attachment") then
-		return instance.WorldPosition
+		return instance.WorldCFrame
 	else
-		error("Unable to get position for value of type " .. typeof(instance))
+		error("Unable to get CFrame for value of type " .. typeof(instance))
 	end
+end
+function axisUtil.getPosition(instance)
+	return axisUtil.getCFrame(instance).p
 end
 
 -- Set CFrame

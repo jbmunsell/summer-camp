@@ -12,7 +12,9 @@ local dart = {}
 
 -- quick wrappers
 function dart.destroy(c)
-	c:Destroy()
+	if c then
+		c:Destroy()
+	end
 end
 function dart.getDescendants(c)
 	return c:GetDescendants()

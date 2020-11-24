@@ -8,6 +8,7 @@
 
 -- env
 local AnalyticsService = game:GetService("AnalyticsService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -23,6 +24,7 @@ local axisUtil = require(axis.lib.axisUtil)
 local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
+local pickupUtil = require(genes.pickup.util)
 local activityUtil = require(activity.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -35,6 +37,25 @@ local function addPlayerToRoster(activityInstance, player)
 	local state = activityInstance.state.activity
 	collection.addValue(state.roster[teamIndex], player)
 	collection.addValue(state.fullRoster[teamIndex], player)
+end
+
+-- Gear
+local function givePlayerActivityGear(activityInstance, player)
+	for _, value in pairs(activityInstance.config.activity.gear:GetChildren()) do
+		local copy = value.Value:Clone()
+		collection.addValue(activityInstance.state.activity.gear, copy)
+		copy.Parent = ReplicatedStorage
+		genesUtil.waitForGene(copy, genes.pickup)
+		pickupUtil.stowObjectForPlayer(player, copy)
+	end
+end
+local function stripPlayerActivityGear(activityInstance, player)
+	for _, entry in pairs(activityInstance.state.activity.gear:GetChildren()) do
+		if entry.Value and entry.Value.state.pickup.owner.Value == player then
+			entry.Value:Destroy()
+			entry:Destroy()
+		end
+	end
 end
 
 -- Start collecting roster
@@ -174,6 +195,10 @@ local activities = genesUtil.initGene(activity)
 
 -- Set roster timer visible
 genesUtil.observeStateValue(activity, "isCollectingRoster"):subscribe(setRosterTimerVisible)
+
+-- Add and remove activity gear according to our presence on a roster
+activityUtil.getPlayerAddedToRosterStream(genes.activity):subscribe(givePlayerActivityGear)
+activityUtil.getPlayerRemovedFromRosterStream(genes.activity):subscribe(stripPlayerActivityGear)
 
 -- Listen to enrolled list changed and begin activity when it's full
 -- We have to spawn the subscription to this because it is subscribes to the collection's ChildRemoved event

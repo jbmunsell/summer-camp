@@ -170,6 +170,7 @@ end
 
 -- From instance event
 function Observable.fromInstanceEvent(instance, eventName)
+	assert(instance and eventName, "Observable.fromInstanceEvent requires 2 arguments")
 	return Observable.from(instance[eventName])
 		:takeUntil(Observable.fromInstanceLeftGame(instance))
 end

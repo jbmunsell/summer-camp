@@ -18,6 +18,7 @@ return {
 			score = { 0, 0, 0, 0 },
 			isCollectingRoster = false,
 			winningTeam = tableau.null,
+			gear = {},
 		},
 	},
 
@@ -32,6 +33,8 @@ return {
 			displayName = "Activity",
 			analyticsName = "activity",
 			activityPromptImage = "",
+
+			gear = {},
 		},
 	},
 
