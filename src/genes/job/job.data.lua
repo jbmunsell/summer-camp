@@ -3,16 +3,18 @@
 -- local tableau = require(env.packages.axis.lib.tableau)
 
 return {
-	instanceTag = "gene_jobClass",
-	name = "jobClass",
+	instanceTag = "gene_job",
+	name = "job",
 	genes = {},
 	state = {
-		jobClass = {
+		job = {
 		},
 	},
 
 	config = {
-		jobClass = {
+		job = {
+			gamepassId = 0,
+
 			clothes = {},
 
 			gear = {},

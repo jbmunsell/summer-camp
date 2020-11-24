@@ -140,6 +140,7 @@ function pickupUtil.trackCharacterHeldObjects(character)
 	end)
 end
 function pickupUtil.getCharacterHeldObjectsStream(character)
+	while not _characterHeldObjects[character] do wait() end
 	return _characterHeldObjects[character]
 end
 function pickupUtil.getCharacterHeldObjects(character)

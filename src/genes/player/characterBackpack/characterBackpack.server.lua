@@ -51,7 +51,7 @@ end
 -- Create backpack
 local function createBackpack(player)
 	-- Create backpack instance
-	genesUtil.waitForGene(player, genes.player.job)
+	genesUtil.waitForGene(player, genes.player.jobs)
 	local backpack = env.res.character.PlayerBackpack:Clone()
 	fx.new("ScaleEffect", backpack)
 	player.state.characterBackpack.instance.Value = backpack
@@ -68,7 +68,7 @@ local function createBackpack(player)
 	enabledStream:subscribe(dart.bind(setBackpackEnabled, backpack))
 
 	-- Set color according to team
-	local isLeader = rx.Observable.from(player.state.job.job):map(dart.equals(env.res.jobs.teamLeader))
+	local isLeader = rx.Observable.from(player.state.jobs.job):map(dart.equals(env.res.jobs.teamLeader))
 	rx.Observable.fromProperty(player, "Team", true)
 		:combineLatest(isLeader, dart.identity)
 		:filter(function (team) return genesUtil.hasGeneTag(team, genes.team) end)

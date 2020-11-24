@@ -3,19 +3,20 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 -- local tableau = require(env.packages.axis.lib.tableau)
 
 return {
-	instanceTag = "gene_job",
-	name = "job",
+	instanceTag = "gene_playerJobs",
+	name = "jobs",
 	genes = {},
 	state = {
-		job = {
+		jobs = {
 			job = env.res.jobs.teamLeader,
 			wearClothes = true,
 			gear = {},
+			unlocked = {},
 		},
 	},
 
 	config = {
-		job = {
+		jobs = {
 		},
 	},
 }

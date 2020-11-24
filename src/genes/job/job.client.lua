@@ -18,4 +18,4 @@ local genesUtil = require(genes.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init gene
-genesUtil.initGene(genes.player.job)
+genesUtil.initGene(genes.job)

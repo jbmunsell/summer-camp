@@ -1,9 +1,9 @@
 --
 --	Jackson Munsell
 --	22 Nov 2020
---	jobClass.server.lua
+--	job.server.lua
 --
---	jobClass gene server driver
+--	job gene server driver
 --
 
 -- env
@@ -18,4 +18,4 @@ local genesUtil = require(genes.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init gene
-genesUtil.initGene(genes.jobClass)
+genesUtil.initGene(genes.job)

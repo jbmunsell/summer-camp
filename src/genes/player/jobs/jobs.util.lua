@@ -1,9 +1,9 @@
 --
 --	Jackson Munsell
 --	22 Nov 2020
---	job.util.lua
+--	jobs.util.lua
 --
---	job gene util
+--	jobs gene util
 --
 
 -- env
@@ -19,21 +19,21 @@ local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 
 -- lib
-local jobUtil = {}
+local jobsUtil = {}
 
 -- Render player character
-function jobUtil.renderPlayerCharacter(player)
+function jobsUtil.renderPlayerCharacter(player)
 	genesUtil.waitForGene(player, genes.player.characterBackpack)
-	jobUtil.renderCharacterWithJob(player.Character, player.state.job.job.Value,
-		player.state.job.wearClothes.Value)
+	jobsUtil.renderCharacterWithJob(player.Character, player.state.jobs.job.Value,
+		player.state.jobs.wearClothes.Value)
 end
 
 -- Render character with job
-function jobUtil.renderCharacterWithJob(character, job, wearClothes)
+function jobsUtil.renderCharacterWithJob(character, job, wearClothes)
 	-- Get humanoid
 	local humanoid = character and character:FindFirstChild("Humanoid")
 	if not humanoid or not job then return end
-	local config = job.config.jobClass
+	local config = job.config.job
 
 	-- Render humanoid description items
 	local player = Players:GetPlayerFromCharacter(character)
@@ -58,19 +58,19 @@ end
 -- 	Clear gear collection
 -- 	Insert new gears into collection
 -- 	Award gear to player
-function jobUtil.giveJobGear(player, job)
+function jobsUtil.giveJobGear(player, job)
 	-- Destroy gear from old job
-	for _, entry in pairs(player.state.job.gear:GetChildren()) do
+	for _, entry in pairs(player.state.jobs.gear:GetChildren()) do
 		if entry.Value then
 			entry.Value:Destroy()
 		end
 	end
-	collection.clear(player.state.job.gear)
+	collection.clear(player.state.jobs.gear)
 
 	-- Insert new gears into collection and stow for player
-	for _, gear in pairs(job.config.jobClass.gear:GetChildren()) do
+	for _, gear in pairs(job.config.job.gear:GetChildren()) do
 		local copy = gear:Clone()
-		collection.addValue(player.state.job.gear, copy)
+		collection.addValue(player.state.jobs.gear, copy)
 		copy.Parent = ReplicatedStorage
 		genesUtil.waitForGene(copy, genes.pickup)
 		pickupUtil.stowObjectForPlayer(player, copy)
@@ -78,4 +78,4 @@ function jobUtil.giveJobGear(player, job)
 end
 
 -- return lib
-return jobUtil
+return jobsUtil
