@@ -67,14 +67,7 @@ viewIndex:filter(function () return viewEnabled:getValue() end)
 	:subscribe(updateView)
 
 -- Bind gui enabled to whether or not we're holding a security camera viewer
-rx.Observable.from(env.LocalPlayer.CharacterAdded)
-	:startWith(env.LocalPlayer.Character)
-	:filter()
-	:switchMap(function (character)
-		return pickupUtil.getCharacterHeldObjectsStream(character)
-			:map(dart.constant(character))
-	end)
-	:map(dart.follow(pickupUtil.characterHoldsObject, genes.securityCameraViewer))
+pickupUtil.getLocalCharacterHoldingStream(genes.securityCameraViewer)
 	:map(dart.boolify)
 	:multicast(viewEnabled)
 

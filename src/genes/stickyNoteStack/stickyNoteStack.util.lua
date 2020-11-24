@@ -108,17 +108,11 @@ function stickyNoteStackUtil.tagNote(note)
 end
 
 -- Create sticky note from raycast data and text
-function stickyNoteStackUtil.createNote(stack, raycastData, text)
+function stickyNoteStackUtil.createNote(stack, raycastData)
 	local note = stack:Clone()
 	stickyNoteStackUtil.removeTags(note)
-	-- if note:IsA("Model") then
-	-- 	note:SetPrimaryPartCFrame()
-	-- else
-	-- 	note.CFrame = stack.CFrame
-	-- end
 	stickyNoteStackUtil.tagNote(note)
 	stickyNoteStackUtil.stickNote(note, raycastData)
-	stickyNoteStackUtil.setNoteText(note, text)
 	note.Parent = workspace
 	return note
 end

@@ -264,23 +264,14 @@ end
 function pickupUtil.getLocalCharacterHoldingStream(gene)
 	assert(RunService:IsClient(), "pickupUtil.getCharacterHoldingStream can only be called from the client")
 
-	-- Is local character holder
-	local function isLocalCharacterHolder(instance)
-		return env.LocalPlayer.Character
-		and instance.state.pickup.holder.Value == env.LocalPlayer.Character
-	end
-
-	-- Any time an instance with this tag changes its holder, recompute the value and push
-	return genesUtil.getInstanceStream(gene)
-		:flatMap(function (instance)
-			return rx.Observable.from(instance.state.pickup.holder)
-				:merge(rx.Observable.fromInstanceLeftGame(instance))
+	return rx.Observable.from(env.LocalPlayer.CharacterAdded)
+		:startWith(env.LocalPlayer.Character)
+		:filter()
+		:switchMap(function (character)
+			return pickupUtil.getCharacterHeldObjectsStream(character)
+				:map(dart.constant(character))
 		end)
-		:map(function ()
-			return genesUtil.getInstances(gene)
-				:first(isLocalCharacterHolder)
-		end)
-		:map(dart.boolify)
+		:map(dart.follow(pickupUtil.characterHoldsObject, gene))
 		:distinctUntilChanged()
 end
 

@@ -31,41 +31,10 @@ local stickyNoteStackUtil = require(stickyNoteStack.util)
 -- Rotation (changed each time the user equips sticky note stack)
 local rotation = 0
 local preview
-local gui = env.PlayerGui:WaitForChild("Core").Container.TextPlacementObject
-local textInput = gui:FindFirstChild("Input", true)
-
--- Set initial text according to input type
-do
-	local initText = string.format("%s to edit text.", (UserInputService.TouchEnabled and "Touch" or "Click"))
-	gui:FindFirstChildWhichIsA("TextBox", true).Text = initText
-end
-
--- Sticky note preview
--- 	Parent is set to show and hide when there is a sticky note equipped
--- local preview = env.res.genes.StickyNote:Clone()
--- stickyNoteStackUtil.tagNote(preview)
--- stickyNoteStackUtil.setNoteText(preview, stickyNoteText)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
-
--- Set gui visible
-local function setGuiVisible(visible)
-	gui.Visible = visible
-end
-
--- Get gui text
-local function getGuiText()
-	return textInput.Text
-end
-
--- set preview text
-local function setPreviewText(text)
-	if preview then
-		stickyNoteStackUtil.setNoteText(preview, text)
-	end
-end
 
 -- Update preview
 local function updatePreview(stack)
@@ -78,7 +47,6 @@ local function updatePreview(stack)
 		stickyNoteStackUtil.removeTags(preview)
 		stickyNoteStackUtil.tagNote(preview)
 		rotation = (math.random() - 0.5) * stack.config.stickyNoteStack.rotationRange.Value
-		setPreviewText(textInput.Text)
 	end
 end
 
@@ -133,16 +101,6 @@ local holdingStream = rx.Observable.heartbeat()
 holdingStream
 	:distinctUntilChanged()
 	:subscribe(updatePreview)
-holdingStream
-	:map(dart.boolify)
-	:distinctUntilChanged()
-	:subscribe(setGuiVisible)
-
--- Change preview text when gui text changes
-rx.Observable.from(textInput.FocusLost)
-	:map(function () return textInput.Text end)
-	:distinctUntilChanged()
-	:subscribe(setPreviewText)
 
 -- Place the preview when we're holding a stack
 holdingStream
@@ -157,7 +115,7 @@ holdingStream
 -- Bind click
 pickupUtil.getClickWhileHoldingStream(stickyNoteStack)
 	:map(function ()
-		return packageRaycastData(inputUtil.raycastMouse()), getGuiText()
+		return packageRaycastData(inputUtil.raycastMouse())
 	end)
 	:filter()
 	:subscribe(dart.forward(stickyNoteStack.net.PlacementRequested))

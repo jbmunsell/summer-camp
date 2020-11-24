@@ -47,10 +47,9 @@ local function unstickNote(note)
 end
 
 -- Place stack note
-local function placePlayerStackNote(player, stack, raycastData, text)
+local function placePlayerStackNote(player, stack, raycastData)
 	-- Place sticky note object
-	local filteredText = stickyNoteStackUtil.filterPlayerText(player, text)
-	local note = stickyNoteStackUtil.createNote(stack, raycastData, filteredText)
+	local note = stickyNoteStackUtil.createNote(stack, raycastData)
 
 	-- Sticky note destroy stream
 	local config = stack.config.stickyNoteStack
@@ -85,6 +84,10 @@ local stacks = genesUtil.initGene(stickyNoteStack)
 
 -- Set stack count on init
 stacks:subscribe(setStackCount)
+
+-- Set text on thing
+-- genesUtil.crossObserveStateValue(stickyNoteStack, genes.textConfigure, "text")
+-- 	:subscribe(stickyNoteStackUtil.setNoteText)
 
 -- Destroy stacks that are used up
 genesUtil.observeStateValue(stickyNoteStack, "count")

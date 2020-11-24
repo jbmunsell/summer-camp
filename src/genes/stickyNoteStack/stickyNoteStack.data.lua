@@ -6,7 +6,7 @@ local genes = env.src.genes
 return {
 	instanceTag = "gene_stickyNoteStack",
 	name = "stickyNoteStack",
-	genes = { genes.pickup },
+	genes = { genes.pickup, genes.textConfigure },
 	state = {
 		stickyNoteStack = {
 			count = 10,
