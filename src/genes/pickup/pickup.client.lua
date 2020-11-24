@@ -17,6 +17,7 @@ local pickup = genes.pickup
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
+local axisUtil = require(axis.lib.axisUtil)
 local pickupUtil = require(pickup.util)
 local pickupStreams = require(pickup.streams)
 local inputUtil = require(input.util)
@@ -52,13 +53,19 @@ rx.Observable.from(pickup.net.ObjectEquipped)
 	end)
 
 -- Simple activation pass
-inputStreams.click
+local activatedStream = inputStreams.click
 	:map(function ()
 		return pickupUtil.getCharacterHeldObjects(env.LocalPlayer.Character):first(),
 			inputUtil.getMouseHit()
 	end)
 	:filter()
-	:subscribe(dart.forward(pickup.net.ObjectActivated))
+activatedStream:subscribe(dart.forward(pickup.net.ObjectActivated))
+activatedStream:subscribe(function (instance)
+	local animation = instance.config.pickup.activationAnimation.Value
+	if animation then
+		axisUtil.getLocalHumanoid():LoadAnimation(animation):Play()
+	end
+end)
 
 -- Drop on backspace
 rx.Observable.from(Enum.KeyCode.Backspace)

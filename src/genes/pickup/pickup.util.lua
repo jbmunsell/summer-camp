@@ -214,10 +214,12 @@ function pickupUtil.updateHoldAnimation(character)
 	local held = pickupUtil.getCharacterHeldObjects(character):first()
 	if held then
 		local animation = held.config.pickup.holdAnimation.Value
-		if not CollectionService:HasTag(animation, "holdAnimation") then
-			CollectionService:AddTag(animation, "holdAnimation")
+		if animation then
+			if not CollectionService:HasTag(animation, "holdAnimation") then
+				CollectionService:AddTag(animation, "holdAnimation")
+			end
+			humanoid:LoadAnimation(animation):Play()
 		end
-		humanoid:LoadAnimation(animation):Play()
 	else
 		for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
 			if CollectionService:HasTag(track.Animation, "holdAnimation") then

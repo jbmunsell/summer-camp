@@ -211,7 +211,7 @@ rosterCollectingStart
 
 -- When a session starts, poll at 2hz to remove glitchers from inside and bring
 -- 	back glitchers from outside
-genesUtil.observeStateValue(activity, "inSession"):filter():subscribe(function (activityInstance)
+genesUtil.observeStateValue(activity, "inSession"):filter(dart.select(2)):subscribe(function (activityInstance)
 	if not activityInstance.config.activity.lockPitch then return end
 	rx.Observable.interval(0.5)
 		:takeUntil(rx.Observable.from(activityInstance.state.activity.inSession):reject())

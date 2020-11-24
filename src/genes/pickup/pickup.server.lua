@@ -28,6 +28,18 @@ local multiswitchUtil = require(multiswitch.util)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
+local function attachToCharacter(character, instance)
+	for _, d in pairs(instance:GetDescendants()) do
+		if d:IsA("Attachment") then
+			local characterAttachment = character:FindFirstChild(d.Name, true)
+			if characterAttachment then
+				axisUtil.snapAttachAttachments(character, characterAttachment, instance, d)
+				break
+			end
+		end
+	end
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
@@ -35,8 +47,24 @@ local multiswitchUtil = require(multiswitch.util)
 -- Pickup object stream
 local pickupInstanceStream = genesUtil.initGene(pickup)
 
--- Activated event
--- pickupUtil.getActivatedStream(pickup):tap(print):subscribe(fireActivatedEvent)
+-- Attach extras on equip
+genesUtil.observeStateValue(pickup, "holder"):filter(dart.select(2))
+	:subscribe(function (instance, holder)
+		local extras = {}
+		for _, entry in pairs(instance.config.pickup.extras:GetChildren()) do
+			if entry.Value then
+				local e = entry.Value:Clone()
+				table.insert(extras, e)
+				attachToCharacter(e, holder)
+				e.Parent = workspace
+			end
+		end
+		rx.Observable.from(instance.state.pickup.holder):reject():first():subscribe(function ()
+			for _, e in pairs(extras) do
+				e:Destroy()
+			end
+		end)
+	end)
 
 -- Track all character held objects
 pickupUtil.initHeldObjectTracking()

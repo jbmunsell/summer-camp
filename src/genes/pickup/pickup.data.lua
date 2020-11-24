@@ -22,7 +22,9 @@ return {
 
 	config = {
 		pickup = {
+			extras = {},
 			holdAnimation = env.res.pickup.DefaultHoldAnimation,
+			activationAnimation = tableau.null,
 			dropDebounce = 1.0,
 			stowable = false,
 			touchPickupEnabled = false,
