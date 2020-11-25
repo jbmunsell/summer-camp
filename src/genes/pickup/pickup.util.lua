@@ -283,9 +283,10 @@ function pickupUtil.getClickWhileHoldingStream(gene)
 	assert(RunService:IsClient(), "pickupUtil.getClickWhileHoldingStream can only be called from the client")
 
 	return inputStreams.click
-		:filter(function ()
+		:map(function ()
 			return pickupUtil.localCharacterHoldsObject(gene)
 		end)
+		:filter()
 end
 
 -- Get player object action request stream
