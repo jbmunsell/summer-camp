@@ -20,18 +20,21 @@ local genesUtil = require(genes.util)
 ---------------------------------------------------------------------------------------------------
 
 local function tryLink(instance, configValueName, gene, stateValueName)
-	if instance.config.teamLink[configValueName].Value then
-		local geneName = require(gene.data).name
-		genesUtil.addGeneTag(instance, gene)
-		genesUtil.waitForGene(instance, gene)
-		rx.Observable.from(instance.state.teamLink.team)
-			:filter()
-			:subscribe(function (team)
-				if genesUtil.hasGeneTag(team, genes.team) then
-					instance.state[geneName][stateValueName].Value = team.config.team[stateValueName].Value
-				end
-			end)
-	end
+	rx.Observable.from(instance.config.teamLink[configValueName])
+		:filter()
+		:first()
+		:subscribe(function ()
+			local geneName = require(gene.data).name
+			genesUtil.addGeneTag(instance, gene)
+			genesUtil.waitForGene(instance, gene)
+			rx.Observable.from(instance.state.teamLink.team)
+				:filter()
+				:subscribe(function (team)
+					if genesUtil.hasGeneTag(team, genes.team) then
+						instance.state[geneName][stateValueName].Value = team.config.team[stateValueName].Value
+					end
+				end)
+		end)
 end
 
 ---------------------------------------------------------------------------------------------------

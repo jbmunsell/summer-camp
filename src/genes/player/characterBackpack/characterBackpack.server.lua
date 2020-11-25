@@ -26,16 +26,6 @@ local playerUtil = require(genes.player.util)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
--- Set backpack color
-local function setBackpackTeam(instance, team, isLeader)
-	local config = team.config.team
-	local color = (isLeader and Color3.new(0.3, 0.3, 0.3) or config.color.Value)
-	local image = config.image.Value
-	instance.Handle.SpecialMesh.VertexColor = Vector3.new(color.R, color.G, color.B)
-	instance.DecalPart.Color = color
-	instance.DecalPart.Decal.Texture = image
-end
-
 -- Set backpack enabled
 local function setBackpackEnabled(instance, enabled, character)
 	axisUtil.destroyChild(instance, "AttachWeld")
@@ -53,7 +43,10 @@ local function createBackpack(player)
 	-- Create backpack instance
 	genesUtil.waitForGene(player, genes.player.jobs)
 	local backpack = env.res.character.PlayerBackpack:Clone()
+	backpack.Parent = ReplicatedStorage
 	fx.new("ScaleEffect", backpack)
+	genesUtil.addGeneTag(backpack, genes.color)
+	genesUtil.waitForGene(backpack, genes.color)
 	player.state.characterBackpack.instance.Value = backpack
 
 	-- Parent to workspace when there's a character and NOT in a competitive activity,
@@ -68,11 +61,17 @@ local function createBackpack(player)
 	enabledStream:subscribe(dart.bind(setBackpackEnabled, backpack))
 
 	-- Set color according to team
-	local isLeader = rx.Observable.from(player.state.jobs.job):map(dart.equals(env.res.jobs.teamLeader))
-	rx.Observable.fromProperty(player, "Team", true)
-		:combineLatest(isLeader, dart.identity)
-		:filter(function (team) return genesUtil.hasGeneTag(team, genes.team) end)
-		:subscribe(dart.bind(setBackpackTeam, backpack))
+	local isLeaderStream = rx.Observable.from(player.state.jobs.job):map(dart.equals(env.res.jobs.teamLeader))
+	rx.Observable.fromProperty(player, "Team", true):subscribe(function (team)
+		backpack.state.teamLink.team.Value = team
+	end)
+	rx.Observable.from(backpack.state.teamLink.team)
+		:filter(dart.follow(genesUtil.hasGeneTag, genes.team))
+		:combineLatest(isLeaderStream, function (team, isLeader)
+			return isLeader and Color3.new(0.3, 0.3, 0.3) or team.config.team.color.Value
+		end):subscribe(function (color)
+			backpack.state.color.color.Value = color
+		end)
 end
 
 -- Destroy player backpack
