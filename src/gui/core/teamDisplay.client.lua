@@ -47,8 +47,9 @@ local function showChangeText()
 end
 
 -- Update team image
-local function updateTeamImage()
-	teamDisplay.Button.Image = env.LocalPlayer.Team.config.team.image.Value
+local function setTeam(team)
+	genesUtil.waitForGene(teamDisplay, genes.teamLink)
+	teamDisplay.state.teamLink.team.Value = team
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -57,6 +58,5 @@ end
 
 -- Team changed
 local teamChanged = rx.Observable.fromProperty(env.LocalPlayer, "Team", true)
-	:filter(dart.follow(genesUtil.hasGeneTag, genes.team))
-teamChanged:subscribe(updateTeamImage)
+teamChanged:subscribe(setTeam)
 teamChanged:subscribe(showChangeText)

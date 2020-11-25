@@ -45,8 +45,6 @@ local function createBackpack(player)
 	local backpack = env.res.character.PlayerBackpack:Clone()
 	backpack.Parent = ReplicatedStorage
 	fx.new("ScaleEffect", backpack)
-	genesUtil.addGeneTag(backpack, genes.color)
-	genesUtil.waitForGene(backpack, genes.color)
 	player.state.characterBackpack.instance.Value = backpack
 
 	-- Parent to workspace when there's a character and NOT in a competitive activity,

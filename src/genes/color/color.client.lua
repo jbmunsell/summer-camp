@@ -8,6 +8,18 @@
 
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
+local axis = env.packages.axis
+local genes = env.src.genes
 
 -- modules
-require(env.src.genes.util).initGene(env.src.genes.color)
+local dart = require(axis.lib.dart)
+local genesUtil = require(genes.util)
+local colorUtil = require(genes.color.util)
+
+---------------------------------------------------------------------------------------------------
+-- Streams
+---------------------------------------------------------------------------------------------------
+
+-- init gene
+genesUtil.initGene(genes.color):filter(dart.isDescendantOf(env.PlayerGui))
+	:subscribe(colorUtil.initInstance)

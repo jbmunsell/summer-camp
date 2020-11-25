@@ -15,6 +15,7 @@ local genes = env.src.genes
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
+local teamLinkUtil = require(genes.teamLink.util)
 local multiswitchUtil = require(genes.multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -33,6 +34,12 @@ end
 
 -- init gene
 genesUtil.initGene(genes.teamLink):subscribe(function (instance)
+	-- Drive the ones that are in player gui (server drives everything else)
+	if instance:IsDescendantOf(env.PlayerGui) then
+		teamLinkUtil.initTeamLink(instance)
+	end
+
+	-- Interact switch
 	if instance.config.teamLink.linkInteract.Value then
 		multiswitchUtil.createSwitch(instance, "interact", "teamLink")
 		rx.Observable.from(instance.state.teamLink.team)

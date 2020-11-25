@@ -43,16 +43,11 @@ local function showMatchResult(activityInstance)
 	for i = 1, 2 do
 		local team = state.sessionTeams[i].Value
 		local didWin = (team == winningTeam)
-		local color = team.config.team.color.Value
-		local image = team.config.team.image.Value
-		local colorFrame = frame["Color" .. i]
-		local circleFrame = frame["Circle" .. i]
-		colorFrame.BackgroundColor3 = color
-		circleFrame.BackgroundColor3 = color
-		colorFrame.BackgroundTransparency = (didWin and 0 or 1)
-		circleFrame.BackgroundTransparency = (didWin and 0 or 1)
-		circleFrame.TeamImage.Image = image
-		circleFrame.TeamImage.Crown.Visible = didWin
+		local teamFrame = frame["Team" .. i]
+		teamFrame.state.teamLink.team.Value = team
+		teamFrame.Color.BackgroundTransparency = (didWin and 0 or 1)
+		teamFrame.Circle.BackgroundTransparency = (didWin and 0 or 1)
+		teamFrame.Circle.TeamImage.Crown.Visible = didWin
 	end
 	frame.ScoreLabel.Text = string.format("%d - %d", state.score[1].Value, state.score[2].Value)
 	frame.WinningTeamLabel.Text = string.format("%s win!", winningTeam.Name)

@@ -7,6 +7,7 @@
 --
 
 -- env
+local Teams = game:GetService("Teams")
 local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -38,12 +39,8 @@ local function getPlayerIndicator(player)
 		end)
 end
 
-local function updateColor(indicator)
-	local state = indicator.state.playerIndicator
-	local team = state.player.Value.Team
-	if not genesUtil.hasFullState(team, genes.team) then return end
-	local h, s, _ = team.config.team.color.Value:ToHSV()
-	state.color.Value = Color3.fromHSV(h, s, 145 / 255)
+local function setTeam(indicator, team)
+	indicator.state.teamLink.team.Value = team
 end
 
 local function setEnabled(instance, enabled)
@@ -55,10 +52,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init
-local indicators = genesUtil.initGene(playerIndicator)
-
--- Tag with fxpart
-indicators:subscribe(dart.addTag("FXPart"))
+genesUtil.initGene(playerIndicator)
 
 -- Create one for each player on entry
 local players = rx.Observable.from(Players.PlayerAdded)
@@ -77,7 +71,12 @@ players:flatMap(function (player)
 end):map(getPlayerIndicator)
 	:filter()
 	:merge(genesUtil.observeStateValue(playerIndicator, "player"):filter(dart.select(2)))
-	:subscribe(updateColor)
+	:map(function (indicator)
+		local team = indicator.state.playerIndicator.player.Value.Team
+		return indicator, (genesUtil.hasGeneTag(team, genes.team) and team)
+	end)
+	:filter(dart.select(2))
+	:subscribe(setTeam)
 
 -- Indicator should only be enabled if we're in a competitive activity
 genesUtil.observeStateValue(playerIndicator, "player")

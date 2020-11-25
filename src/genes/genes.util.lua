@@ -61,6 +61,9 @@ end
 
 -- init gene queue
 local _geneRequestQueue = {}
+local function queueInstanceWithGene(instance, gene)
+	table.insert(_geneRequestQueue, { instance, gene })
+end
 local function initInstanceGene(instance, gene)
 	-- Add folders
 	local geneData = require(gene.data)
@@ -131,14 +134,31 @@ function genesUtil.initGene(gene)
 	rx.Observable.from(instanceRemoved):subscribe(dart.bind(tableau.removeValue, geneReadyList))
 
 	-- (server only) Init all tagged instances when we hear about them
+	local queueInstance = dart.follow(queueInstanceWithGene, gene)
 	if RunService:IsServer() then
-		rx.Observable.fromInstanceTag(geneData.instanceTag):subscribe(function (instance)
-			table.insert(_geneRequestQueue, { instance, gene })
-		end)
+		rx.Observable.fromInstanceTag(geneData.instanceTag):subscribe(queueInstance)
+	elseif RunService:IsClient() then
+		rx.Observable.fromInstanceTag(geneData.instanceTag):filter(dart.isDescendantOf(env.PlayerGui))
+			:subscribe(queueInstance)
 	end
 
 	-- return instance stream
 	return genesUtil.getInstanceStream(gene)
+end
+
+-- Add gene async
+-- 	This supports client-side gene addition and folder rendering
+function genesUtil.addGeneAsync(instance, gene)
+	-- Add collection service tag
+	genesUtil.addGeneTag(instance, gene)
+
+	-- Server will automatically queue, so force it if we're client
+	-- if RunService:IsClient() and not instance:IsDescendantOf(env.PlayerGui) then
+	-- 	queueInstanceWithGene(instance, gene)
+	-- end
+
+	-- Wait for folders to render
+	genesUtil.waitForGene(instance, gene)
 end
 
 -- Get a SNAPSHOT list of instances with a particular gene

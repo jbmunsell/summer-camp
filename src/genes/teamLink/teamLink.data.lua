@@ -1,11 +1,11 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
--- local genes = env.src.genes
+local genes = env.src.genes
 local tableau = require(env.packages.axis.lib.tableau)
 
 return {
 	instanceTag = "gene_teamLink",
 	name = "teamLink",
-	genes = {},
+	genes = { genes.color, genes.image },
 	state = {
 		teamLink = {
 			team = tableau.null,
@@ -18,6 +18,7 @@ return {
 			linkFromOwnerTeam = false,
 			linkColor = false,
 			linkImage = false,
+			teamImageType = "image",
 			linkInteract = false,
 		},
 	},
