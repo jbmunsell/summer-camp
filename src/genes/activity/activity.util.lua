@@ -161,6 +161,10 @@ function activityUtil.getTeamRoster(activityInstance, team)
 	local index = activityUtil.getTeamIndex(activityInstance, team)
 	return activityInstance.state.activity.roster[index]
 end
+function activityUtil.getTeamFullRoster(activityInstance, team)
+	local index = activityUtil.getTeamIndex(activityInstance, team)
+	return activityInstance.state.activity.fullRoster[index]
+end
 function activityUtil.getTeamRosterChangedStream(activityInstance, team, init)
 	return collection.observeChanged(activityUtil.getTeamRoster(activityInstance, team), init)
 end

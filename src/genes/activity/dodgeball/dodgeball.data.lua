@@ -18,6 +18,7 @@ return {
 			isCompetitive = true,
 			lockPitch = true,
 			trophy = env.res.activities.DodgeballTrophy,
+			patch = env.res.activities.DodgeballWinPatch,
 			displayName = "Dodgeball",
 			analyticsName = "dodgeball",
 			activityPromptImage = "",

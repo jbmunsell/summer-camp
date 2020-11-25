@@ -25,6 +25,7 @@ local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
+local patchUtil = require(genes.patch.util)
 local activityUtil = require(activity.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -139,6 +140,13 @@ local function createTrophy(activityInstance, team)
 
 	-- Play sound inside the trophy
 	soundUtil.playSound(env.res.audio.sounds.MatchWon, trophy)
+end
+
+-- Award patches
+local function awardPatches(activityInstance, team)
+	for _, entry in pairs(activityUtil.getTeamFullRoster(activityInstance, team):GetChildren()) do
+		patchUtil.givePlayerPatch(entry.Value, activityInstance.config.activity.patch.Value:Clone())
+	end
 end
 
 -- Render gates
@@ -287,6 +295,7 @@ local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")
 
 -- Create trophy when a winner is declared
 winnerDeclared:subscribe(createTrophy)
+winnerDeclared:subscribe(awardPatches)
 winnerDeclared:map(dart.select(1)):delay(1.0):subscribe(activityUtil.stopSession)
 
 -- Hard switch gates on activity session

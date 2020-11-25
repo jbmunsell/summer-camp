@@ -1,16 +1,18 @@
 --
 --	Jackson Munsell
---	00 Mon 2020
+--	25 Nov 2020
 --	patch.util.lua
 --
 --	patch gene util
 --
 
 -- env
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
 
 -- modules
+local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 
 -- lib
@@ -38,6 +40,14 @@ function patchUtil.attachPatch(player, patch, result)
 	weld.Part1 = patch
 	weld.C0 = state.attachmentCFrame.Value
 	weld.Parent = patch
+end
+
+-- Give player patch
+function patchUtil.givePlayerPatch(player, patch)
+	-- Put the patch in their stowed items
+	patch.Parent = ReplicatedStorage
+	genesUtil.waitForGene(patch, genes.pickup)
+	pickupUtil.stowObjectForPlayer(player, patch)
 end
 
 -- return lib

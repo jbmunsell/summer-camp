@@ -20,6 +20,7 @@ return {
 			isCompetitive = true,
 			lockPitch = true,
 			trophy = env.res.activities.SoccerTrophy,
+			patch = env.res.activities.SoccerWinPatch,
 			displayName = "Soccer",
 			analyticsName = "soccer",
 			activityPromptImage = "rbxassetid://179546941",

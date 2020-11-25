@@ -16,6 +16,7 @@ return {
 			isCompetitive = true,
 			-- lockPitch = true,
 			-- trophy = env.res.activities.CaptureTheFlagTrophy,
+			-- patch = env.res.activities.CaptureTheFlagWinPatch,
 			displayName = "Capture the Flag",
 			analyticsName = "captureTheFlag",
 			-- activityPromptImage = "",

@@ -5,7 +5,7 @@ local tableau = require(env.packages.axis.lib.tableau)
 return {
 	instanceTag = "gene_patch",
 	name = "patch",
-	genes = { genes.pickup, genes.image },
+	genes = { genes.pickup },
 	state = {
 		patch = {
 			attached = false,

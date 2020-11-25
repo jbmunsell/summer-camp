@@ -12,6 +12,7 @@ return {
 			wearClothes = true,
 			gear = {},
 			unlocked = {},
+			dailyGearGiven = {},
 		},
 	},
 

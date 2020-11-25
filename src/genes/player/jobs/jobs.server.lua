@@ -20,6 +20,7 @@ local genesUtil = require(genes.util)
 local playerUtil = require(genes.player.util)
 local jobUtil = require(genes.job.util)
 local jobsUtil = require(genes.player.jobs.util)
+local scheduleUtil = require(env.src.schedule.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
@@ -42,7 +43,26 @@ local wearClothesChanged = genesUtil.observeStateValue(genes.player.jobs, "wearC
 jobChanged:merge(jobCharacterStream, wearClothesChanged):subscribe(jobsUtil.renderPlayerCharacter)
 
 -- Render gear when job is changed
-jobChanged:subscribe(jobsUtil.giveJobGear)
+jobChanged:subscribe(jobsUtil.givePlayerJobGear)
+
+-- Give player daily job gear at the start of the day OR when they switch
+-- 	UNLESS they have already received it
+local dayStartStream = rx.BehaviorSubject.new()
+scheduleUtil.getTimeOfDayStream(6):subscribe(function ()
+	genesUtil.getInstances(genes.player.jobs):foreach(function (player)
+		collection.clear(player.state.jobs.dailyGearGiven)
+	end)
+	dayStartStream:push()
+end)
+jobChanged:merge(dayStartStream:skip(1):flatMap(function ()
+	return rx.Observable.from(genesUtil.getInstances(genes.player.jobs))
+		:map(function (player)
+			return player, player.state.jobs.job.Value
+		end)
+		:filter(dart.select(2))
+end)):reject(function (player, job)
+	return collection.getValue(player.state.jobs.dailyGearGiven, job)
+end):subscribe(jobsUtil.givePlayerJobDailyGear)
 
 -- Track player unlocked jobs
 playerStream:subscribe(function (player)

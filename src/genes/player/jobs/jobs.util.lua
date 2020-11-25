@@ -14,6 +14,7 @@ local axis = env.packages.axis
 local genes = env.src.genes
 
 -- modules
+local dart = require(axis.lib.dart)
 local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
@@ -54,11 +55,26 @@ function jobsUtil.renderCharacterWithJob(character, job, wearClothes)
 	humanoid:ApplyDescription(avatarDescription)
 end
 
+-- Root function to give player all gear from a specific folder
+function jobsUtil.givePlayerGear(player, gearFolder, process)
+	process = process or dart.noop
+	-- Insert new gears into collection and stow for player
+	for _, gear in pairs(gearFolder:GetChildren()) do
+		local copy = gear:Clone()
+		copy.Parent = ReplicatedStorage
+		genesUtil.waitForGene(copy, genes.pickup)
+		pickupUtil.stowObjectForPlayer(player, copy)
+		if process then
+			process(copy)
+		end
+	end
+end
+
 -- Grant job gear
 -- 	Clear gear collection
 -- 	Insert new gears into collection
 -- 	Award gear to player
-function jobsUtil.giveJobGear(player, job)
+function jobsUtil.givePlayerJobGear(player, job)
 	-- Destroy gear from old job
 	for _, entry in pairs(player.state.jobs.gear:GetChildren()) do
 		if entry.Value then
@@ -67,14 +83,20 @@ function jobsUtil.giveJobGear(player, job)
 	end
 	collection.clear(player.state.jobs.gear)
 
-	-- Insert new gears into collection and stow for player
-	for _, gear in pairs(job.config.job.gear:GetChildren()) do
-		local copy = gear:Clone()
-		collection.addValue(player.state.jobs.gear, copy)
-		copy.Parent = ReplicatedStorage
-		genesUtil.waitForGene(copy, genes.pickup)
-		pickupUtil.stowObjectForPlayer(player, copy)
-	end
+	-- Give new
+	jobsUtil.givePlayerGear(player, job.config.job.gear, function (instance)
+		collection.addValue(player.state.jobs.gear, instance)
+	end)
+end
+
+-- Give player job daily gear
+function jobsUtil.givePlayerJobDailyGear(player, job)
+	-- Track
+	collection.addValue(player.state.jobs.dailyGearGiven, job)
+
+	-- Give all daily gear
+	print("giving ", player, " daily gear for " .. job:GetFullName())
+	jobsUtil.givePlayerGear(player, job.config.job.dailyGear)
 end
 
 -- return lib

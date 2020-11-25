@@ -31,6 +31,8 @@ end
 function dart.identity(...)
 	return ...
 end
+function dart.noop()
+end
 
 -- quick utilities (not factories)
 function dart.increment(v)

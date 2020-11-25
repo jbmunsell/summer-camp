@@ -18,6 +18,7 @@ return {
 			clothes = {},
 
 			gear = {},
+			dailyGear = {},
 
 			humanoidDescription = {
 				DepthScale = 0.7,
