@@ -68,10 +68,8 @@ end):subscribe(jobsUtil.givePlayerJobDailyGear)
 playerStream:subscribe(function (player)
 	for _, instance in pairs(genesUtil.getInstances(genes.job):raw()) do
 		local gamepassId = instance.config.job.gamepassId.Value
-		if gamepassId ~= 0 then
-			if MarketplaceService:UserOwnsGamepassAsync(player, gamepassId) then
-				collection.addValue(player.state.jobs.unlocked, instance)
-			end
+		if gamepassId == 0 or MarketplaceService:UserOwnsGamePassAsync(player.UserId, gamepassId) then
+			collection.addValue(player.state.jobs.unlocked, instance)
 		end
 	end
 end)

@@ -390,23 +390,38 @@ function fx.setScale(instance, scale, model)
 	assert(scale, "fx.setScale requires a number")
 
 	-- Parts
-	if instance:FindFirstChild("FullScaleProperties") then
+	if instance:FindFirstChild("FullScaleProperties") and not instance:FindFirstChild("noScale") then
 		if instance:IsA("BasePart") then
 			local offset = scaleCFrame(instance.FullScaleProperties.Offset.Value, scale)
 			renderVectorValue(instance, "Size", scale)
-			instance.CFrame = model:GetPrimaryPartCFrame():toWorldSpace(offset)
+			-- instance.CFrame = model:GetPrimaryPartCFrame():toWorldSpace(offset)
 		elseif instance:IsA("Attachment") then
 			renderCFrameValue(instance, "CFrame", scale)
 		elseif instance:IsA("JointInstance") then
-			renderCFrameValue(instance, "C0", scale)
-			renderCFrameValue(instance, "C1", scale)
+			if not instance.Part0:FindFirstChild("noScale") then renderCFrameValue(instance, "C0", scale) end
+			if not instance.Part1:FindFirstChild("noScale") then renderCFrameValue(instance, "C1", scale) end
 		elseif instance:IsA("SpecialMesh") then
 			renderVectorValue(instance, "Scale", scale)
 		end
 	end
 
 	-- Recurse through children
-	for _, child in pairs(instance:GetChildren()) do
+	local instances
+	if instance:FindFirstChild("noScale") then
+		instances = instance:GetDescendants()
+		for i = #instances, 1, -1 do
+			local v = instances[i]
+			if not v:IsA("JointInstance")
+			or (v.Part0 and v.Part0:FindFirstChild("noScale")
+			and v.Part1 and v.Part1:FindFirstChild("noScale"))
+			then
+				table.remove(instances, i)
+			end
+		end
+	else
+		instances = instance:GetChildren()
+	end
+	for _, child in pairs(instances) do
 		fx.setScale(child, scale, model)
 	end
 end

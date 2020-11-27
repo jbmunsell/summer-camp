@@ -39,6 +39,15 @@ local function jip()
 	return math.random() - 0.5
 end
 
+-- Put commas in a number
+function axisUtil.commify(number)
+	local str = tostring(number)
+	return
+		#str % 3 == 0 and
+		str:reverse():gsub("(%d%d%d)", "%1,"):reverse():sub(2) or
+		str:reverse():gsub("(%d%d%d)", "%1,"):reverse()
+end
+
 -- Destroy child by name if it exists
 function axisUtil.destroyChild(instance, childName)
 	local child = instance:FindFirstChild(childName)

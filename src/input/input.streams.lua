@@ -23,7 +23,15 @@ local clickStream = rx.Observable.from(UserInputService.InputBegan)
 	:merge(rx.Observable.from(UserInputService.TouchTapInWorld):tap(print):reject(dart.select(2)))
 	:map(dart.constant(nil))
 
+-- activation ended
+local activationEnded = rx.Observable.from(UserInputService.InputEnded)
+	:filter(function (input)
+		return input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch
+	end)
+
 -- return lib
 return {
 	click = clickStream,
+	activationEnded = activationEnded,
 }

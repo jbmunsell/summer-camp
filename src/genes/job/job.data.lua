@@ -13,9 +13,11 @@ return {
 
 	config = {
 		job = {
-			gamepassId = 0,
+			displayName = "JOB",
 
-			clothes = {},
+			displayedPerks = {},
+
+			gamepassId = 0,
 
 			gear = {},
 			dailyGear = {},

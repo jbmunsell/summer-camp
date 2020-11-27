@@ -33,7 +33,7 @@ end
 -- guis
 local coreGui = env.PlayerGui:WaitForChild("Core")
 local splashScreen = env.PlayerGui:WaitForChild("SplashScreen")
-local roleSelection = env.PlayerGui:WaitForChild("RoleSelection")
+local jobSelection = env.PlayerGui:WaitForChild("JobSelection")
 local teamSelect = env.PlayerGui:WaitForChild("TeamSelect")
 
 -- Camera variables
@@ -60,12 +60,12 @@ local rotationSpeed = math.pi * 2 * 0.01
 
 -- Enable and disable all the right guis
 coreGui.Enabled = false
-roleSelection.Enabled = false
+jobSelection.Enabled = false
 teamSelect.Enabled = false
 splashScreen.Enabled = true
 
 -- Streams
-local roleSelected = rx.Observable.fromProperty(roleSelection, "Enabled")
+local jobSelected = rx.Observable.fromProperty(jobSelection, "Enabled")
 	:reject()
 	:first()
 local playClicked = rx.Observable.from(splashScreen:FindFirstChild("PlayButton", true).Activated)
@@ -86,19 +86,23 @@ rx.Observable.heartbeat()
 		camera.CFrame = pivot:toWorldSpace(cameraOffset)
 	end)
 
--- When role selection hides, hide depth and show team selection
+-- When play is clicked, show job selection
 playClicked:subscribe(function ()
-	-- camera.CameraType = Enum.CameraType.Custom
 	depth.state.propertySwitcher.propertySet.Value = "gameplay"
-	teamSelect.Enabled = true
 	splashScreen.Enabled = false
+	jobSelection.Enabled = true
+end)
+
+-- When job selection hides, show team select
+jobSelected:subscribe(function ()
+	teamSelect.Enabled = true
 end)
 
 -- Bind core gui visible to basically everything else NOT being visible
 local function fromDisabled(gui)
 	return rx.Observable.fromProperty(gui, "Enabled", true):map(dart.boolNot)
 end
-fromDisabled(splashScreen):combineLatest(fromDisabled(teamSelect), fromDisabled(roleSelection), dart.boolAll)
+fromDisabled(splashScreen):combineLatest(fromDisabled(teamSelect), fromDisabled(jobSelection), dart.boolAll)
 	:subscribe(function (v)
 		coreGui.Enabled = v
 	end)
