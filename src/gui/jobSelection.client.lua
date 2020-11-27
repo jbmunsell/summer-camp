@@ -133,13 +133,19 @@ end
 
 -- Render avatars very simply
 local function renderAvatars()
+	local scale = state.avatarScale:getValue()
 	for _, job in pairs(jobListing) do
 		local frame = getJobFrame(job)
 		local character = frame.WorldModel.Character
 		local playerCharacter = env.LocalPlayer.Character
 		local outfit = state.outfitsEnabled:getValue()
 		local description = job.config.job.humanoidDescription
-		character.ScaleEffect.Value = state.avatarScale:getValue()
+		character.ScaleEffect.Value = scale
+
+		local fullShadowY = frame.Shadow.properties.maxYScale.Value
+		local anchorY = 0.4
+		frame.Shadow.Position = UDim2.new(frame.Shadow.Position.X.Scale, 0,
+			anchorY + (fullShadowY - anchorY) * scale, 0)
 
 		local function tryClothing(piece)
 			local jobPiece = description:FindFirstChild(piece)
