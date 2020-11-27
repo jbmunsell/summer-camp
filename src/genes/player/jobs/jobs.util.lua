@@ -24,35 +24,45 @@ local jobsUtil = {}
 
 -- Render player character
 function jobsUtil.renderPlayerCharacter(player)
+	-- Wait for backpack ready
 	genesUtil.waitForGene(player, genes.player.characterBackpack)
-	jobsUtil.renderCharacterWithJob(player.Character, player.state.jobs.job.Value,
-		player.state.jobs.wearClothes.Value)
-end
+	-- jobsUtil.renderCharacterWithJob(player.Character, player.state.jobs.job.Value,
+	-- 	player.state.jobs.outfitsEnabled.Value, player.state.jobs.avatarScale.Value)
 
--- Render character with job
-function jobsUtil.renderCharacterWithJob(character, job, wearClothes)
-	-- Get humanoid
-	local humanoid = character and character:FindFirstChild("Humanoid")
-	if not humanoid or not job then return end
-	local config = job.config.job
+	-- Get objects
+	local jobsState = player.state.jobs
+	local jobConfig = player.state.jobs.job.Value.config.job
+	local avatarScale = jobsState.avatarScale.Value
+	local humanoid = player.Character:FindFirstChild("Humanoid")
+	local playerDescription = jobsState.playerDescription
+	local characterDescription = humanoid and humanoid:GetAppliedDescription()
+	if not humanoid then return end
 
-	-- Render humanoid description items
-	local player = Players:GetPlayerFromCharacter(character)
-	local avatarDescription = Players:GetHumanoidDescriptionFromUserId(player.UserId)
-	for _, child in pairs(config.humanoidDescription:GetChildren()) do
-		if (child.Name ~= "Shirt" and child.Name ~= "Pants") or wearClothes then
-			avatarDescription[child.Name] = child.Value
+	-- Set clothes
+	local function tryClothes(piece)
+		local jobPiece = jobConfig.humanoidDescription:FindFirstChild(piece)
+		if jobsState.outfitsEnabled.Value and jobPiece then
+			-- player.Character[piece][piece .. "Template"] = jobPiece[piece .. "Template"]
+			characterDescription[piece] = jobPiece.Value
+		else
+			-- player.Character[piece][piece .. "Template"] = playerDescription[piece]
+			characterDescription[piece] = playerDescription[piece]
 		end
 	end
+	tryClothes("Shirt")
+	tryClothes("Pants")
 
-	-- Render backpack size
-	local backpack = player and player.state.characterBackpack.instance.Value
+	-- Set character scale
+	for _, scale in pairs({"DepthScale", "WidthScale", "HeightScale"}) do
+		characterDescription[scale] = avatarScale
+	end
+	local backpack = player.state.characterBackpack.instance.Value
 	if backpack then
-		backpack.ScaleEffect.Value = config.backpackScale.Value
+		backpack.ScaleEffect.Value = avatarScale
 	end
 
-	-- Apply
-	humanoid:ApplyDescription(avatarDescription)
+	-- Apply it all
+	humanoid:ApplyDescription(characterDescription)
 end
 
 -- Root function to give player all gear from a specific folder

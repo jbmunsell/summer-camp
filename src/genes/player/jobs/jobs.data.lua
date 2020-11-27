@@ -8,8 +8,9 @@ return {
 	genes = {},
 	state = {
 		jobs = {
-			job = env.res.jobs.teamLeader,
-			wearClothes = true,
+			job = env.res.jobs.camper,
+			outfitsEnabled = true,
+			avatarScale = env.config.character.scaleDefault.Value,
 			gear = {},
 			unlocked = {},
 			dailyGearGiven = {},

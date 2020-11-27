@@ -33,7 +33,7 @@ function soundUtil.playSound(sound, parent)
 	sound:Play()
 	return sound
 end
-function soundUtil.playGlobalSound(sound)
+function soundUtil.playSoundGlobal(sound)
 	return soundUtil.playSound(sound, workspace)
 end
 

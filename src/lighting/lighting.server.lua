@@ -39,5 +39,5 @@ end
 
 local rooster = env.res.audio.sounds.Rooster
 local twinkle = env.res.audio.sounds.NightTwinkle
-scheduleUtil.getLiveTimeOfDayStream(6):subscribe(dart.bind(soundUtil.playGlobalSound, rooster))
-scheduleUtil.getLiveTimeOfDayStream(18):subscribe(dart.bind(soundUtil.playGlobalSound, twinkle))
+scheduleUtil.getLiveTimeOfDayStream(6):subscribe(dart.bind(soundUtil.playSoundGlobal, rooster))
+scheduleUtil.getLiveTimeOfDayStream(18):subscribe(dart.bind(soundUtil.playSoundGlobal, twinkle))

@@ -21,6 +21,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local Spring = require(axis.classes.Spring)
 local genesUtil = require(genes.util)
@@ -106,31 +107,6 @@ local function renderOutfitsEnabled(enabled)
 	-- TODO: Update all avatars to wear appropriate clothes
 end
 
--- local function copyProperties(src, dest, ...)
--- 	for _, property in pairs({...}) do
--- 		dest[property] = src[property]
--- 	end
--- end
--- local function mirror(src, dest, root)
--- 	if src:IsA("BasePart") then
--- 		dest.CFrame = src.
--- 		copyProperties("CFrame")
--- 	elseif src:IsA("JointInstance") then
--- 	end
--- 	for _, child in pairs(src) do
--- 		local c = dest:FindFirstChild(child.Name)
--- 		if c then
--- 			mirror(child, c)
--- 		end
--- 	end
--- end
--- local function renderAvatars()
--- 	for _, job in pairs(jobListing) do
--- 		local frame = getJobFrame(job)
--- 		mirror(dummy, frame.WorldModel.Character)
--- 	end
--- end
-
 -- Render avatars very simply
 local function renderAvatars()
 	local scale = state.avatarScale:getValue()
@@ -139,7 +115,7 @@ local function renderAvatars()
 		local character = frame.WorldModel.Character
 		local playerCharacter = env.LocalPlayer.Character
 		local outfit = state.outfitsEnabled:getValue()
-		local description = job.config.job.humanoidDescription
+		local assets = job.config.job.humanoidDescriptionAssets
 		character.ScaleEffect.Value = scale
 
 		local fullShadowY = frame.Shadow.properties.maxYScale.Value
@@ -148,7 +124,7 @@ local function renderAvatars()
 			anchorY + (fullShadowY - anchorY) * scale, 0)
 
 		local function tryClothing(piece)
-			local jobPiece = description:FindFirstChild(piece)
+			local jobPiece = assets:FindFirstChild(piece)
 			if outfit and jobPiece then
 				character[piece][piece .. "Template"] = jobPiece[piece .. "Template"]
 			else
@@ -298,7 +274,9 @@ local function createJobFrame(job, i)
 	rx.Observable.fromInstanceEvent(actionButton, "Activated"):subscribe(function ()
 		if isUnlocked() then
 			-- Send request to server and close gui
-			genes.player.jobs.net.JobChangeRequested:FireServer(job)
+			local outfitsEnabled = state.outfitsEnabled:getValue()
+			local scale = state.avatarScale:getValue()
+			genes.player.jobs.net.JobChangeRequested:FireServer(job, outfitsEnabled, scale)
 			jobSelection.Enabled = false
 		else
 			-- Prompt gamepass purchase
@@ -418,3 +396,10 @@ state.avatarScale
 	-- :throttle(0.1)
 	:merge(state.outfitsEnabled)
 	:subscribe(renderAvatars)
+
+-- Play special sound on job unlocked
+-- 	player, gamePassId, wasPurchased
+rx.Observable.from(MarketplaceService.PromptGamePassPurchaseFinished)
+	:filter(dart.equals(env.LocalPlayer))
+	:filter(dart.select(3))
+	:subscribe(dart.bind(soundUtil.playSoundGlobal, env.res.audio.sounds.JobUnlocked))

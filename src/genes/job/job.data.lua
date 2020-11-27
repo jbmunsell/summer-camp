@@ -22,12 +22,8 @@ return {
 			gear = {},
 			dailyGear = {},
 
-			humanoidDescription = {
-				DepthScale = 0.7,
-				WidthScale = 0.7,
-				HeightScale = 0.7,
-				HeadScale = 1.0,
-			},
+			humanoidDescriptionAssets = {},
+			humanoidDescription = {},
 
 			backpackScale = 0.7,
 		},
