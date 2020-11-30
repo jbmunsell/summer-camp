@@ -42,10 +42,7 @@ local function initPlayerGene(gene, waitForTeam)
 		end
 
 		obs:subscribe(function (player)
-			print("tagging player with gene: ", player, tostring(gene))
-
 			genesUtil.addGeneTag(player, gene)
-			-- CollectionService:AddTag(player, require(gene.data).instanceTag)
 		end)
 	end
 

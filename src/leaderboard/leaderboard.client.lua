@@ -34,7 +34,6 @@ end
 
 local function renderLeaderboard()
 	-- Sort according to wins
-	print("rendering leaderboard")
 	local teams = genesUtil.getInstances(genes.team):raw()
 	table.sort(teams, function (a, b)
 		return getWins(a) > getWins(b)

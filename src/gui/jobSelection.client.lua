@@ -213,7 +213,11 @@ local function createJobFrame(job, i)
 	rootCFrame.Name = "rootCFrame"
 	frame.WorldModel.Character:Destroy()
 	local character = env.LocalPlayer.Character
+	character:WaitForChild("Humanoid")
 	character.Archivable = true
+	for _, d in pairs(character:GetDescendants()) do
+		d.Archivable = true
+	end
 	local copy = character:Clone()
 	copy.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	fx.new("ScaleEffect", copy)

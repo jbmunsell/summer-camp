@@ -49,7 +49,6 @@ end)
 -- Render character when added AND when job changed AND when outfitsEnabled changed
 jobChanged:merge(jobCharacterStream, outfitsEnabledChanged, avatarScaleChanged, teamChanged)
 	:throttle(0.1) -- they will usually fire in quick succession
-	:tap(print)
 	:subscribe(jobsUtil.renderPlayerCharacter)
 
 -- Render gear when job is changed
@@ -116,14 +115,12 @@ rx.Observable.from(MarketplaceService.PromptGamePassPurchaseFinished)
 
 -- Award patch upon first unlocking
 playerStream:subscribe(function (player)
-	print("connecting job patches for ", player.Name)
 	local unlocked = player.state.jobs.unlocked
 	rx.Observable.from(unlocked.ChildAdded)
 		:startWithTable(unlocked:GetChildren())
 		:map(dart.index("Value"))
 		:distinct()
 		:subscribe(function (job)
-			print(job:GetFullName())
 			local patch = job.config.job:FindFirstChild("Patch")
 			if patch then
 				patchUtil.givePlayerPatch(player, patch:Clone())
