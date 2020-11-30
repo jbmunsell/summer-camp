@@ -36,7 +36,8 @@ function Observer:init(onNext, onFail, onComplete)
 	self.bin = Bin.new()
 end
 function Observer:destroy()
-	self:unsubscribe()
+	self:complete()
+	-- self:unsubscribe()
 end
 
 -- Accessors

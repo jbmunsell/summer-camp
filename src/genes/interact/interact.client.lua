@@ -180,8 +180,8 @@ rx.Observable.interval(0.5):subscribe(updatePollingList)
 
 -- Maintain hold packages cache list
 spawn(function ()
-	local totalTracker = ReplicatedStorage.data.TotalInteractables
-	local pollingTracker = ReplicatedStorage.data.PollingInteractables
+	local totalTracker = ReplicatedStorage.debug.data.TotalInteractables
+	local pollingTracker = ReplicatedStorage.debug.data.PollingInteractables
 	while wait(1) do
 		totalTracker.Value = #holdPackages
 		pollingTracker.Value = #pollingPackages

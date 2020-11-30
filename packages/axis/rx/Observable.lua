@@ -9,6 +9,7 @@
 -- roblox services
 local ContextActionService = game:GetService("ContextActionService")
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -96,9 +97,16 @@ end
 local connections = {}
 spawn(function ()
 	local trackerName = RunService:IsServer() and "Server" or "Client"
-	local tracker = game:GetService("ReplicatedStorage").data[trackerName .. "EventSubscriptions"]
+	local tracker = ReplicatedStorage.debug.data[trackerName .. "EventSubscriptions"]
 	while wait(1) do
 		tracker.Value = #connections
+	end
+end)
+spawn(function ()
+	while wait(1) do
+		if ReplicatedStorage.debug.printLatestConnectionTrace.Value then
+			print(connections[#connections].trace)
+		end
 	end
 end)
 function Observable.from(o)
@@ -115,7 +123,7 @@ function Observable.from(o)
 	elseif t == "RBXScriptSignal" then
 		return Observable.new(function (observer)
 			table.insert(connections, observer)
-			-- observer.trace = debug.traceback()
+			observer.trace = debug.traceback()
 			local connection = o:Connect(function (...)
 				observer:push(...)
 			end)

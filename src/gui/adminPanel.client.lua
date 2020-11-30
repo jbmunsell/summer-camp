@@ -67,4 +67,4 @@ rx.Observable.from(toggleVisibilityButton.Activated):subscribe(toggleVisibility)
 rx.Observable.fromProperty(adminPanel.Container, "Visible", true):subscribe(setButtonText)
 
 -- Bind labels to values
-rx.Observable.from(ReplicatedStorage.data:GetChildren()):subscribe(createValueLabel)
+rx.Observable.from(ReplicatedStorage.debug.data:GetChildren()):subscribe(createValueLabel)

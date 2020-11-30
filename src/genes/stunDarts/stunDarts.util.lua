@@ -72,14 +72,11 @@ function stunDartsUtil.stunAndAffix(firingInstance, projectile, hit)
 
 	-- Check if player character AND they're in our roster
 	local player = getPlayerFromHit(hit)
-	print(player)
 	local character = player and player.Character
 	local activityInstance = firingInstance.state.pickup.activity.Value
-	print(activityInstance)
 	if not player or not character
 	or player == firingInstance.state.pickup.owner.Value
 	or not activityInstance or not activityUtil.isPlayerInRoster(activityInstance, player) then return end
-	print("got player")
 
 	-- Play crazy particles
 	local emitter = firingInstance.config.stunDarts.characterParticles.Value:Clone()

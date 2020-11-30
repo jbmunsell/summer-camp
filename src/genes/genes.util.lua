@@ -24,6 +24,8 @@ local geneFolders = {}
 
 -- Create gene folders
 if RunService:IsServer() then
+	genesUtil.log = Instance.new("BoolValue", ReplicatedStorage.debug)
+	genesUtil.log.Name = "genes"
 	Instance.new("Folder", ReplicatedStorage).Name = "_geneValueFolders"
 end
 
@@ -78,6 +80,10 @@ local function queueInstanceWithGene(instance, gene)
 	if table.find(getReadyInstances(gene), instance) then return end
 	table.insert(_geneRequestQueue, { instance, gene })
 
+	if genesUtil.log.Value then
+		print("Queueing ", instance:GetFullName(), " with gene ", gene)
+	end
+
 	rx.Observable.from(instance.DescendantAdded)
 		:throttle(0.2)
 		:startWith(0)
@@ -86,7 +92,9 @@ local function queueInstanceWithGene(instance, gene)
 		:subscribe(function ()
 			table.insert(getReadyInstances(gene), instance)
 			gene.data.InstanceReadyEvent:Fire(instance)
-		end)
+		end, nil, (genesUtil.log.Value and function ()
+			print("Completed state listener for ", instance, gene)
+		end) or nil)
 end
 local function initInstanceGene(instance, gene)
 	-- Add folders
