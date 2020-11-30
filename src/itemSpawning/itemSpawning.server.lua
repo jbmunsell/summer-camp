@@ -8,6 +8,8 @@
 --
 
 -- env
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
@@ -19,7 +21,9 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
+local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
+local pickupUtil = require(genes.pickup.util)
 local scheduleUtil = require(env.src.schedule.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -186,3 +190,24 @@ local function shuffleTip()
 	tipLabel.Text = tip.Value
 end
 rx.Observable.interval(20):subscribe(shuffleTip)
+
+---------------------------------------------------------------------------------------------------
+-- Give admin gear to admins
+---------------------------------------------------------------------------------------------------
+
+local function isAdmin(player)
+	return collection.getValue(env.config.admins, player.UserId) or RunService:IsStudio()
+end
+
+rx.Observable.from(Players.PlayerAdded)
+	:startWithTable(Players:GetPlayers())
+	:filter(isAdmin)
+	:subscribe(function (player)
+		for _, gear in pairs(env.res.adminGear:GetChildren()) do
+			local copy = gear:Clone()
+			copy.Parent = ReplicatedStorage
+			genesUtil.waitForGene(copy, genes.pickup)
+			pickupUtil.stowObjectForPlayer(player, copy)
+			print("granting ", player.Name, copy.Name)
+		end
+	end)
