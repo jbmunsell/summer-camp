@@ -99,6 +99,22 @@ function activityUtil.getPlayerCompetingStream(player)
 				:map(dart.constant(false)))
 	end):takeUntil(rx.Observable.from(Players.PlayerRemoving):filter(dart.equals(player)))
 end
+function activityUtil.getPlayerActivityStream(player)
+	return genesUtil.getInstanceStream(activity):flatMap(function (activityInstance)
+		local roster = activityInstance.state.activity.roster
+		local function isPlayer(o)
+			return o:filter(dart.isa("ObjectValue"))
+					:filter(function (c) return c.Value == player end)
+		end
+		return rx.Observable.from(roster.DescendantAdded)
+			:startWithTable(roster:GetDescendants())
+			:pipe(isPlayer)
+			:map(dart.constant(activityInstance))
+			:merge(rx.Observable.from(roster.DescendantRemoving)
+				:pipe(isPlayer)
+				:map(dart.constant(nil)))
+	end):takeUntil(rx.Observable.from(Players.PlayerRemoving):filter(dart.equals(player)))
+end
 
 -- Get player added to roster stream
 local function getPlayerRosterValue(roster, player)
@@ -133,8 +149,7 @@ function activityUtil.getPlayerRemovedFromRosterStream(gene)
 		local roster = activityInstance.state.activity.roster
 		return rx.Observable.from(roster.ChildAdded):startWithTable(roster:GetChildren())
 			:flatMap(function (teamFolder)
-				return rx.Observable.from(teamFolder.ChildAdded)
-					:merge(rx.Observable.from(teamFolder.ChildRemoved))
+				return rx.Observable.from(teamFolder.ChildRemoved)
 			end)
 			:map(dart.index("Value"))
 			:map(dart.carry(activityInstance))
@@ -236,6 +251,7 @@ end
 -- Eject players from instance
 function activityUtil.ejectPlayerFromActivity(activityInstance, player)
 	local ejectionSpawnPlane = activityInstance:FindFirstChild("EjectionSpawnPlane", true)
+	if not ejectionSpawnPlane then return end
 	activityUtil.spawnPlayersInPlane({ player }, ejectionSpawnPlane)
 end
 function activityUtil.ejectPlayers(activityInstance)

@@ -40,6 +40,20 @@ local function addPlayerToRoster(activityInstance, player)
 	collection.addValue(state.fullRoster[teamIndex], player)
 end
 
+-- Set sprint particles to team color
+local function setPlayerSprintEmitterTeam(player, team)
+	local emitter = player.Character and player.Character:FindFirstChild("SprintEmitter")
+	if emitter then
+		emitter.state.teamLink.team.Value = team
+	end
+end
+local function setPlayerSprintParticlesToTeamColor(player)
+	setPlayerSprintEmitterTeam(player, player.Team)
+end
+local function clearPlayerSprintParticlesColor(player)
+	setPlayerSprintEmitterTeam(player, nil)
+end
+
 -- Gear
 local function givePlayerActivityGear(activityInstance, player)
 	for _, value in pairs(activityInstance.config.activity.gear:GetChildren()) do
@@ -47,29 +61,38 @@ local function givePlayerActivityGear(activityInstance, player)
 		collection.addValue(activityInstance.state.activity.gear, copy)
 		copy.Parent = ReplicatedStorage
 		genesUtil.waitForGene(copy, genes.pickup)
+		copy.state.pickup.activity.Value = activityInstance
 		pickupUtil.stowObjectForPlayer(player, copy)
 	end
 end
 local function stripPlayerActivityGear(activityInstance, player)
 	for _, entry in pairs(activityInstance.state.activity.gear:GetChildren()) do
-		if entry.Value and entry.Value.state.pickup.owner.Value == player then
+		if entry.Value and entry.Value:IsDescendantOf(game)
+		and entry.Value.state.pickup.owner.Value == player then
 			entry.Value:Destroy()
-			entry:Destroy()
 		end
+		entry:Destroy()
 	end
 end
 
 -- Start collecting roster
-local function getRosterTimerLabel(activityInstance)
-	local timerLabel = activityInstance:FindFirstChild("RosterTimerLabel", true)
-	if not timerLabel then
-		error("No RosterTimerLabel found in " .. activityInstance:GetFullName())
+local function getRosterTimerLabels(activityInstance)
+	local labels = {}
+	for _, label in pairs(activityInstance:GetDescendants()) do
+		if label.Name == "RosterTimerLabel" then
+			table.insert(labels, label)
+		end
 	end
-	return timerLabel
+	if #labels == 0 then
+		warn("No RosterTimerLabel instances found for " .. activityInstance:GetFullName())
+	end
+	return labels
 end
-local function setRosterTimerVisible(activityInstance, visible)
-	local timerLabel = getRosterTimerLabel(activityInstance)
-	timerLabel.Parent.Enabled = visible
+local function setRosterTimersVisible(activityInstance, visible)
+	local timerLabels = getRosterTimerLabels(activityInstance)
+	for _, label in pairs(timerLabels) do
+		label.Parent.Enabled = visible
+	end
 end
 local function startCollectingRoster(activityInstance)
 	-- Move all enrolled teams to session teams
@@ -83,9 +106,11 @@ local function startCollectingRoster(activityInstance)
 	state.inSession.Value = true
 
 	-- Show countdown part
-	local timerLabel = getRosterTimerLabel(activityInstance)
+	local timerLabels = getRosterTimerLabels(activityInstance)
 	local function setTimerText(t)
-		timerLabel.Text = t
+		for _, label in pairs(timerLabels) do
+			label.Text = t
+		end
 	end
 	rx.Observable.heartbeat()
 		:scan(function (t, dt)
@@ -202,7 +227,7 @@ end
 local activities = genesUtil.initGene(activity)
 
 -- Set roster timer visible
-genesUtil.observeStateValue(activity, "isCollectingRoster"):subscribe(setRosterTimerVisible)
+genesUtil.observeStateValue(activity, "isCollectingRoster"):subscribe(setRosterTimersVisible)
 
 -- Add and remove activity gear according to our presence on a roster
 activityUtil.getPlayerAddedToRosterStream(genes.activity):subscribe(givePlayerActivityGear)
@@ -245,7 +270,7 @@ rosterCollectingStart
 -- When a session starts, poll at 2hz to remove glitchers from inside and bring
 -- 	back glitchers from outside
 genesUtil.observeStateValue(activity, "inSession"):filter(dart.select(2)):subscribe(function (activityInstance)
-	if not activityInstance.config.activity.lockPitch then return end
+	if not activityInstance.config.activity.lockPitch.Value then return end
 	rx.Observable.interval(0.5)
 		:takeUntil(rx.Observable.from(activityInstance.state.activity.inSession):reject())
 		:subscribe(dart.bind(lockPitch, activityInstance))
@@ -288,6 +313,12 @@ leaveRequested:subscribe(function (player)
 		warn("Player attempted to leave an activity but is not on any rosters")
 	end
 end)
+
+-- Change color of sprint particles when they join a roster
+activityUtil.getPlayerAddedToRosterStream(genes.activity):map(dart.select(2))
+	:subscribe(setPlayerSprintParticlesToTeamColor)
+activityUtil.getPlayerRemovedFromRosterStream(genes.activity):map(dart.select(2))
+	:subscribe(clearPlayerSprintParticlesColor)
 
 -- Stop session when a winner is declared from the inside
 local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")

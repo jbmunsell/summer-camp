@@ -168,7 +168,7 @@ scheduleUtil.getTimeOfDayStream(18):subscribe(function ()
 	for _, d in pairs(folder:GetChildren()) do
 		local weld = Instance.new("WeldConstraint")
 		weld.Part0 = workspace.Terrain
-		weld.Part1 = d
+		weld.Part1 = (d:IsA("Model") and d.PrimaryPart or d)
 		weld.Name = "StationaryWeld"
 		weld.Parent = d
 	end

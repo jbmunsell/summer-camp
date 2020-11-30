@@ -37,6 +37,11 @@ function collection.getValue(folder, value)
 		:first(function (v) return v.Value == value end)
 end
 
+-- get index
+function collection.getIndex(folder, value)
+	return tonumber(collection.getValue(folder, value).Name)
+end
+
 -- clear
 function collection.clear(folder)
 	folder:ClearAllChildren()

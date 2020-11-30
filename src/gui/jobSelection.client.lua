@@ -26,15 +26,17 @@ local collection = require(axis.lib.collection)
 local Spring = require(axis.classes.Spring)
 local genesUtil = require(genes.util)
 local inputStreams = require(env.src.input.streams)
+local interactUtil = require(genes.interact.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Variables
 ---------------------------------------------------------------------------------------------------
 
 local state = {
-	outfitsEnabled = rx.BehaviorSubject.new(true),
-	avatarScale    = rx.BehaviorSubject.new(env.config.character.scaleDefault.Value),
-	selectedIndex  = rx.BehaviorSubject.new(1),
+	outfitsEnabled     = rx.BehaviorSubject.new(true),
+	avatarScale        = rx.BehaviorSubject.new(env.config.character.scaleDefault.Value),
+	selectedIndex      = rx.BehaviorSubject.new(1),
+	isPrimarySelection = rx.BehaviorSubject.new(true),
 }
 
 local jobSelection = env.PlayerGui:WaitForChild("JobSelection")
@@ -125,6 +127,9 @@ local function renderAvatars()
 
 		local function tryClothing(piece)
 			local jobPiece = assets:FindFirstChild(piece)
+			if jobPiece and jobPiece:IsA("Folder") then
+				jobPiece = jobPiece:GetChildren()[1]
+			end
 			if outfit and jobPiece then
 				character[piece][piece .. "Template"] = jobPiece[piece .. "Template"]
 			else
@@ -151,13 +156,13 @@ local function renderJobFrame(job)
 	local gradientName
 	local buttonHeight
 	local buttonColor
-	local lockVisible
+	local lockVisible = false
 	local ambientColor
 	if isLocked then
 		gradientName = "Locked"
 		buttonHeight = button.properties.fullHeight.Value
 		buttonColor = button.properties.buyColor.Value
-		lockVisible = true
+		-- lockVisible = true
 		ambientColor = frame.properties.ambientLocked.Value
 	else
 		buttonColor = button.properties.selectColor.Value
@@ -210,6 +215,7 @@ local function createJobFrame(job, i)
 	local character = env.LocalPlayer.Character
 	character.Archivable = true
 	local copy = character:Clone()
+	copy.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	fx.new("ScaleEffect", copy)
 	copy:SetPrimaryPartCFrame(rootCFrame.Value)
 	copy.Parent = frame.WorldModel
@@ -278,6 +284,7 @@ local function createJobFrame(job, i)
 			local scale = state.avatarScale:getValue()
 			genes.player.jobs.net.JobChangeRequested:FireServer(job, outfitsEnabled, scale)
 			jobSelection.Enabled = false
+			state.isPrimarySelection:push(false)
 		else
 			-- Prompt gamepass purchase
 			MarketplaceService:PromptGamePassPurchase(env.LocalPlayer, jobConfig.gamepassId.Value)
@@ -322,6 +329,9 @@ rx.Observable.fromProperty(jobSelection, "Enabled"):subscribe(renderEnabled)
 state.selectedIndex:subscribe(renderSelectedIndex)
 state.avatarScale:subscribe(renderAvatarScale)
 state.outfitsEnabled:subscribe(renderOutfitsEnabled)
+state.isPrimarySelection:subscribe(function (isPrimary)
+	instances.closeButton.Visible = not isPrimary
+end)
 
 -- Create a position spring for scrolling frame
 local positionSpring = Spring.new(0, 0)
@@ -403,3 +413,10 @@ rx.Observable.from(MarketplaceService.PromptGamePassPurchaseFinished)
 	:filter(dart.equals(env.LocalPlayer))
 	:filter(dart.select(3))
 	:subscribe(dart.bind(soundUtil.playSoundGlobal, env.res.audio.sounds.JobUnlocked))
+
+-- Open gui on job giver interact
+interactUtil.getInteractStream(genes.jobGiver):subscribe(function (instance)
+	local job = instance.config.jobGiver.job.Value
+	state.selectedIndex:push(table.find(jobListing, job))
+	jobSelection.Enabled = true
+end)

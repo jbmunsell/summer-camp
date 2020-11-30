@@ -25,6 +25,7 @@ return {
 	config = {
 		activity = {
 			isCompetitive = false,
+			lockPitch = false,
 			rosterCollectionTimer = 25,
 			trophy = tableau.null,
 			teamCount = 1,

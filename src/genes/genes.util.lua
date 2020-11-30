@@ -59,21 +59,47 @@ function genesUtil.getAllSubGenes(gene)
 	return tableau.from(genes)
 end
 
+-- Ready tracking
+local readyInstances = {}
+local function getReadyInstances(gene)
+	if not readyInstances[gene] then
+		readyInstances[gene] = {}
+	end
+	return readyInstances[gene]
+end
+
 -- init gene queue
 local _geneRequestQueue = {}
 local function queueInstanceWithGene(instance, gene)
+	for i = #_geneRequestQueue, 1, -1 do
+		local entry = _geneRequestQueue[i]
+		if entry[1] == instance and entry[2] == gene then return end
+	end
+	if table.find(getReadyInstances(gene), instance) then return end
 	table.insert(_geneRequestQueue, { instance, gene })
+
+	rx.Observable.from(instance.DescendantAdded)
+		:throttle(0.2)
+		:startWith(0)
+		:filter(dart.bind(genesUtil.hasFullState, instance, gene))
+		:first()
+		:subscribe(function ()
+			table.insert(getReadyInstances(gene), instance)
+			gene.data.InstanceReadyEvent:Fire(instance)
+		end)
 end
 local function initInstanceGene(instance, gene)
 	-- Add folders
-	local geneData = require(gene.data)
-	genesUtil.touchFolder(instance, gene, "config")
-	genesUtil.touchFolder(instance, gene, "state")
-	genesUtil.addInterface(instance, gene)
+	if RunService:IsServer() or instance:IsDescendantOf(env.PlayerGui) then
+		local geneData = require(gene.data)
+		genesUtil.touchFolder(instance, gene, "config")
+		genesUtil.touchFolder(instance, gene, "state")
+		genesUtil.addInterface(instance, gene)
 
-	-- Add tags to apply inherited gene functionality
-	for _, g in pairs(geneData.genes) do
-		genesUtil.addGeneTag(instance, g)
+		-- Add tags to apply inherited gene functionality
+		for _, g in pairs(geneData.genes) do
+			genesUtil.addGeneTag(instance, g)
+		end
 	end
 end
 function genesUtil.initQueueProcessing(bufferSize)
@@ -86,33 +112,6 @@ function genesUtil.initQueueProcessing(bufferSize)
 end
 
 -- init object server
-local readyInstances = {}
-local function getReadyInstances(gene)
-	if not readyInstances[gene] then
-		readyInstances[gene] = {}
-	end
-	return readyInstances[gene]
-end
-local function createInstanceReadiedStream(gene)
-	local geneData = require(gene.data)
-	local instanceAdded = CollectionService:GetInstanceAddedSignal(geneData.instanceTag)
-	return rx.Observable.from(instanceAdded)
-		:startWithTable(CollectionService:GetTagged(geneData.instanceTag))
-		:flatMap(function (instance)
-			if table.find(getReadyInstances(gene), instance) or genesUtil.hasFullState(instance, gene) then
-				return rx.Observable.just(instance)
-			else
-				return rx.Observable.from(instance.DescendantAdded)
-					:throttle(0.2)
-					:filter(dart.bind(genesUtil.hasFullState, instance, gene))
-					:map(dart.constant(instance))
-					:first()
-			end
-		end)
-end
-local function getInstanceReadiedStream(gene)
-	return createInstanceReadiedStream(gene)
-end
 function genesUtil.initGene(gene)
 	-- Grab data
 	local geneData = require(gene.data)
@@ -127,20 +126,17 @@ function genesUtil.initGene(gene)
 			gene.data:WaitForChild("InstanceReadyEvent")
 		end
 	end
-	getInstanceReadiedStream(gene):subscribe(function (instance)
-		table.insert(geneReadyList, instance)
-		gene.data.InstanceReadyEvent:Fire(instance)
-	end)
 	rx.Observable.from(instanceRemoved):subscribe(dart.bind(tableau.removeValue, geneReadyList))
 
 	-- (server only) Init all tagged instances when we hear about them
 	local queueInstance = dart.follow(queueInstanceWithGene, gene)
-	if RunService:IsServer() then
-		rx.Observable.fromInstanceTag(geneData.instanceTag):subscribe(queueInstance)
-	elseif RunService:IsClient() then
-		rx.Observable.fromInstanceTag(geneData.instanceTag):filter(dart.isDescendantOf(env.PlayerGui))
-			:subscribe(queueInstance)
-	end
+	rx.Observable.fromInstanceTag(geneData.instanceTag):subscribe(queueInstance)
+	-- if RunService:IsServer() then
+	-- 	rx.Observable.fromInstanceTag(geneData.instanceTag):subscribe(queueInstance)
+	-- elseif RunService:IsClient() then
+	-- 	rx.Observable.fromInstanceTag(geneData.instanceTag):filter(dart.isDescendantOf(env.PlayerGui))
+	-- 		:subscribe(queueInstance)
+	-- end
 
 	-- return instance stream
 	return genesUtil.getInstanceStream(gene)

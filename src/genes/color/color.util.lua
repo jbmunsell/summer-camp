@@ -37,8 +37,11 @@ function colorUtil.renderColor(instance, color)
 			end
 
 			local alteredColor = Color3.fromHSV(h, s, math.min(math.max(v, 0), 1))
-			if d.Parent:IsA("ParticleEmitter") then
+			local propType = typeof(d.Parent[d.Value])
+			if propType == "ColorSequence" then
 				d.Parent[d.Value] = ColorSequence.new(alteredColor)
+			elseif propType == "BrickColor" then
+				d.Parent[d.Value] = BrickColor.new(alteredColor)
 			else
 				d.Parent[d.Value] = alteredColor
 			end

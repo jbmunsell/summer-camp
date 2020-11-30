@@ -122,11 +122,6 @@ local function renderLayout(ownedObjects)
 		:foreachi(renderButtonHotkey)
 end
 
--- Set scrolling frame size
-local function setScrollingFrameSize(pixelSize)
-	actionsContainer.CanvasSize = UDim2.new(0, pixelSize.X, 0, pixelSize.Y)
-end
-
 ---------------------------------------------------------------------------------------------------
 -- Streams and subscriptions
 ---------------------------------------------------------------------------------------------------
@@ -135,9 +130,9 @@ end
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 
 -- Recompute scrolling frame size when the list layout size changes
-local layout = actionsContainer:FindFirstChildWhichIsA("UIListLayout")
-rx.Observable.fromProperty(layout, "AbsoluteContentSize")
-	:subscribe(setScrollingFrameSize)
+-- local layout = actionsContainer:FindFirstChildWhichIsA("UIListLayout")
+-- rx.Observable.fromProperty(layout, "AbsoluteContentSize")
+-- 	:subscribe(setScrollingFrameSize)
 
 -- Clear layout contents to begin
 -- 	(eliminates the display testing actions)

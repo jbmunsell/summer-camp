@@ -22,17 +22,17 @@ local genesUtil = require(genes.util)
 local interactUtil = {}
 
 -- Get interact stream
-function interactUtil.getInteractStream(class)
+function interactUtil.getInteractStream(gene)
 	if RunService:IsServer() then
 		return rx.Observable.from(interact.net.ClientInteracted)
 			:filter(dart.boolAnd)
 			:filter(function (_, instance)
-				return genesUtil.hasFullState(instance, class)
+				return genesUtil.hasFullState(instance, gene)
 			end)
 	elseif RunService:IsClient() then
 		return rx.Observable.from(interact.interface.ClientInteracted)
 			:filter(function (instance)
-				return genesUtil.hasFullState(instance, class)
+				return genesUtil.hasFullState(instance, gene)
 			end)
 	end
 end

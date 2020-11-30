@@ -23,7 +23,9 @@ function flashlightUtil.renderFlashlight(instance)
 	if not enabled then
 		fx.clearEmitters(instance)
 	else
-		instance.Dust:FindFirstChildWhichIsA("ParticleEmitter"):Emit(10)
+		if instance:FindFirstChild("Dust") then
+			instance.Dust:FindFirstChildWhichIsA("ParticleEmitter"):Emit(10)
+		end
 	end
 	local v = (enabled and 0.7 or 0.2)
 	instance.LightPart.Color = Color3.fromHSV(0, 0, v)

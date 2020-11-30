@@ -22,15 +22,16 @@ local function defaultAccess(team, stateValueName)
 	return team.config.team[stateValueName].Value
 end
 
-local function tryLink(instance, configValueName, gene, stateValueName, transform)
+local function tryLink(instance, configValueName, gene, stateValueName, default, transform)
 	transform = transform or defaultAccess
 	if instance.config.teamLink[configValueName].Value then
 		local geneName = require(gene.data).name
 		rx.Observable.from(instance.state.teamLink.team)
-			:filter()
 			:subscribe(function (team)
-				if genesUtil.hasGeneTag(team, genes.team) then
+				if team and genesUtil.hasGeneTag(team, genes.team) then
 					instance.state[geneName][stateValueName].Value = transform(team, stateValueName)
+				else
+					instance.state[geneName][stateValueName].Value = default
 				end
 			end)
 	end
@@ -39,13 +40,14 @@ end
 function teamLinkUtil.initTeamLink(instance)
 	-- Link properties (interact is handled by client)
 	genesUtil.readConfigIntoState(instance, "teamLink", "team")
-	tryLink(instance, "linkColor", genes.color, "color")
-	tryLink(instance, "linkImage", genes.image, "image", function (team)
-		return team.config.team[instance.config.teamLink.teamImageType.Value].Value
+	local config = instance.config.teamLink
+	tryLink(instance, "linkColor", genes.color, "color", config.defaultColor.Value)
+	tryLink(instance, "linkImage", genes.image, "image", config.defaultImage.Value, function (team)
+		return team.config.team[config.teamImageType.Value].Value
 	end)
 
 	-- Pull from owner if config says so
-	if instance.config.teamLink.linkFromOwnerTeam.Value then
+	if config.linkFromOwnerTeam.Value then
 		genesUtil.waitForGene(instance, genes.pickup)
 		rx.Observable.from(instance.state.pickup.owner)
 			:switchMap(function (player)

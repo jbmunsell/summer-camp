@@ -319,13 +319,15 @@ end
 
 local function logScaleVectorProperty(instance, property, value, initValue)
 	value = value or instance[property]
-	local v = Instance.new("Vector3Value", instance.FullScaleProperties)
+	local v = instance.FullScaleProperties:FindFirstChild(property)
+		or Instance.new("Vector3Value", instance.FullScaleProperties)
 	v.Name = property
 	v.Value = value * (1 / initValue)
 end
 local function logScaleCFrameProperty(instance, property, value, initValue)
 	value = value or instance[property]
-	local v = Instance.new("CFrameValue", instance.FullScaleProperties)
+	local v = instance.FullScaleProperties:FindFirstChild(property)
+		or Instance.new("CFrameValue", instance.FullScaleProperties)
 	v.Name = property
 	v.Value = value - value.p + (1 / initValue) * value.p
 	-- v.Value = value + (-1 + 1 / initValue) * value.p

@@ -9,6 +9,7 @@ return {
 	state = {
 		plantInGround = {
 			plantId = -1,
+			planted = false,
 		},
 	},
 	

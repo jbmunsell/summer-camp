@@ -30,5 +30,6 @@ genesUtil.initGene(genes.stunDarts)
 
 -- Fire on activated
 pickupUtil.getActivatedStream(genes.stunDarts):subscribe(function (character, instance, target)
+	if not stunDartsUtil.processDebounce(instance) then return end
 	stunDartsUtil.fireDart(character, instance, axisUtil.getPosition(instance), target)
 end)

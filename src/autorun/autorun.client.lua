@@ -10,11 +10,13 @@
 local TweenService = game:GetService("TweenService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
+local genes = env.src.genes
 
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
+local pickupUtil = require(genes.pickup.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Variables
@@ -47,6 +49,9 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
+local holdingHeavy = pickupUtil.getLocalCharacterHoldingStream(genes.preventRunning)
+	:map(dart.boolify)
+
 local running = rx.Observable.from(env.LocalPlayer.CharacterAdded)
 	:startWith(env.LocalPlayer.Character)
 	:filter()
@@ -61,11 +66,14 @@ local running = rx.Observable.from(env.LocalPlayer.CharacterAdded)
 	:distinctUntilChanged()
 	:share()
 local started, stopped = running:partition()
-started:subscribe(function ()
+started
+	:withLatestFrom(holdingHeavy)
+	:reject(dart.select(2))
+	:subscribe(function ()
 	-- Speed them up after a few seconds if we're still running
 	local fast = rx.Observable.timer(AutorunTimer)
 	fast:map(dart.constant(true))
 		:merge(stopped:map(dart.constant(false)))
-		:takeUntil(stopped:delay(0))
+		:takeUntil(stopped:delay(0):merge(holdingHeavy:filter()))
 		:subscribe(setRunning)
 end)

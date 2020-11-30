@@ -82,21 +82,22 @@ function pickupUtil.equip(character, object)
 	-- Destroy any stationary welds
 	axisUtil.destroyChildren(object, "StationaryWeld")
 
+	-- Place in workspace if not already
+	-- 	This is for equipping stowed objects
+	local isInWorkspace = object:IsDescendantOf(workspace)
+	if not isInWorkspace then
+		axisUtil.setCFrame(object, character:GetPrimaryPartCFrame())
+		-- object:SetPrimaryPartCFrame(character:GetPrimaryPartCFrame())
+		object.Parent = workspace
+	end
+
 	-- If in workspace already, then smooth attach
 	-- Otherwise, snap attach
-	local isInWorkspace = object:IsDescendantOf(workspace)
 	local attach = isInWorkspace
 		and axisUtil.smoothAttach
 		or axisUtil.snapAttach
 	local weld = attach(character, object, "RightGripAttachment")
 	weld.Name = "RightGripWeld"
-
-	-- Place in workspace if not already
-	-- 	This is for equipping stowed objects
-	if not isInWorkspace then
-		object.Parent = workspace
-	end
-	-- object.Parent = character
 
 	-- Set holder value
 	object.state.pickup.holder.Value = character

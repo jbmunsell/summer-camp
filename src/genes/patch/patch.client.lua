@@ -27,6 +27,7 @@ local inputUtil = require(env.src.input.util)
 ---------------------------------------------------------------------------------------------------
 
 local preview = rx.BehaviorSubject.new()
+local humanoidRunning = rx.BehaviorSubject.new()
 
 local gui = env.PlayerGui:WaitForChild("Core").Container.PatchDisplay
 do
@@ -51,7 +52,9 @@ local function renderPreview()
 	local result = inputUtil.raycastMouse()
 	local instance = preview:getValue()
 	if result and result.Instance and result.Instance:IsDescendantOf(localBackpack) then
+	-- and not humanoidRunning:getValue() then
 		instance.CFrame = CFrame.new(result.Position, result.Position + result.Normal)
+			* CFrame.Angles(0, math.pi * 0.5, 0)
 		instance.Parent = workspace
 	else
 		instance.Parent = ReplicatedStorage
@@ -92,6 +95,21 @@ end)
 -- Set gui visible according to preview
 preview:map(dart.boolify):subscribe(function (p) gui.Visible = p end)
 
+-- Get humanoid running stream
+rx.Observable.from(env.LocalPlayer.CharacterAdded)
+	:startWith(env.LocalPlayer.Character)
+	:filter()
+	:map(function (character)
+		return character:WaitForChild("Humanoid")
+	end)
+	:filter()
+	:flatMap(function (humanoid)
+		return rx.Observable.fromInstanceEvent(humanoid, "Running")
+	end)
+	:map(dart.greaterThan(0.02))
+	:distinctUntilChanged()
+	:multicast(humanoidRunning)
+
 -- Set preview cframe to mouse or touch
 preview:switchMap(function (instance)
 	return instance
@@ -102,7 +120,11 @@ end):subscribe(renderPreview)
 -- Send request on activated
 pickupUtil.getActivatedStream(genes.patch):subscribe(function (instance)
 	local result = inputUtil.raycastMouse()
-	if result and result.Instance:IsDescendantOf(localBackpack) then
-		genes.patch.net.AttachRequested:FireServer(instance, packageRaycastResult(result))
+	local p = preview:getValue()
+	if p and p:IsDescendantOf(workspace) and
+	result and result.Instance:IsDescendantOf(localBackpack) then
+		local offset = localBackpack.Handle.CFrame:toObjectSpace(CFrame.new(result.Position, result.Position + result.Normal)
+			* CFrame.Angles(0, math.pi * 0.5, 0))
+		genes.patch.net.AttachRequested:FireServer(instance, offset)
 	end
 end)

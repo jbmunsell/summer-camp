@@ -20,6 +20,9 @@ return {
 			linkImage = false,
 			teamImageType = "image",
 			linkInteract = false,
+
+			defaultImage = "",
+			defaultColor = Color3.new(0.5, 0.5, 0.5),
 		},
 	},
 }

@@ -13,6 +13,7 @@ return {
 			avatarScale = env.config.character.scaleDefault.Value,
 			gear = {},
 			unlocked = {},
+			playerClothes = {},
 			dailyGearGiven = {},
 		},
 	},

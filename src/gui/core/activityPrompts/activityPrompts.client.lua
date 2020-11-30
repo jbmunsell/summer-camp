@@ -80,7 +80,7 @@ local function createStartupPrompt(activityInstance)
 		:filter(dart.lessThan(0))
 		:merge(exitStream, localPlayerCompeting:filter(), rosterCollectionStopped)
 		:first()
-		:subscribe(dart.bind(killPrompt, prompt))
+		-- :subscribe(dart.bind(killPrompt, prompt))
 
 	-- Connect to join button text
 	rx.Observable.from(prompt.JoinButton.Activated):first()

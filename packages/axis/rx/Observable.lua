@@ -17,6 +17,7 @@ local Players = game:GetService("Players")
 local axis = script.Parent.Parent
 local class = require(axis.lib.class)
 local Observer = require(script.Parent.Observer)
+local tableau = require(axis.lib.tableau)
 
 -- constants
 local identity = function (x) return x end

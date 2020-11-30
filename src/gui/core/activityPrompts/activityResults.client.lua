@@ -39,6 +39,7 @@ local function showMatchResult(activityInstance)
 
 	-- Create window
 	local container = coreGui.seeds.activityResult.ActivityContainer:Clone()
+	container.Parent = coreGui.Container
 	local frame = container.ActivityResult
 	for i = 1, 2 do
 		local team = state.sessionTeams[i].Value
@@ -61,7 +62,6 @@ local function showMatchResult(activityInstance)
 
 	-- Play animation
 	glib.playAnimation(coreGui.animations.activityPrompt.show, container)
-	container.Parent = coreGui.Container
 	container.Visible = true
 end
 

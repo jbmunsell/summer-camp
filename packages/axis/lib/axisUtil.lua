@@ -121,17 +121,15 @@ end
 function axisUtil.getPosition(instance)
 	return axisUtil.getCFrame(instance).p
 end
-
--- Set CFrame
 function axisUtil.setCFrame(instance, cframe)
 	if instance:IsA("Model") then
-		local primary = instance.PrimaryPart
-		if not primary then
-			error("Attempt to call setCFrame on a model with no PrimaryPart: " .. instance:GetFullName())
-		end
 		instance:SetPrimaryPartCFrame(cframe)
 	elseif instance:IsA("BasePart") then
 		instance.CFrame = cframe
+	-- elseif instance:IsA("Attachment") then
+	-- 	return instance.WorldCFrame
+	else
+		error("Unable to set CFrame for value of type " .. typeof(instance))
 	end
 end
 

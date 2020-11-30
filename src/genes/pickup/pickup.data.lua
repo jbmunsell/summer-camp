@@ -11,6 +11,7 @@ return {
 			dropDebounce = false,
 			holder = tableau.null,
 			owner = tableau.null,
+			activity = tableau.null,
 		},
 
 		interact = {

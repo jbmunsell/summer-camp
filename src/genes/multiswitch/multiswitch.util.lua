@@ -29,10 +29,11 @@ function multiswitchUtil.toggleSwitch(instance, setName, switchName)
 end
 
 -- Create switch
-function multiswitchUtil.createSwitch(instance, setName, switchName)
+function multiswitchUtil.createSwitch(instance, setName, switchName, initValue)
+	if initValue == nil then initValue = true end
 	local switch = Instance.new("BoolValue")
 	switch.Name = switchName
-	switch.Value = true
+	switch.Value = initValue
 	switch.Parent = instance.state[setName].switches
 end
 
@@ -56,8 +57,9 @@ function multiswitchUtil.observeSwitches(instance, setName)
 		:flatMap(function (c)
 			-- Go directly to the changed event to skip the first one
 			-- 	so we don't push a bunch of init events
-			return rx.Observable.fromInstanceEvent(c, "Changed")
+			return rx.Observable.from(c)
 		end)
+		:distinctUntilChanged()
 end
 
 -- 	Gets the switch stream for all instances of a gene

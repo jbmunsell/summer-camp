@@ -34,23 +34,9 @@ function jobsUtil.renderPlayerCharacter(player)
 	local jobConfig = player.state.jobs.job.Value.config.job
 	local avatarScale = jobsState.avatarScale.Value
 	local humanoid = player.Character:FindFirstChild("Humanoid")
-	local playerDescription = jobsState.playerDescription
+	local playerClothes = jobsState.playerClothes
 	local characterDescription = humanoid and humanoid:GetAppliedDescription()
 	if not humanoid then return end
-
-	-- Set clothes
-	local function tryClothes(piece)
-		local jobPiece = jobConfig.humanoidDescription:FindFirstChild(piece)
-		if jobsState.outfitsEnabled.Value and jobPiece then
-			-- player.Character[piece][piece .. "Template"] = jobPiece[piece .. "Template"]
-			characterDescription[piece] = jobPiece.Value
-		else
-			-- player.Character[piece][piece .. "Template"] = playerDescription[piece]
-			characterDescription[piece] = playerDescription[piece]
-		end
-	end
-	tryClothes("Shirt")
-	tryClothes("Pants")
 
 	-- Set character scale
 	for _, scale in pairs({"DepthScale", "WidthScale", "HeightScale"}) do
@@ -63,6 +49,27 @@ function jobsUtil.renderPlayerCharacter(player)
 
 	-- Apply it all
 	humanoid:ApplyDescription(characterDescription)
+	wait()
+
+	-- Set clothes
+	local function tryClothes(piece)
+		local jobPiece = jobConfig.humanoidDescriptionAssets:FindFirstChild(piece)
+		if jobPiece and jobPiece:IsA("Folder") then
+			jobPiece = jobPiece:FindFirstChild(player.Team.Name)
+		end
+		if not player.Character:FindFirstChild(piece) then
+			Instance.new(piece, player.Character).Name = piece
+		end
+		if jobsState.outfitsEnabled.Value and jobPiece then
+			player.Character[piece][piece .. "Template"] = jobPiece[piece .. "Template"]
+			-- characterDescription[piece] = jobPiece.Value
+		else
+			player.Character[piece][piece .. "Template"] = playerClothes[piece][piece .. "Template"]
+			-- characterDescription[piece] = playerDescription[piece]
+		end
+	end
+	tryClothes("Shirt")
+	tryClothes("Pants")
 end
 
 -- Root function to give player all gear from a specific folder
@@ -71,6 +78,10 @@ function jobsUtil.givePlayerGear(player, gearFolder, process)
 	-- Insert new gears into collection and stow for player
 	for _, gear in pairs(gearFolder:GetChildren()) do
 		local copy = gear:Clone()
+		if genesUtil.hasGeneTag(copy, genes.playerProperty) then
+			copy.state.playerProperty.owner.Value = player
+			print("Set playerProperty owner")
+		end
 		copy.Parent = ReplicatedStorage
 		genesUtil.waitForGene(copy, genes.pickup)
 		pickupUtil.stowObjectForPlayer(player, copy)

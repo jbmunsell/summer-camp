@@ -12,18 +12,18 @@ return {
 	},
 
 	config = {
-		captureTheFlag = {
+		activity = {
 			isCompetitive = true,
 			-- lockPitch = true,
-			-- trophy = env.res.activities.CaptureTheFlagTrophy,
-			-- patch = env.res.activities.CaptureTheFlagWinPatch,
+			trophy = env.res.activities.CaptureTheFlagTrophy,
+			patch = env.res.activities.CaptureTheFlagWinPatch,
 			displayName = "Capture the Flag",
 			analyticsName = "captureTheFlag",
 			-- activityPromptImage = "",
 			teamCount = 2,
 
 			gear = {
-				env.res.activities.StunDarts,
+				env.res.activities.gear.StunGun,
 			},
 		},
 	},

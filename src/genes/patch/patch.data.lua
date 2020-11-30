@@ -21,6 +21,10 @@ return {
 	},
 
 	config = {
+		pickup = {
+			stowable = true,
+		},
+
 		patch = {
 		},
 	},

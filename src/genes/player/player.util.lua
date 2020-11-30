@@ -26,6 +26,7 @@ local playerUtil = {}
 local function initPlayerGene(gene, waitForTeam)
 	-- init gene
 	genesUtil.initGene(gene)
+	print("initializing " .. tostring(gene))
 
 	-- If server, wait for each player's first cabin request to add player gene
 	if RunService:IsServer() then
@@ -41,7 +42,10 @@ local function initPlayerGene(gene, waitForTeam)
 		end
 
 		obs:subscribe(function (player)
-			CollectionService:AddTag(player, require(gene.data).instanceTag)
+			print("tagging player with gene: ", player, tostring(gene))
+
+			genesUtil.addGeneTag(player, gene)
+			-- CollectionService:AddTag(player, require(gene.data).instanceTag)
 		end)
 	end
 

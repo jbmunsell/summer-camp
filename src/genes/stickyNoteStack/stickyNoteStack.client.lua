@@ -46,6 +46,11 @@ local function updatePreview(stack)
 		preview = stack:Clone()
 		stickyNoteStackUtil.removeTags(preview)
 		stickyNoteStackUtil.tagNote(preview)
+		rx.Observable.from(stack.state.textConfigure.text)
+			:takeUntil(rx.Observable.fromInstanceLeftGame(preview))
+			:subscribe(function (text)
+				stickyNoteStackUtil.setNoteText(preview, text)
+			end)
 		rotation = (math.random() - 0.5) * stack.config.stickyNoteStack.rotationRange.Value
 	end
 end

@@ -22,6 +22,7 @@ local playerUtil = require(genes.player.util)
 local jobUtil = require(genes.job.util)
 local jobsUtil = require(genes.player.jobs.util)
 local scheduleUtil = require(env.src.schedule.util)
+local patchUtil = require(genes.patch.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
@@ -39,10 +40,16 @@ end)
 -- Job changed stream
 local jobChanged = genesUtil.observeStateValue(genes.player.jobs, "job")
 local outfitsEnabledChanged = genesUtil.observeStateValue(genes.player.jobs, "outfitsEnabled")
+local avatarScaleChanged = genesUtil.observeStateValue(genes.player.jobs, "avatarScale")
+local teamChanged = playerStream:flatMap(function (player)
+	return rx.Observable.fromProperty(player, "Team", true)
+		:map(dart.constant(player))
+end)
 
 -- Render character when added AND when job changed AND when outfitsEnabled changed
-jobChanged:merge(jobCharacterStream, outfitsEnabledChanged)
+jobChanged:merge(jobCharacterStream, outfitsEnabledChanged, avatarScaleChanged, teamChanged)
 	:throttle(0.1) -- they will usually fire in quick succession
+	:tap(print)
 	:subscribe(jobsUtil.renderPlayerCharacter)
 
 -- Render gear when job is changed
@@ -54,10 +61,14 @@ playerStream:subscribe(function (player)
 		:startWith(player:HasAppearanceLoaded())
 		:filter()
 		:subscribe(function ()
-			axisUtil.destroyChild(player.state.jobs, "playerDescription")
-			local desc = player.Character.Humanoid:GetAppliedDescription():Clone()
-			desc.Parent = player.state.jobs
-			desc.Name = "playerDescription"
+			axisUtil.destroyChild(player.state.jobs.playerClothes, "Shirt")
+			axisUtil.destroyChild(player.state.jobs.playerClothes, "Pants")
+			for _, pieceName in pairs({"Shirt", "Pants"}) do
+				local piece = player.Character:FindFirstChild(pieceName)
+				if piece then
+					piece:Clone().Parent = player.state.jobs.playerClothes
+				end
+			end
 		end)
 end)
 
@@ -85,7 +96,10 @@ playerStream:subscribe(function (player)
 	for _, instance in pairs(genesUtil.getInstances(genes.job):raw()) do
 		local gamepassId = instance.config.job.gamepassId.Value
 		if gamepassId == 0 or MarketplaceService:UserOwnsGamePassAsync(player.UserId, gamepassId) then
-			collection.addValue(player.state.jobs.unlocked, instance)
+			local unlocked = player.state.jobs.unlocked
+			if not collection.getValue(unlocked, instance) then
+				collection.addValue(unlocked, instance)
+			end
 		end
 	end
 end)
@@ -93,9 +107,29 @@ rx.Observable.from(MarketplaceService.PromptGamePassPurchaseFinished)
 	:subscribe(function (player, gamepassId, wasPurchased)
 		local job = jobUtil.getJobFromGamepassId(gamepassId)
 		if job and wasPurchased then
-			collection.addValue(player.state.jobs.unlocked, job)
+			local unlocked = player.state.jobs.unlocked
+			if not collection.getValue(unlocked, job) then
+				collection.addValue(unlocked, job)
+			end
 		end
 	end)
+
+-- Award patch upon first unlocking
+playerStream:subscribe(function (player)
+	print("connecting job patches for ", player.Name)
+	local unlocked = player.state.jobs.unlocked
+	rx.Observable.from(unlocked.ChildAdded)
+		:startWithTable(unlocked:GetChildren())
+		:map(dart.index("Value"))
+		:distinct()
+		:subscribe(function (job)
+			print(job:GetFullName())
+			local patch = job.config.job:FindFirstChild("Patch")
+			if patch then
+				patchUtil.givePlayerPatch(player, patch:Clone())
+			end
+		end)
+end)
 
 -- Forward job requests
 rx.Observable.from(genes.player.jobs.net.JobChangeRequested)

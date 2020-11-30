@@ -29,6 +29,8 @@ local multiswitchUtil = require(multiswitch.util)
 ---------------------------------------------------------------------------------------------------
 
 local function attachToCharacter(character, instance)
+	axisUtil.setCFrame(instance, character:GetPrimaryPartCFrame())
+	instance.Parent = workspace
 	for _, d in pairs(instance:GetDescendants()) do
 		if d:IsA("Attachment") then
 			local characterAttachment = character:FindFirstChild(d.Name, true)
@@ -55,8 +57,15 @@ genesUtil.observeStateValue(pickup, "holder"):filter(dart.select(2))
 			if entry.Value then
 				local e = entry.Value:Clone()
 				table.insert(extras, e)
-				attachToCharacter(e, holder)
-				e.Parent = workspace
+				attachToCharacter(holder, e)
+				if genesUtil.hasGeneTag(instance, genes.teamLink) then
+					genesUtil.addGeneAsync(e, genes.teamLink)
+					rx.Observable.from(instance.state.teamLink.team)
+						:takeUntil(rx.Observable.fromInstanceLeftGame(e))
+						:subscribe(function (team)
+							e.state.teamLink.team.Value = team
+						end)
+				end
 			end
 		end
 		rx.Observable.from(instance.state.pickup.holder):reject():first():subscribe(function ()
