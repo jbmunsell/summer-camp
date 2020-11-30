@@ -60,6 +60,9 @@ function jobsUtil.renderPlayerCharacter(player)
 		if not player.Character:FindFirstChild(piece) then
 			Instance.new(piece, player.Character).Name = piece
 		end
+		if not playerClothes:FindFirstChild(piece) then
+			Instance.new(piece, playerClothes).Name = piece
+		end
 		if jobsState.outfitsEnabled.Value and jobPiece then
 			player.Character[piece][piece .. "Template"] = jobPiece[piece .. "Template"]
 			-- characterDescription[piece] = jobPiece.Value

@@ -26,9 +26,9 @@ local function tryLink(instance, configValueName, gene, stateValueName, default,
 	transform = transform or defaultAccess
 	if instance.config.teamLink[configValueName].Value then
 		local geneName = require(gene.data).name
+		genesUtil.waitForGene(instance, gene)
 		rx.Observable.from(instance.state.teamLink.team)
 			:subscribe(function (team)
-				genesUtil.waitForGene(instance, gene)
 				if team and genesUtil.hasGeneTag(team, genes.team) then
 					instance.state[geneName][stateValueName].Value = transform(team, stateValueName)
 				else

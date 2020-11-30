@@ -21,10 +21,10 @@ local colorUtil = {}
 
 -- init instance
 function colorUtil.initInstance(instance)
-	genesUtil.readConfigIntoState(instance, "color", "color")
-	-- rx.Observable.from(instance.state.color.color)
-	-- 	:map(dart.carry(instance))
-	-- 	:subscribe(colorUtil.renderColor)
+	-- genesUtil.readConfigIntoState(instance, "color", "color")
+	rx.Observable.from(instance.state.color.color)
+		:map(dart.carry(instance))
+		:subscribe(colorUtil.renderColor)
 	-- LEFT OFF HERE
 	-- Next trick is going to be monitoring subscription counts
 	-- upon deleting an item with just the color subscription

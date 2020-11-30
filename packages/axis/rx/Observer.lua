@@ -86,7 +86,7 @@ end
 function Observer:unsubscribe()
 	-- Set state to stopped
 	self.subscribed = false
-	self.bin:dump()
+	self.bin:destroy()
 end
 
 -- return class

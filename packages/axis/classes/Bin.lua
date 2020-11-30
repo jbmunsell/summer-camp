@@ -60,7 +60,12 @@ function Bin.hold(self, ...)
 		assert(table.find(SupportedTypes, tof), "Bin cannot hold type '" .. tof .. "'")
 
 		if tof == "table" and item._isObserver and not item:isSubscribed() then return end
-		table.insert(self.items, item)
+		if self.destroyed then
+			-- print("Hold called on a destroyed bin; disposing")
+			dispose(item)
+		else
+			table.insert(self.items, item)
+		end
 	end
 end
 
@@ -83,6 +88,13 @@ function Bin.dump(self)
 		dispose(item)
 	end
 	self.items = {}
+end
+
+-- Destroy
+-- 	Dumps and sets flag so that we can immediately dump future holds
+function Bin.destroy(self)
+	self.destroyed = true
+	self:dump()
 end
 
 -- return class

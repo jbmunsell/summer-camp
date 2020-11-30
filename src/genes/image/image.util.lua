@@ -21,7 +21,7 @@ local imageUtil = {}
 
 -- init instance
 function imageUtil.initInstance(instance)
-	genesUtil.readConfigIntoState(instance, "image", "image")
+	-- genesUtil.readConfigIntoState(instance, "image", "image")
 	rx.Observable.from(instance.state.image.image)
 		:map(dart.carry(instance))
 		:subscribe(imageUtil.renderImage)

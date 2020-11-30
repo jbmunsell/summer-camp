@@ -7,6 +7,7 @@
 --
 
 -- env
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -16,9 +17,9 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local soundUtil = require(axis.lib.soundUtil)
+local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local activityUtil = require(genes.activity.util)
-local pickupUtil = require(genes.pickup.util)
 local multiswitchUtil = require(genes.multiswitch.util)
 local plantInGroundUtil = require(genes.plantInGround.util)
 
@@ -27,27 +28,15 @@ local plantInGroundUtil = require(genes.plantInGround.util)
 ---------------------------------------------------------------------------------------------------
 
 -- Create flag switches
-local function createFlagSwitches(activityInstance)
+local function initFlags(activityInstance)
 	for i = 1, 2 do
 		local flag = activityInstance["Flag" .. i]
 		genesUtil.waitForGene(flag, genes.interact)
 		multiswitchUtil.createSwitch(flag, "interact", "captureTheFlag", false)
-	end
-end
-
--- Reset flags (to be called at the end of a match to return flags to normal positions
--- 	and turn off interact)
-local function resetFlags(activityInstance)
-	for i = 1, 2 do
-		local flag = activityInstance["Flag" .. i]
-		local base = activityInstance["Base" .. i]
-		genesUtil.waitForGene(flag, genes.pickup)
-		genesUtil.waitForGene(flag, genes.plantInGround)
-		pickupUtil.stripObject(flag)
-		axisUtil.destroyChild(flag, "StationaryWeld")
-		flag:SetPrimaryPartCFrame(base:FindFirstChild("FlagPlant", true).CFrame + Vector3.new(0, 5, 0))
-		plantInGroundUtil.tryPlant(flag)
-		flag.state.teamLink.team.Value = nil
+		local copy = flag:Clone()
+		copy.Parent = ReplicatedStorage
+		collection.addValue(activityInstance.state.captureTheFlag.flagSeeds, copy)
+		flag:Destroy()
 	end
 end
 
@@ -57,7 +46,17 @@ local function prepareBases(activityInstance)
 		-- Get team
 		local team = activityInstance.state.activity.sessionTeams[teamIndex].Value
 		local base = activityInstance["Base" .. teamIndex]
-		local flag = activityInstance["Flag" .. teamIndex]
+
+		-- Clone flag
+		local flag = activityInstance.state.captureTheFlag.flagSeeds[teamIndex].Value:Clone()
+		flag.Parent = activityInstance
+		genesUtil.waitForGene(flag, genes.teamLink)
+		genesUtil.waitForGene(flag, genes.pickup)
+		genesUtil.waitForGene(flag, genes.plantInGround)
+		wait()
+		axisUtil.destroyChildren(flag, "StationaryWeld")
+		flag:SetPrimaryPartCFrame(base:FindFirstChild("FlagPlant", true).CFrame + Vector3.new(0, 5, 0))
+		plantInGroundUtil.tryPlant(flag)
 
 		-- Link team
 		base.state.teamLink.team.Value = team
@@ -87,6 +86,10 @@ local function unlinkBases(activityInstance)
 		local base = activityInstance["Base" .. i]
 		genesUtil.waitForGene(base, genes.teamLink)
 		base.state.teamLink.team.Value = nil
+
+		if activityInstance.state.captureTheFlag.flagSeeds:FindFirstChild(i) then
+			axisUtil.destroyChild(activityInstance, "Flag" .. i)
+		end
 	end
 end
 
@@ -149,13 +152,12 @@ end)
 activityUtil.getSingleTeamLeftStream(genes.activity.captureTheFlag):subscribe(activityUtil.zeroJoinTerminate)
 
 -- Create flag interact switches for new instances
-activityInstances:subscribe(createFlagSwitches)
+activityInstances:subscribe(initFlags)
 
 -- Spawn balloons on session start
 sessionStart:subscribe(prepareBases)
 sessionEnd:delay(2):subscribe(destroyBalloons)
 sessionEnd:delay(2):subscribe(unlinkBases)
-sessionEnd:delay(2):subscribe(resetFlags)
 
 -- Whistle
 playStartStream:subscribe(function (activityInstance)
@@ -165,15 +167,22 @@ end)
 
 -- Listen for flag planted
 activityInstances:subscribe(function (activityInstance)
-	for teamIndex = 1, 2 do
-		local flag = activityInstance["Flag" .. teamIndex]
-		genesUtil.waitForGene(flag, genes.plantInGround)
-		rx.Observable.from(flag.state.plantInGround.planted)
-			:filter()
-			:filter(dart.bind(activityUtil.isInSession, activityInstance))
-			:filter(dart.bind(isFlagInOpponentsZone, activityInstance, teamIndex))
-			:subscribe(dart.bind(declareWinner, activityInstance, 3 - teamIndex))
-	end
+	rx.Observable.from(activityInstance.ChildAdded)
+		:map(function (c)
+			return c, tonumber(string.match(c.Name, "Flag(%d)"))
+		end)
+		:filter(dart.boolAnd)
+		:flatMap(function (flag, teamIndex)
+			genesUtil.waitForGene(flag, genes.plantInGround)
+			return rx.Observable.from(flag.state.plantInGround.planted)
+				:map(dart.constant(teamIndex))
+		end)
+		:filter()
+		:map(dart.carry(activityInstance))
+		:filter(activityUtil.isInSession)
+		:filter(isFlagInOpponentsZone)
+		:map(function (ai, t) return ai, 3 - t end)
+		:subscribe(declareWinner)
 end)
 
 sessionStart:merge(playStartStream):subscribe(spawnAllPlayers)

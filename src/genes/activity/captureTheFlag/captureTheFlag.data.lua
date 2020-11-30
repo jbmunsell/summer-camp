@@ -8,6 +8,7 @@ return {
 	genes = { genes.activity },
 	state = {
 		captureTheFlag = {
+			flagSeeds = {},
 		},
 	},
 

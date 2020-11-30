@@ -66,12 +66,13 @@ local function givePlayerActivityGear(activityInstance, player)
 	end
 end
 local function stripPlayerActivityGear(activityInstance, player)
-	for _, entry in pairs(activityInstance.state.activity.gear:GetChildren()) do
+	local gear = activityInstance.state.activity.gear
+	for _, entry in pairs(gear:GetChildren()) do
 		if entry.Value and entry.Value:IsDescendantOf(game)
 		and entry.Value.state.pickup.owner.Value == player then
 			entry.Value:Destroy()
+			entry:Destroy()
 		end
-		entry:Destroy()
 	end
 end
 
@@ -135,7 +136,6 @@ end
 local function startPlay(activityInstance)
 	-- Get state
 	local state = activityInstance.state.activity
-	print("starting play")
 
 	-- If we have players on both teams, then start a match
 	local hasBoth = true

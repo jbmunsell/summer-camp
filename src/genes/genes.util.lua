@@ -27,6 +27,8 @@ if RunService:IsServer() then
 	genesUtil.log = Instance.new("BoolValue", ReplicatedStorage.debug)
 	genesUtil.log.Name = "genes"
 	Instance.new("Folder", ReplicatedStorage).Name = "_geneValueFolders"
+else
+	genesUtil.log = ReplicatedStorage.debug:WaitForChild("genes")
 end
 
 -- Has gene
@@ -252,6 +254,9 @@ function genesUtil.waitForGene(instance, gene)
 	local instanceList = getReadyInstances(gene)
 	while not table.find(instanceList, instance) do
 		wait()
+	end
+	for _, sub in pairs(require(gene.data).genes) do
+		genesUtil.waitForGene(instance, sub)
 	end
 end
 

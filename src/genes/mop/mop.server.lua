@@ -46,7 +46,7 @@ local function createPuddle(character, instance)
 	local down = Vector3.new(0, -10, 0)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Whitelist
-	params.FilterDescendantsInstances = { workspace.Terrain, workspace.Map }
+	params.FilterDescendantsInstances = { workspace.Terrain, workspace.Map, workspace.Cabins }
 	local result = workspace:Raycast(instance.BottomBase.Position + down * -0.5, down, params)
 	if not result or not result.Position then return end
 
