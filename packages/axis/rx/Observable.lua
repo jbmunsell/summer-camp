@@ -17,7 +17,6 @@ local Players = game:GetService("Players")
 local axis = script.Parent.Parent
 local class = require(axis.lib.class)
 local Observer = require(script.Parent.Observer)
-local tableau = require(axis.lib.tableau)
 
 -- constants
 local identity = function (x) return x end
@@ -140,8 +139,7 @@ function Observable.from(o)
 			-- This is chosen instead of using :startWith because some ValueObjects have nil values
 			-- and still desire to fire with initial value (nil)
 			-- return Observable.just(o.Value):merge(Observable.from(o.Changed))
-			local terminator = Observable.fromInstanceLeftGame(o)
-			return Observable.from(o.Changed):startWithArgs(o.Value):takeUntil(terminator)
+			return Observable.fromInstanceEvent(o, "Changed"):startWithArgs(o.Value)
 		elseif o:IsA("RemoteEvent") then
 			if RunService:IsServer() then
 				return Observable.from(o.OnServerEvent)

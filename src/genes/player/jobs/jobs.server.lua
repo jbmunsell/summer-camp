@@ -31,7 +31,7 @@ local patchUtil = require(genes.patch.util)
 -- init gene
 local playerStream = playerUtil.hardInitPlayerGene(genes.player.jobs)
 local jobCharacterStream = playerStream:flatMap(function (player)
-	return rx.Observable.from(player.CharacterAdded)
+	return rx.Observable.fromInstanceEvent(player, "CharacterAdded")
 		:startWith(player.Character)
 		:filter()
 		:map(dart.constant(player))
@@ -56,7 +56,7 @@ jobChanged:subscribe(jobsUtil.givePlayerJobGear)
 
 -- Keep track of a player's loaded avatar
 playerStream:subscribe(function (player)
-	rx.Observable.from(player.CharacterAppearanceLoaded)
+	rx.Observable.fromInstanceEvent(player, "CharacterAppearanceLoaded")
 		:startWith(player:HasAppearanceLoaded())
 		:filter()
 		:subscribe(function ()
@@ -96,9 +96,7 @@ playerStream:subscribe(function (player)
 		local gamepassId = instance.config.job.gamepassId.Value
 		if gamepassId == 0 or MarketplaceService:UserOwnsGamePassAsync(player.UserId, gamepassId) then
 			local unlocked = player.state.jobs.unlocked
-			if not collection.getValue(unlocked, instance) then
-				collection.addValue(unlocked, instance)
-			end
+			collection.addValue(unlocked, instance)
 		end
 	end
 end)
@@ -107,16 +105,14 @@ rx.Observable.from(MarketplaceService.PromptGamePassPurchaseFinished)
 		local job = jobUtil.getJobFromGamepassId(gamepassId)
 		if job and wasPurchased then
 			local unlocked = player.state.jobs.unlocked
-			if not collection.getValue(unlocked, job) then
-				collection.addValue(unlocked, job)
-			end
+			collection.addValue(unlocked, job)
 		end
 	end)
 
 -- Award patch upon first unlocking
 playerStream:subscribe(function (player)
 	local unlocked = player.state.jobs.unlocked
-	rx.Observable.from(unlocked.ChildAdded)
+	rx.Observable.fromInstanceEvent(unlocked, "ChildAdded")
 		:startWithTable(unlocked:GetChildren())
 		:map(dart.index("Value"))
 		:distinct()
