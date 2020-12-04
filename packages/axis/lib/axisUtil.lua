@@ -102,6 +102,16 @@ function axisUtil.squareMagnitude(vector)
 	return vector.X * vector.X + vector.Y * vector.Y + vector.Z * vector.Z
 end
 
+-- Thank you badcc!!!!!!
+function axisUtil.closestPointToPart(point, part)
+    local cf = part.CFrame
+    local relative = cf:pointToObjectSpace(point)
+    local x = math.clamp(relative.X, -part.Size.X * 0.5, part.Size.X * 0.5)
+    local y = math.clamp(relative.Y, -part.Size.Y * 0.5, part.Size.Y * 0.5)
+    local z = math.clamp(relative.Z, -part.Size.Z * 0.5, part.Size.Z * 0.5)
+    return cf * Vector3.new(x, y, z)
+end
+
 -- Get position
 function axisUtil.getCFrame(instance)
 	if instance:IsA("Model") then

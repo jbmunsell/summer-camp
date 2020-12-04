@@ -110,7 +110,8 @@ end
 
 -- Is flag in opponent's zone
 local function isFlagInOpponentsZone(activityInstance, teamIndex)
-	local flag = activityInstance["Flag" .. teamIndex]
+	local flag = activityInstance:FindFirstChild("Flag" .. teamIndex)
+	if not flag then return false end
 	local zone = activityInstance["Base" .. (3 - teamIndex)].PlantVictoryZone
 	return axisUtil.isPointInPartXZ(axisUtil.getPosition(flag), zone)
 end
@@ -167,22 +168,15 @@ end)
 
 -- Listen for flag planted
 activityInstances:subscribe(function (activityInstance)
-	rx.Observable.from(activityInstance.ChildAdded)
-		:map(function (c)
-			return c, tonumber(string.match(c.Name, "Flag(%d)"))
+	rx.Observable.heartbeat()
+		:filter(dart.bind(activityUtil.isInSession, activityInstance))
+		:subscribe(function ()
+			for teamIndex = 1, 2 do
+				if isFlagInOpponentsZone(activityInstance, teamIndex) then
+					declareWinner(activityInstance, 3 - teamIndex)
+				end
+			end
 		end)
-		:filter(dart.boolAnd)
-		:flatMap(function (flag, teamIndex)
-			genesUtil.waitForGene(flag, genes.plantInGround)
-			return rx.Observable.from(flag.state.plantInGround.planted)
-				:map(dart.constant(teamIndex))
-		end)
-		:filter()
-		:map(dart.carry(activityInstance))
-		:filter(activityUtil.isInSession)
-		:filter(isFlagInOpponentsZone)
-		:map(function (ai, t) return ai, 3 - t end)
-		:subscribe(declareWinner)
 end)
 
 sessionStart:merge(playStartStream):subscribe(spawnAllPlayers)

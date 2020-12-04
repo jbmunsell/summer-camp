@@ -111,6 +111,7 @@ local function startCollectingRoster(activityInstance)
 	local function setTimerText(t)
 		for _, label in pairs(timerLabels) do
 			label.Text = t
+			label.Shadow.Text = t
 		end
 	end
 	rx.Observable.heartbeat()
@@ -158,8 +159,11 @@ end
 -- Create trophy for activity instance and team, place it at the spawn
 local function createTrophy(activityInstance, team)
 	-- Create trophy
+	local teamIndex = activityUtil.getTeamIndex(activityInstance, team)
+	local teamSpawn = activityInstance.functional:FindFirstChild("Team" .. teamIndex .. "TrophySpawn")
+	local trophySpawn = teamSpawn or activityInstance.functional.TrophySpawn
 	local trophy = activityInstance.config.activity.trophy.Value:Clone()
-	trophy:SetPrimaryPartCFrame(activityInstance.functional.TrophySpawn.CFrame)
+	trophy:SetPrimaryPartCFrame(trophySpawn.CFrame)
 	trophy.Parent = workspace
 	trophy.state.teamLink.team.Value = team
 

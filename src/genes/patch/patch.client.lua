@@ -31,18 +31,15 @@ local humanoidRunning = rx.BehaviorSubject.new()
 
 local gui = env.PlayerGui:WaitForChild("Core").Container.PatchDisplay
 do
-	local initText = string.format("%s to attach to your backpack! This feature is an "
-		.. " experiment, so patches don't save yet. Tell us what you think on the group wall!",
+	local initText = string.format("%s to attach to your backpack",
 		(UserInputService.TouchEnabled and "Tap" or "Click"))
 	gui.Frame.Label.Text = initText
 end
 
 genesUtil.waitForGene(env.LocalPlayer, genes.player.characterBackpack)
-local localBackpack
-while not localBackpack do
-	wait()
-	localBackpack = env.LocalPlayer.state.characterBackpack.instance.Value
-end
+local localBackpackSubject = rx.BehaviorSubject.new()
+rx.Observable.from(env.LocalPlayer.state.characterBackpack.instance)
+	:multicast(localBackpackSubject)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -51,7 +48,8 @@ end
 local function renderPreview()
 	local result = inputUtil.raycastMouse()
 	local instance = preview:getValue()
-	if result and result.Instance and result.Instance:IsDescendantOf(localBackpack) then
+	local localBackpack = localBackpackSubject:getValue()
+	if result and result.Instance and localBackpack and result.Instance:IsDescendantOf(localBackpack) then
 	-- and not humanoidRunning:getValue() then
 		instance.CFrame = CFrame.new(result.Position, result.Position + result.Normal)
 			* CFrame.Angles(0, math.pi * 0.5, 0)
@@ -121,8 +119,9 @@ end):subscribe(renderPreview)
 pickupUtil.getActivatedStream(genes.patch):subscribe(function (instance)
 	local result = inputUtil.raycastMouse()
 	local p = preview:getValue()
+	local localBackpack = localBackpackSubject:getValue()
 	if p and p:IsDescendantOf(workspace) and
-	result and result.Instance:IsDescendantOf(localBackpack) then
+	result and localBackpack and result.Instance:IsDescendantOf(localBackpack) then
 		local offset = localBackpack.Handle.CFrame:toObjectSpace(CFrame.new(result.Position, result.Position + result.Normal)
 			* CFrame.Angles(0, math.pi * 0.5, 0))
 		genes.patch.net.AttachRequested:FireServer(instance, offset)

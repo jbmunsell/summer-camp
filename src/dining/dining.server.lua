@@ -69,7 +69,7 @@ local function fillFreshTrolleyTrays()
 		end
 	end
 	for _, spawnPoint in pairs(traySpawns) do
-		-- wait()
+		wait()
 		local trolley = dart.getNamedAncestor(spawnPoint, "FreshTrayTrolley")
 		for i = 1, (diningConfig.numFreshTrays / #traySpawns) do
 			local tray = env.res.dining.Tray:Clone()
@@ -99,7 +99,7 @@ local function fillServingTables(mealKey)
 		end
 	end
 	for _, dishAttachment in pairs(dishSpawns) do
-		-- wait()
+		wait()
 		local servingTable = dart.getNamedAncestor(dishAttachment, "ServingTable")
 		local dishName = tableau.from(diningConfig[mealKey][servingTable.config.dishType.Value .. "List"])
 			:random()
@@ -120,12 +120,15 @@ end
 local function initMeal(mealChunk)
 	-- Clear old trays from trolleys
 	clearFreshTrayTrolleys()
+	wait()
 
 	-- Create new trays in trolleys
 	fillFreshTrolleyTrays()
+	wait()
 
 	-- Clear old dish from tables
 	clearServingTables()
+	wait()
 
 	-- Place new dish on tables
 	fillServingTables(mealChunk.MealKey)

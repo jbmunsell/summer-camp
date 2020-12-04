@@ -166,18 +166,34 @@ rx.Observable.interval(10):subscribe(cullSpawnedItems)
 -- Marshmallow spawning
 ---------------------------------------------------------------------------------------------------
 
+local spawned = {}
 scheduleUtil.getTimeOfDayStream(18):subscribe(function ()
-	local folder = env.res.sticksAndMarshmallows:Clone()
-	folder.Parent = workspace
-	for _, d in pairs(folder:GetChildren()) do
+	for _, child in pairs(env.res.sticksAndMarshmallows:GetChildren()) do
+		local copy = child:Clone()
+		copy.Parent = workspace
+		table.insert(spawned, copy)
+
 		local weld = Instance.new("WeldConstraint")
 		weld.Part0 = workspace.Terrain
-		weld.Part1 = (d:IsA("Model") and d.PrimaryPart or d)
+		weld.Part1 = (copy:IsA("Model") and copy.PrimaryPart or copy)
 		weld.Name = "StationaryWeld"
-		weld.Parent = d
+		weld.Parent = copy
+
+		if #spawned % 5 == 0 then
+			wait()
+		end
 	end
 end)
-scheduleUtil.getTimeOfDayStream(22):subscribe(dart.bind(axisUtil.destroyChild, workspace, "sticksAndMarshmallows"))
+scheduleUtil.getTimeOfDayStream(22):subscribe(function ()
+	for _, item in pairs(spawned) do
+		item:Destroy()
+
+		if #spawned % 3 == 0 then
+			wait()
+		end
+	end
+	spawned = {}
+end)
 
 ---------------------------------------------------------------------------------------------------
 -- Tip generation

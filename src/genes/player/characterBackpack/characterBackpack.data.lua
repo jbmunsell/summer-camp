@@ -8,6 +8,7 @@ return {
 	genes = {},
 	state = {
 		characterBackpack = {
+			destroyed = false,
 			instance = tableau.null,
 		}
 	},
