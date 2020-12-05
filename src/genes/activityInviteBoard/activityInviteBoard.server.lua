@@ -59,7 +59,7 @@ validRequest
 validRequest
 	:flatMap(function (player, instance)
 		return rx.Observable.from(player.Team:GetPlayers())
-			:reject(dart.equals(player))
+			-- :reject(dart.equals(player))
 			:map(dart.drag(instance, player))
 	end)
 	:subscribe(dart.forward(genes.activityInviteBoard.net.InviteSent))
