@@ -62,11 +62,12 @@ function canvasUtil.clearCanvas(canvasInstance)
 end
 
 -- Get player canvas
-function canvasUtil.getPlayerCanvas(player)
+function canvasUtil.getPlayerCanvasInGroup(player, group)
 	local function playerIsOwner(canvasInstance)
 		return canvasInstance.state.canvas.owner.Value == player
 	end
 	return genesUtil.getInstances(canvas)
+		:filter(dart.isDescendantOf(group))
 		:first(playerIsOwner)
 end
 

@@ -35,4 +35,7 @@ plants:filter(function (instance) return instance.config.plantInGround.initPlant
 	:merge(genesUtil.crossObserveStateValue(genes.plantInGround, genes.pickup, "holder")
 		:reject(dart.select(2))
 		:map(dart.select(1)))
+	:reject(function (instance)
+		return instance.state.pickup.owner.Value -- This is to prevent planting objects when you stow them
+	end)
 	:subscribe(plantInGroundUtil.tryPlant)

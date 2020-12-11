@@ -72,7 +72,7 @@ canvases:subscribe(wipeCanvas)
 
 -- Connect to client ownership request
 rx.Observable.from(canvas.net.CanvasOwnershipRequested.OnServerEvent)
-	:reject(canvasUtil.getPlayerCanvas)
+	:reject(function (p, c) return canvasUtil.getPlayerCanvasInGroup(p, c.Parent) end)
 	:map(function (p, c) return c, p end)
 	:subscribe(canvasUtil.setCanvasOwner)
 

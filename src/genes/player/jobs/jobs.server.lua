@@ -8,6 +8,7 @@
 
 -- env
 local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -89,6 +90,26 @@ jobChanged:merge(dayStartStream:skip(1):flatMap(function ()
 end)):reject(function (player, job)
 	return collection.getValue(player.state.jobs.dailyGearGiven, job)
 end):subscribe(jobsUtil.givePlayerJobDailyGear)
+
+-- When a player is given canvas gear from artist job, set the canvas owner to player
+playerStream:flatMap(function (player)
+	return rx.Observable.fromInstanceEvent(player.state.jobs.gear, "ChildAdded")
+		:map(dart.index("Value"))
+		:filter(function (gear) return gear.Name == "ArtistCanvasPickupContainer" end)
+		:map(dart.carry(player))
+end):subscribe(function (player, container)
+	genesUtil.waitForGene(container.Canvas, genes.canvas)
+	container.Canvas.state.canvas.owner.Value = player
+end)
+
+-- Kill gear when player leaves
+rx.Observable.from(Players.PlayerRemoving)
+	:filter(dart.follow(genesUtil.hasFullState, genes.player.jobs))
+	:subscribe(function (player)
+		for _, pointer in pairs(player.state.jobs.gear:GetChildren()) do
+			pointer.Value:Destroy()
+		end
+	end)
 
 -- Track player unlocked jobs
 playerStream:subscribe(function (player)

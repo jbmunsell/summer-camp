@@ -119,21 +119,23 @@ end
 -- Get interactable from hold
 -- 	This function reads upward the instance hierarchy until it finds the ancestor that 
 -- 	has the interactable tag
-local function getInteractableFromHold(hold)
-	if hold == game or not hold then
-		return nil
+local function getEnabledInteractableFromHold(hold)
+	for _, package in pairs(holdPackages) do
+		if package.hold == hold and package.isInteractable:getValue() then return package.instance end
 	end
-	return CollectionService:HasTag(hold, interactData.instanceTag) and hold or getInteractableFromHold(hold.Parent)
 end
 
 -- Update interact prompt
 local function updateInteractPrompt(hold, timer)
 	-- Get config
-	local config = (hold and getInteractableFromHold(hold).config.interact)
+	local instance = hold and getEnabledInteractableFromHold(hold)
+	local config = (instance and instance.config.interact)
 
 	-- Set enabled and adornee
 	interactPrompt.Enabled = (hold and true or false)
 	interactPrompt.Adornee = hold
+
+	if not instance then return end
 
 	-- Pull proper image from spritesheet
 	local totalCells = (SpritesheetDims.X * SpritesheetDims.Y)
@@ -150,7 +152,7 @@ end
 
 -- Trigger interact
 local function triggerInteract(hold)
-	local interactable = getInteractableFromHold(hold)
+	local interactable = getEnabledInteractableFromHold(hold)
 	interact.interface.ClientInteracted:Fire(interactable)
 	interact.net.ClientInteracted:FireServer(interactable)
 end
@@ -275,7 +277,7 @@ hotInteractor
 	:merge(advancingInteract:reject())
 	:map(function ()
 		local hot = hotInteractor:getValue()
-		local interactable = getInteractableFromHold(hot)
+		local interactable = getEnabledInteractableFromHold(hot)
 		return hot and interactable and interactable.config.interact.duration.Value
 	end)
 	:multicast(interactionTimer)

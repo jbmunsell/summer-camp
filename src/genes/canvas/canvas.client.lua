@@ -231,14 +231,17 @@ end
 -- Canvas instance stream
 local canvases = genesUtil.initGene(canvas)
 
--- Player owns any
-local playerOwnsAnyCanvas = canvases
-	:flatMap(function (instance)
-		return rx.Observable.from(instance.state.canvas.owner)
-	end)
-	:map(dart.bind(canvasUtil.getPlayerCanvas, env.LocalPlayer))
-	:map(dart.boolify)
-	:distinctUntilChanged()
+-- Player owns canvas in group stream
+local function getPlayerOwnsCanvasInGroupStream(group)
+	return rx.Observable.from(group:GetChildren())
+		:filter(dart.follow(genesUtil.hasGeneTag, genes.canvas))
+		:flatMap(function (instance)
+			return rx.Observable.from(instance.state.canvas.owner)
+		end)
+		:map(dart.bind(canvasUtil.getPlayerCanvasInGroup, env.LocalPlayer, group))
+		:map(dart.boolify) -- push through nil values as false (otherwise stream won't fire)
+		:distinctUntilChanged()
+end
 
 -- Bind interact switch
 canvases
@@ -247,10 +250,10 @@ canvases
 		if instance.config.canvas.collaborative.Value then
 			stream = rx.Observable.just(false)
 		else
-			local owner = rx.Observable.from(instance.state.canvas.owner)
-			stream = owner
+			local ownerStream = rx.Observable.from(instance.state.canvas.owner)
+			stream = ownerStream
 				:map(dart.boolNot)
-				:combineLatest(playerOwnsAnyCanvas:map(dart.boolNot), dart.boolAll)
+				:combineLatest(getPlayerOwnsCanvasInGroupStream(instance.Parent):map(dart.boolNot), dart.boolAll)
 		end
 		return stream:map(dart.carry(instance, "interact", "canvas"))
 	end)

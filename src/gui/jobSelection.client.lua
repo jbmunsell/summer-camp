@@ -53,6 +53,7 @@ local instances = {
 local buttonTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 local focusTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 local jobListing = {
+	env.res.jobs.artist,
 	env.res.jobs.camper,
 	env.res.jobs.teamLeader,
 	env.res.jobs.cheerleader,
@@ -117,7 +118,7 @@ local function renderAvatars()
 		local character = frame.WorldModel.Character
 		local playerCharacter = env.LocalPlayer.Character
 		local outfit = state.outfitsEnabled:getValue()
-		local assets = job.config.job.humanoidDescriptionAssets
+		local assets = job.config.job:FindFirstChild("humanoidDescriptionAssets")
 		character.ScaleEffect.Value = scale
 
 		local fullShadowY = frame.Shadow.properties.maxYScale.Value
@@ -126,7 +127,7 @@ local function renderAvatars()
 			anchorY + (fullShadowY - anchorY) * scale, 0)
 
 		local function tryClothing(piece)
-			local jobPiece = assets:FindFirstChild(piece)
+			local jobPiece = assets and assets:FindFirstChild(piece)
 			if jobPiece and jobPiece:IsA("Folder") then
 				jobPiece = jobPiece:GetChildren()[1]
 			end
