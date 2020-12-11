@@ -59,8 +59,17 @@ local dayEndStream = fromTimeStream(18)
 local isDayStream = dayStartStream:map(dart.constant(true))
 	:merge(dayEndStream:map(dart.constant(false)))
 
+-- Track priority:
+-- 	1. Menu music
+-- 	2. Competitive
+-- 	3. Day / night music
+local menuEnabledStream = rx.Observable.fromProperty(env.PlayerGui:WaitForChild("SplashScreen"), "Enabled", true)
 local isCompetingStream = activityUtil.getPlayerActivityStream(env.LocalPlayer):startWith(false)
-isCompetingStream:combineLatest(isDayStream, function (activityInstance, isDay)
+isCompetingStream:combineLatest(menuEnabledStream, isDayStream, function (activityInstance, menuEnabled, isDay)
+	if menuEnabled then
+		return tracks.MenuTrack
+	end
+
 	local activityTrack
 	if activityInstance then
 		if genesUtil.hasGeneTag(activityInstance, genes.activity.captureTheFlag) then
