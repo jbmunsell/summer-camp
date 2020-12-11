@@ -38,6 +38,10 @@ local function tryDive()
 	local root = axisUtil.getLocalHumanoidRootPart()
 	if ragdollCount:getValue() > 0 or not root then return end
 
+	-- Can't dive while sitting
+	local humanoid = axisUtil.getLocalHumanoid()
+	if not humanoid or humanoid.Sit then return end
+
 	-- Set ragdoll and launch player
 	local horizontal, vertical = ragdollConfig.DiveHorizontalMagnitude, ragdollConfig.DiveVerticalMagnitude
 	local trajectory = math.atan2(root.CFrame.lookVector.X, root.CFrame.lookVector.Z)
