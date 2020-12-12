@@ -49,6 +49,9 @@ genesUtil.initGene(genes.textConfigure)
 -- When a player equips an object, show the gui
 local holdingStream = pickupUtil.getLocalCharacterHoldingStream(genes.textConfigure)
 holdingStream:map(dart.boolify):subscribe(setGuiEnabled)
+holdingStream:filter():subscribe(function (instance)
+	textInput.Text = instance.state.textConfigure.text.Value
+end)
 
 -- When the gui is changed, send data to server
 rx.Observable.from(textInput.FocusLost)

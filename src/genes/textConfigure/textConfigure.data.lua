@@ -14,6 +14,7 @@ return {
 
 	config = {
 		textConfigure = {
+			text = "Click to edit text",
 		},
 	},
 }

@@ -62,6 +62,13 @@ local jobListing = {
 	env.res.jobs.janitor,
 }
 
+-- Gamepad enabled
+local gamepadEnabledStream = rx.Observable.from(UserInputService.GamepadConnected)
+	:merge(rx.Observable.from(UserInputService.GamepadConnected))
+	:startWith(0)
+	:map(function () return UserInputService.GamepadEnabled end)
+	:multicast(rx.BehaviorSubject.new())
+
 -- Create a dummy in workspace that we can use play with descriptions and copy over results
 if not env.LocalPlayer:HasAppearanceLoaded() then
 	env.LocalPlayer.CharacterAppearanceLoaded:wait()
@@ -284,6 +291,9 @@ local function createJobFrame(job, i)
 			actionButton.Text = string.format("R$%s", axisUtil.commify(info.PriceInRobux))
 		end)
 	end
+	gamepadEnabledStream:subscribe(function (enabled)
+		actionButton.GamepadButtonImage.Visible = enabled
+	end)
 
 	-- Subscribe to job business
 	-- When job unlocked is changed OR selected index is changed, render frame contents again

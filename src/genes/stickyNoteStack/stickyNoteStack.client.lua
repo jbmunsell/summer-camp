@@ -22,6 +22,7 @@ local dart = require(axis.lib.dart)
 local inputUtil = require(input.util)
 local pickupUtil = require(pickup.util)
 local genesUtil = require(genes.util)
+local textConfigureUtil = require(genes.textConfigure.util)
 local stickyNoteStackUtil = require(stickyNoteStack.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ local function updatePreview(stack)
 		rx.Observable.from(stack.state.textConfigure.text)
 			:takeUntil(rx.Observable.fromInstanceLeftGame(preview))
 			:subscribe(function (text)
-				stickyNoteStackUtil.setNoteText(preview, text)
+				textConfigureUtil.renderText(preview, text)
 			end)
 		rotation = (math.random() - 0.5) * stack.config.stickyNoteStack.rotationRange.Value
 	end

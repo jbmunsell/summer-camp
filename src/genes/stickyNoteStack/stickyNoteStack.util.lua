@@ -83,15 +83,6 @@ function stickyNoteStackUtil.stickNote(note, raycastData)
 		:subscribe(dart.destroy)
 end
 
--- Set note text
-function stickyNoteStackUtil.setNoteText(note, text)
-	tableau.from(note:GetDescendants())
-		:filter(dart.isa("TextBox"))
-		:foreach(function (box)
-			box.Text = text
-		end)
-end
-
 -- Tag note with FXPart so that it gets ignored by raycasts and stuff
 function stickyNoteStackUtil.removeTags(note)
 	for _, tag in pairs(CollectionService:GetTags(note)) do

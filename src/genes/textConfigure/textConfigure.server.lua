@@ -46,7 +46,9 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init gene
-genesUtil.initGene(genes.textConfigure)
+genesUtil.initGene(genes.textConfigure):subscribe(function (instance)
+	genesUtil.readConfigIntoState(instance, "textConfigure", "text")
+end)
 
 -- When text is changed, render autos
 genesUtil.observeStateValue(genes.textConfigure, "text"):subscribe(textConfigureUtil.renderText)
