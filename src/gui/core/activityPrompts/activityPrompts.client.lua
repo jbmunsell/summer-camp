@@ -83,9 +83,12 @@ local function createStartupPrompt(activityInstance)
 		:subscribe(dart.bind(killPrompt, prompt))
 
 	-- Connect to join button text
-	rx.Observable.from(prompt.JoinButton.Activated):first()
+	local joinClicked = rx.Observable.from(prompt.JoinButton.Activated):first()
 		:map(dart.constant(activityInstance))
-		:subscribe(dart.forward(genes.activity.net.RosterJoinRequested))
+	joinClicked:subscribe(dart.forward(genes.activity.net.RosterJoinRequested))
+	joinClicked:subscribe(function ()
+		prompt.MainLabel.Text = "Waiting for other players"
+	end)
 
 	-- Show and parent
 	glib.playAnimation(Core.animations.activityPrompt.show, prompt)
