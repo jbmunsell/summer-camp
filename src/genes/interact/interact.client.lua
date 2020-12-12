@@ -23,7 +23,6 @@ local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local inputUtil = require(input.util)
 local genesUtil = require(genes.util)
-local interactData = require(interact.data)
 local multiswitchUtil = require(multiswitch.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -32,11 +31,6 @@ local multiswitchUtil = require(multiswitch.util)
 
 -- instances
 local interactPrompt = env.PlayerGui:WaitForChild("InteractPrompt")
-do
-	local touch = UserInputService.TouchEnabled
-	interactPrompt.InteractButton.TouchImage.Visible = touch
-	interactPrompt.InteractButton.KeyLabel.Visible = not touch
-end
 
 -- constants
 local SpritesheetDims = Vector2.new(4, 4)
@@ -49,6 +43,15 @@ local pollingPackages = {}
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
+
+-- Render input prompt
+local function renderInputPrompt()
+	local gamepad = UserInputService.GamepadEnabled
+	local touch = not gamepad and UserInputService.TouchEnabled
+	interactPrompt.InteractButton.GamepadImage.Visible = gamepad
+	interactPrompt.InteractButton.TouchImage.Visible = touch
+	interactPrompt.InteractButton.KeyLabel.Visible = not touch and not gamepad
+end
 
 -- Update polling list
 local pollingDistance = math.pow(env.config.interact.PollingDistance.Value, 2)
@@ -161,6 +164,12 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
+-- Render prompt when gamepad connection changes
+rx.Observable.from(UserInputService.GamepadConnected)
+	:merge(rx.Observable.from(UserInputService.GamepadDisconnected))
+	:startWith(0)
+	:subscribe(renderInputPrompt)
+
 -- Init gene
 local interactStream = genesUtil.initGene(interact)
 
@@ -246,6 +255,7 @@ rx.Observable.from(CollectionService:GetInstanceRemovedSignal(require(interact.d
 -- 		:map(dart.constant(value))
 -- end
 local keyStateStream = rx.Observable.from(Enum.KeyCode.E)
+	:merge(rx.Observable.from(Enum.KeyCode.ButtonX))
 	:map(dart.equals(Enum.UserInputState.Begin))
 	:multicast(rx.BehaviorSubject.new(false))
 -- local buttonDownStream = createButtonInputStream(interactPrompt.InteractButton.InputBegan, true)

@@ -16,6 +16,7 @@ return {
 			displayName = "JOB",
 
 			displayedPerks = {},
+			new = false,
 
 			gamepassId = 0,
 

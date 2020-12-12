@@ -8,9 +8,11 @@
 
 -- env
 local UserInputService = game:GetService("UserInputService")
--- local env = require(game:GetService("ReplicatedStorage").src.env)
+local env = require(game:GetService("ReplicatedStorage").src.env)
+local axis = env.packages.axis
 
 -- modules
+local rx = require(axis.lib.rx)
 
 -- lib
 local inputUtil = {}
@@ -20,6 +22,22 @@ raycastParams.CollisionGroup = "ToolRaycast"
 ---------------------------------------------------------------------------------------------------
 -- Mouse tracking functions
 ---------------------------------------------------------------------------------------------------
+
+-- Get thumbstick shifts
+function inputUtil.getThumbstickXShiftStream(stick)
+	return rx.Observable.from(UserInputService.InputChanged)
+		:filter(function (input) return input.KeyCode == stick end)
+		:map(function (input)
+			if input.Position.X <= -0.25 then
+				return -1
+			elseif input.Position.X >= 0.25 then
+				return 1
+			else
+				return 0
+			end
+		end)
+		:distinctUntilChanged()
+end
 
 -- Basic raycast params
 -- 	Ignores the basic ignore groups, like fx parts and ghost parts

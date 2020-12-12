@@ -17,6 +17,7 @@ local genes = env.src.genes
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
+local inputUtil = require(env.src.input.util)
 local activityUtil = require(genes.activity.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -26,7 +27,6 @@ local activityUtil = require(genes.activity.util)
 local cameraTweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
 
 local coreGui = env.PlayerGui:WaitForChild("Core")
-local roleSelection = env.PlayerGui:WaitForChild("RoleSelection")
 local teamSelect = env.PlayerGui:WaitForChild("TeamSelect")
 local cameraParts = workspace.cabinCameraParts
 local teamImage = teamSelect:FindFirstChild("TeamImage", true)
@@ -94,6 +94,12 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
+local function connectWhileEnabled(stream)
+	return rx.Observable.fromProperty(teamSelect, "Enabled", true):switchMap(function (enabled)
+		return enabled and stream or rx.Observable.never()
+	end)
+end
+
 -- Connect to arrows to switch team
 local function arrowToShift(arrowName, delta)
 	return rx.Observable.from(teamSelect:FindFirstChild(arrowName, true).Activated)
@@ -101,6 +107,7 @@ local function arrowToShift(arrowName, delta)
 end
 arrowToShift("LeftArrow", -1)
 	:merge(arrowToShift("RightArrow", 1))
+	:merge(connectWhileEnabled(inputUtil.getThumbstickXShiftStream(Enum.KeyCode.Thumbstick1)))
 	:subscribe(shiftInspectingTeam)
 
 -- Connect to gui enabled

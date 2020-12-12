@@ -64,11 +64,15 @@ jobSelection.Enabled = false
 teamSelect.Enabled = false
 splashScreen.Enabled = true
 
+-- Buttons and genes
+local playButton = splashScreen:FindFirstChild("PlayButton", true)
+genesUtil.waitForGene(playButton, genes.guiButton)
+
 -- Streams
 local jobSelected = rx.Observable.fromProperty(jobSelection, "Enabled")
 	:reject()
 	:first()
-local playClicked = rx.Observable.from(splashScreen:FindFirstChild("PlayButton", true).Activated)
+local playClicked = rx.Observable.from(playButton.interface.guiButton.Activated)
 	:first()
 
 -- Get other instances

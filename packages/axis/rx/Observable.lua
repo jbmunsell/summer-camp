@@ -109,7 +109,7 @@ spawn(function ()
 		end
 	end
 end)
-function Observable.from(o)
+function Observable.from(o, b)
 	local t = typeof(o)
 	if t == "table" then
 		return Observable.new(function (observer)
@@ -161,9 +161,14 @@ function Observable.from(o)
 		if table.find(Enum.KeyCode:GetEnumItems(), o) then
 			return Observable.new(function (observer)
 				local actionName = HttpService:GenerateGUID(false)
-				ContextActionService:BindAction(actionName, function (_, state, _)
+				local callback = function (_, state, _)
 					observer:push(state)
-				end, false, o)
+				end
+				if b then
+					ContextActionService:BindActionAtPriority(actionName, callback, false, b, o)
+				else
+					ContextActionService:BindAction(actionName, callback, false, o)
+				end
 
 				observer.bin:hold(function ()
 					ContextActionService:UnbindAction(actionName)
@@ -682,6 +687,8 @@ function Observable:combineLatest(...)
 				latest[i] = v
 				if not next(pending) then
 					observer:push(operate(table.unpack(latest, 1, #sources)))
+				else
+					-- print("still waiting for something in combineLatest")
 				end
 			end, fail, complete(i))
 			observer.bin:hold(sub)

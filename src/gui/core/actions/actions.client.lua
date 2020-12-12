@@ -20,7 +20,9 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local glib = require(axis.lib.glib)
 local tableau = require(axis.lib.tableau)
+local genesUtil = require(genes.util)
 local pickupStreams = require(pickup.streams)
+local pickupUtil = require(pickup.util)
 local actionsConfig = require(actions.config)
 
 ---------------------------------------------------------------------------------------------------
@@ -139,12 +141,43 @@ game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false
 glib.clearLayoutContents(actionsContainer)
 
 -- Dive on press or hotkey
+genesUtil.waitForGene(diveFrame.Button, genes.guiButton)
 diveFrame.Hotkey.TextLabel.Text = string.sub(tostring(actionsConfig.diveHotkey), -1)
-rx.Observable.from(diveFrame.Button.Activated)
+rx.Observable.from(diveFrame.Button.interface.guiButton.Activated)
 	:merge(rx.Observable.from(actionsConfig.diveHotkey)
 		:filter(dart.equals(Enum.UserInputState.Begin)))
 	:subscribe(function ()
 		ragdoll.interface.tryDive:Invoke()
+	end)
+
+-- Switch selected index on right or left bumpers
+local function buttonShift(button, shift)
+	return rx.Observable.from(button):filter(dart.equals(Enum.UserInputState.Begin))
+		:map(dart.constant(shift))
+end
+buttonShift(Enum.KeyCode.ButtonR1, 1)
+	:merge(buttonShift(Enum.KeyCode.ButtonL1, -1))
+	:subscribe(function (shift)
+		local owned = pickupStreams.ownedObjects:getValue()
+		local held = pickupUtil.getLocalCharacterHeldObjects():first()
+		local index = table.find(owned, held)
+		local shifted
+		if index then
+			shifted = index + shift
+			if shifted < 1 or shifted > #owned then
+				shifted = index
+			end
+		else
+			shifted = (shift == 1 and 1 or #owned)
+		end
+		toggleEquipped(owned[shifted])
+	end)
+
+-- Set hotkey visible to not gamepad image visible (which is automatic)
+rx.Observable.fromProperty(diveFrame.Button.GamepadButtonImage, "Visible", true)
+	:map(dart.boolNot)
+	:subscribe(function (v)
+		diveFrame.Hotkey.Visible = v
 	end)
 
 -- Update on subject change

@@ -25,6 +25,7 @@ local soundUtil = require(axis.lib.soundUtil)
 local collection = require(axis.lib.collection)
 local Spring = require(axis.classes.Spring)
 local genesUtil = require(genes.util)
+local inputUtil = require(env.src.input.util)
 local inputStreams = require(env.src.input.streams)
 local interactUtil = require(genes.interact.util)
 
@@ -69,6 +70,23 @@ end
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
+
+-- Trigger job index
+local function triggerJobIndex(index)
+	local job = jobListing[index]
+	local isUnlocked = collection.getValue(env.LocalPlayer.state.jobs.unlocked, job)
+	if isUnlocked then
+		-- Send request to server and close gui
+		local outfitsEnabled = state.outfitsEnabled:getValue()
+		local scale = state.avatarScale:getValue()
+		genes.player.jobs.net.JobChangeRequested:FireServer(job, outfitsEnabled, scale)
+		jobSelection.Enabled = false
+		state.isPrimarySelection:push(false)
+	else
+		-- Prompt gamepass purchase
+		MarketplaceService:PromptGamePassPurchase(env.LocalPlayer, job.config.job.gamepassId.Value)
+	end
+end
 
 local function getJobFrame(job)
 	for _, frame in pairs(instances.jobContainer:GetChildren()) do
@@ -207,6 +225,7 @@ local function createJobFrame(job, i)
 	pointer.Value = job
 	frame.LayoutOrder = i
 	frame.JobName.Text = jobConfig.displayName.Value
+	frame.NewLabel.Visible = jobConfig.new.Value
 
 	-- Character
 	local rootCFrame = Instance.new("CFrameValue", frame)
@@ -282,19 +301,9 @@ local function createJobFrame(job, i)
 		:subscribe(dart.bind(renderJobFrame, job))
 
 	-- Action button clicked
-	rx.Observable.fromInstanceEvent(actionButton, "Activated"):subscribe(function ()
-		if isUnlocked() then
-			-- Send request to server and close gui
-			local outfitsEnabled = state.outfitsEnabled:getValue()
-			local scale = state.avatarScale:getValue()
-			genes.player.jobs.net.JobChangeRequested:FireServer(job, outfitsEnabled, scale)
-			jobSelection.Enabled = false
-			state.isPrimarySelection:push(false)
-		else
-			-- Prompt gamepass purchase
-			MarketplaceService:PromptGamePassPurchase(env.LocalPlayer, jobConfig.gamepassId.Value)
-		end
-	end)
+	rx.Observable.fromInstanceEvent(actionButton, "Activated")
+		:map(dart.constant(i))
+		:subscribe(triggerJobIndex)
 
 	-- Hide button if it's supposed to be invisible
 	rx.Observable.fromProperty(actionButton, "Size"):map(function ()
@@ -314,6 +323,14 @@ end
 ---------------------------------------------------------------------------------------------------
 
 --------------------------------------------------------
+-- Get a stream that switches off when the gui is disabled
+local function connectWhileEnabled(stream)
+	return rx.Observable.fromProperty(jobSelection, "Enabled", true):switchMap(function (enabled)
+		return enabled and stream or rx.Observable.never()
+	end)
+end
+
+--------------------------------------------------------
 -- Prep work
 -- The dummy job container is a padding technique to allow pseudo-negative scrolling
 genesUtil.waitForGene(Lighting.Blur, genes.propertySwitcher)
@@ -327,6 +344,13 @@ instances.jobContainer.DummyJobFrame.Visible = true
 for i, job in pairs(jobListing) do
 	createJobFrame(job, i)
 end
+
+--------------------------------------------------------
+-- Select job on A gamepad press
+connectWhileEnabled(rx.Observable.from(Enum.KeyCode.ButtonA, 2001))
+	:filter(dart.equals(Enum.UserInputState.Begin))
+	:mapToLatest(state.selectedIndex)
+	:subscribe(triggerJobIndex)
 
 --------------------------------------------------------
 -- State subscriptions
@@ -361,23 +385,31 @@ rx.Observable.fromProperty(jobSelection, "Enabled")
 
 --------------------------------------------------------
 -- Set state values according to other things
-rx.Observable.fromInstanceEvent(instances.outfitButton, "Activated"):subscribe(function ()
+genesUtil.waitForGene(instances.outfitButton, genes.guiButton)
+genesUtil.waitForGene(instances.closeButton, genes.guiButton)
+rx.Observable.from(instances.outfitButton.interface.guiButton.Activated):subscribe(function ()
 	state.outfitsEnabled:push(not state.outfitsEnabled:getValue())
 end)
-rx.Observable.fromInstanceEvent(instances.closeButton, "Activated"):subscribe(function ()
+rx.Observable.from(instances.closeButton.interface.guiButton.Activated):subscribe(function ()
 	jobSelection.Enabled = false
 end)
 
 -- Slider adjustments
+local characterConfig = env.config.character
+local function isRightStick(input)
+	return input.KeyCode == Enum.KeyCode.Thumbstick2
+end
 local function getScaleFromMousePosition()
-	local characterConfig = env.config.character
 	local mousePosition = UserInputService:GetMouseLocation()
 	local sliderPosition = instances.scaleSlider.AbsolutePosition
 	local sliderSize = instances.scaleSlider.AbsoluteSize
-	local d = math.min(1, math.max(0, (mousePosition.X - sliderPosition.X) / sliderSize.X))
-	return characterConfig.scaleMin.Value * (1 - d) +characterConfig.scaleMax.Value * d
+	local d = (mousePosition.X - sliderPosition.X) / sliderSize.X
+	return characterConfig.scaleMin.Value * (1 - d) + characterConfig.scaleMax.Value * d
 end
-rx.Observable.fromInstanceEvent(instances.scaleSlider.Slider, "InputBegan")
+local function pushScale(scale)
+	state.avatarScale:push(math.clamp(scale, characterConfig.scaleMin.Value, characterConfig.scaleMax.Value))
+end
+local mouseDragScale = rx.Observable.fromInstanceEvent(instances.scaleSlider.Slider, "InputBegan")
 	:filter(function (input)
 		return input.UserInputType == Enum.UserInputType.Touch
 		or input.UserInputType == Enum.UserInputType.MouseButton1
@@ -388,11 +420,26 @@ rx.Observable.fromInstanceEvent(instances.scaleSlider.Slider, "InputBegan")
 		return holding and rx.Observable.heartbeat() or rx.Observable.never()
 	end)
 	:map(getScaleFromMousePosition)
-	:multicast(state.avatarScale)
+local thumbstickScale = connectWhileEnabled(rx.Observable.from(UserInputService.InputChanged))
+	:reject(dart.select(2))
+	:filter(isRightStick)
+	:tap(dart.printConstant("right stick input changed"))
+	:map(function (input) return input.Position.X end)
+	:merge(rx.Observable.from(UserInputService.InputEnded)
+		:filter(isRightStick)
+		:map(dart.constant(0)))
+	:switchMap(function (delta)
+		return delta == 0 and rx.Observable.never()
+		or rx.Observable.heartbeat():map(dart.drag(delta))
+	end)
+	:map(function (dt, delta)
+		return state.avatarScale:getValue() + delta * dt
+	end)
+mouseDragScale:merge(thumbstickScale):distinctUntilChanged():subscribe(pushScale)
 
 -- Swipe to change index
-rx.Observable.from(UserInputService.TouchSwipe)
-	:reject(dart.select(2))
+local swipeShift = connectWhileEnabled(rx.Observable.from(UserInputService.TouchSwipe))
+	-- :reject(dart.select(2))
 	:filter(function () return jobSelection.Enabled end)
 	:map(function (direction)
 		if direction == Enum.SwipeDirection.Left then
@@ -402,9 +449,10 @@ rx.Observable.from(UserInputService.TouchSwipe)
 		end
 	end)
 	:filter()
-	:subscribe(function (shift)
-		state.selectedIndex:push(state.selectedIndex:getValue() + shift)
-	end)
+local thumbstickShift = connectWhileEnabled(inputUtil.getThumbstickXShiftStream(Enum.KeyCode.Thumbstick1))
+swipeShift:merge(thumbstickShift):subscribe(function (shift)
+	state.selectedIndex:push(state.selectedIndex:getValue() + shift)
+end)
 
 -- Update avatars on scale changed
 state.avatarScale

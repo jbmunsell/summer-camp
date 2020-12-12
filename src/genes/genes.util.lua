@@ -7,6 +7,7 @@
 --
 
 -- env
+local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -100,7 +101,19 @@ local function queueInstanceWithGene(instance, gene)
 end
 local function initInstanceGene(instance, gene)
 	-- Add folders
-	if RunService:IsServer() or instance:IsDescendantOf(env.PlayerGui) then
+	local touchClient = (RunService:IsClient() and instance:IsDescendantOf(env.PlayerGui))
+	local touchServer = true
+	if RunService:IsServer() and not instance:IsDescendantOf(game:GetService("StarterGui")) then
+		for _, player in pairs(Players:GetPlayers()) do
+			if instance:IsDescendantOf(player.PlayerGui) then
+				touchServer = false
+				break
+			end
+		end
+	else
+		touchServer = false
+	end
+	if touchServer or touchClient then
 		local geneData = require(gene.data)
 		genesUtil.touchFolder(instance, gene, "config")
 		genesUtil.touchFolder(instance, gene, "state")
