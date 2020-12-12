@@ -38,6 +38,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Award to player on entered
+print("Early bird badge binding")
 rx.Observable.from(Players.PlayerAdded)
 	:startWithTable(Players:GetPlayers())
 	:map(dart.carry(awardBadge))
