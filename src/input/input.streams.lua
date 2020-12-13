@@ -15,8 +15,11 @@ local axis = env.packages.axis
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 
+-- module
+local inputStreams = {}
+
 -- streams
-local clickStream = rx.Observable.from(UserInputService.InputBegan)
+inputStreams.click = rx.Observable.from(UserInputService.InputBegan)
 	:filter(function (input, processed)
 		return not processed
 		and (input.UserInputType == Enum.UserInputType.MouseButton1
@@ -26,14 +29,18 @@ local clickStream = rx.Observable.from(UserInputService.InputBegan)
 	:map(dart.constant(nil))
 
 -- activation ended
-local activationEnded = rx.Observable.from(UserInputService.InputEnded)
+inputStreams.activationEnded = rx.Observable.from(UserInputService.InputEnded)
 	:filter(function (input)
 		return input.UserInputType == Enum.UserInputType.MouseButton1
 		or input.UserInputType == Enum.UserInputType.Touch
 	end)
 
+-- Gamepads enabled subject
+inputStreams.gamepadEnabled = rx.Observable.from(UserInputService.GamepadConnected)
+	:merge(rx.Observable.from(UserInputService.GamepadConnected))
+	:startWith(0)
+	:map(function () return UserInputService.GamepadEnabled end)
+	:multicast(rx.BehaviorSubject.new())
+
 -- return lib
-return {
-	click = clickStream,
-	activationEnded = activationEnded,
-}
+return inputStreams

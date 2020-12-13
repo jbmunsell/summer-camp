@@ -7,7 +7,6 @@
 --
 
 -- env
-local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -17,6 +16,7 @@ local gamepadImages = env.src.gui.gamepad.images
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
+local inputStreams = require(env.src.input.streams)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
@@ -64,13 +64,6 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
--- Gamepad enabled stream
-local gamepadEnabledStream = rx.Observable.from(UserInputService.GamepadConnected)
-	:merge(rx.Observable.from(UserInputService.GamepadConnected))
-	:startWith(0)
-	:map(function () return UserInputService.GamepadEnabled end)
-	:multicast(rx.BehaviorSubject.new())
-
 -- init gene
 local buttons = genesUtil.initGene(genes.guiButton)
 
@@ -108,7 +101,7 @@ buttons:flatMap(function (instance)
 			end
 			table.insert(observables, rx.Observable.fromProperty(instance, "Active", true))
 			table.insert(observables, dart.boolAll)
-			return gamepadEnabledStream:combineLatest(unpack(observables))
+			return inputStreams.gamepadEnabled:combineLatest(unpack(observables))
 		end)
 		:merge(rx.Observable.fromInstanceLeftGame(instance):map(dart.constant(false)))
 		:map(dart.carry(instance))
