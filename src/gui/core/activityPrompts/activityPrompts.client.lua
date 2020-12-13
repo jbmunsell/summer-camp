@@ -78,7 +78,9 @@ local function createStartupPrompt(activityInstance)
 	end)
 	pulse
 		:filter(dart.lessThan(0))
-		:merge(exitStream, localPlayerCompeting:filter(), rosterCollectionStopped)
+		:merge(exitStream,
+			-- localPlayerCompeting:filter(),
+			rosterCollectionStopped)
 		:first()
 		:subscribe(dart.bind(killPrompt, prompt))
 
@@ -88,6 +90,7 @@ local function createStartupPrompt(activityInstance)
 	joinClicked:subscribe(dart.forward(genes.activity.net.RosterJoinRequested))
 	joinClicked:subscribe(function ()
 		prompt.MainLabel.Text = "Waiting for other players"
+		prompt.JoinButton.Visible = false
 	end)
 
 	-- Show and parent

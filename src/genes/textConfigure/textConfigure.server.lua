@@ -37,8 +37,8 @@ end
 
 -- Configure instance from player
 local function configureInstanceFromPlayer(player, instance, text)
-	local filtered = filterPlayerText(player, text)
-	instance.state.textConfigure.text.Value = filtered
+	local result = (instance.config.textConfigure.shouldFilter.Value and filterPlayerText(player, text) or text)
+	instance.state.textConfigure.text.Value = result
 end
 
 ---------------------------------------------------------------------------------------------------

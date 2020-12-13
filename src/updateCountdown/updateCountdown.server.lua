@@ -17,8 +17,9 @@ local rx = require(axis.lib.rx)
 -- Variables
 ---------------------------------------------------------------------------------------------------
 
-local UpdateTimestamp = 1608393600
+local UpdateTimestamp = 1608480000 - (4 * 60 * 60)
 local countdownLabel = workspace.UpdateCountdown:FindFirstChild("CountdownLabel", true)
+local daysLabel = workspace.UpdateCountdown:FindFirstChild("DaysLabel", true)
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
@@ -30,5 +31,6 @@ rx.Observable.heartbeat():subscribe(function ()
 	local minutes = math.floor(remaining / 60) % 60
 	local hours = math.floor(remaining / (60 * 60)) % 24
 	local days = math.floor(remaining / (60 * 60 * 24))
-	countdownLabel.Text = string.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds)
+	daysLabel.Text = (days == 0 and "TODAY!" or string.format("%d day%s", days, (days == 1 and "" or "s")))
+	countdownLabel.Text = string.format("%02d:%02d:%02d", hours, minutes, seconds)
 end)

@@ -54,9 +54,10 @@ local instances = {
 local buttonTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 local focusTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 local jobListing = {
-	env.res.jobs.artist,
 	env.res.jobs.camper,
 	env.res.jobs.teamLeader,
+	env.res.jobs.teacher,
+	env.res.jobs.artist,
 	env.res.jobs.cheerleader,
 	env.res.jobs.securityGuard,
 	env.res.jobs.janitor,

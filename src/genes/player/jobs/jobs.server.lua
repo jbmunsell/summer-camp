@@ -53,7 +53,7 @@ jobChanged:merge(jobCharacterStream, outfitsEnabledChanged, avatarScaleChanged, 
 	:subscribe(jobsUtil.renderPlayerCharacter)
 
 -- Render gear when job is changed
-jobChanged:subscribe(jobsUtil.givePlayerJobGear)
+jobChanged:tap(print):subscribe(jobsUtil.givePlayerJobGear)
 
 -- Keep track of a player's loaded avatar
 playerStream:subscribe(function (player)

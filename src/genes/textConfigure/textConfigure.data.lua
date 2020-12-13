@@ -14,7 +14,10 @@ return {
 
 	config = {
 		textConfigure = {
+			numbersOnly = false,
+			shouldFilter = true,
 			text = "Click to edit text",
+			pretext = "",
 		},
 	},
 }

@@ -18,6 +18,7 @@ local axis = env.packages.axis
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
+local axisUtil = require(axis.lib.axisUtil)
 
 -- lib
 local genesUtil = {}
@@ -302,6 +303,20 @@ function genesUtil.readConfigIntoState(instance, geneName, valueName)
 	if v then
 		instance.state[geneName][valueName].Value = v
 	end
+end
+
+-- Get nearest instance
+function genesUtil.getNearestInstance(gene, position, threshold)
+	threshold = threshold or math.huge
+	local nearestDistance, nearestInstance = math.huge, nil
+	for _, instance in pairs(genesUtil.getInstances(gene):raw()) do
+		local d = (axisUtil.getPosition(instance) - position).magnitude
+		if d < nearestDistance and d < threshold then
+			nearestDistance = d
+			nearestInstance = instance
+		end
+	end
+	return nearestInstance
 end
 
 ---------------------------------------------------------------------------------------------------

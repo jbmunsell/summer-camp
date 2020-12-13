@@ -108,6 +108,7 @@ function jobsUtil.givePlayerJobGear(player, job)
 	collection.clear(player.state.jobs.gear)
 
 	-- Give new
+	print("giving ", player, " gear for " .. job:GetFullName())
 	jobsUtil.givePlayerGear(player, job.config.job.gear, function (instance)
 		collection.addValue(player.state.jobs.gear, instance)
 	end)
@@ -119,7 +120,6 @@ function jobsUtil.givePlayerJobDailyGear(player, job)
 	collection.addValue(player.state.jobs.dailyGearGiven, job)
 
 	-- Give all daily gear
-	print("giving ", player, " daily gear for " .. job:GetFullName())
 	jobsUtil.givePlayerGear(player, job.config.job.dailyGear)
 end
 
