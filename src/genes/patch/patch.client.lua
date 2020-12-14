@@ -18,7 +18,6 @@ local genes = env.src.genes
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
-local patchUtil = require(genes.patch.util)
 local pickupUtil = require(genes.pickup.util)
 local inputUtil = require(env.src.input.util)
 
@@ -27,7 +26,6 @@ local inputUtil = require(env.src.input.util)
 ---------------------------------------------------------------------------------------------------
 
 local preview = rx.BehaviorSubject.new()
-local humanoidRunning = rx.BehaviorSubject.new()
 
 local gui = env.PlayerGui:WaitForChild("Core").Container.PatchDisplay
 do
@@ -50,21 +48,12 @@ local function renderPreview()
 	local instance = preview:getValue()
 	local localBackpack = localBackpackSubject:getValue()
 	if result and result.Instance and localBackpack and result.Instance:IsDescendantOf(localBackpack) then
-	-- and not humanoidRunning:getValue() then
 		instance.CFrame = CFrame.new(result.Position, result.Position + result.Normal)
 			* CFrame.Angles(0, math.pi * 0.5, 0)
 		instance.Parent = workspace
 	else
 		instance.Parent = ReplicatedStorage
 	end
-end
-
-local function packageRaycastResult(result)
-	return {
-		Instance = result.Instance,
-		Normal = result.Normal,
-		Position = result.Position,
-	}
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -92,21 +81,6 @@ end)
 
 -- Set gui visible according to preview
 preview:map(dart.boolify):subscribe(function (p) gui.Visible = p end)
-
--- Get humanoid running stream
-rx.Observable.from(env.LocalPlayer.CharacterAdded)
-	:startWith(env.LocalPlayer.Character)
-	:filter()
-	:map(function (character)
-		return character:WaitForChild("Humanoid")
-	end)
-	:filter()
-	:flatMap(function (humanoid)
-		return rx.Observable.fromInstanceEvent(humanoid, "Running")
-	end)
-	:map(dart.greaterThan(0.02))
-	:distinctUntilChanged()
-	:multicast(humanoidRunning)
 
 -- Set preview cframe to mouse or touch
 preview:switchMap(function (instance)
