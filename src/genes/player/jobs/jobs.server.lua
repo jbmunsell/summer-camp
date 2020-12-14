@@ -38,8 +38,23 @@ local jobCharacterStream = playerStream:flatMap(function (player)
 		:map(dart.constant(player))
 end)
 
+-- Wait for job gene
+local function waitForJobGene(obs)
+	return obs:map(function (player, ...)
+		-- Wait for job gene
+		local job = player.state.jobs.job.Value
+		if job then genesUtil.waitForGene(job, genes.job) end
+
+		-- Only pass event if the job has not changed while we were waiting
+		if player.state.jobs.job.Value == job then
+			return player, ...
+		end
+	end):filter()
+end
+
 -- Job changed stream
 local jobChanged = genesUtil.observeStateValue(genes.player.jobs, "job")
+	:pipe(waitForJobGene)
 local outfitsEnabledChanged = genesUtil.observeStateValue(genes.player.jobs, "outfitsEnabled")
 local avatarScaleChanged = genesUtil.observeStateValue(genes.player.jobs, "avatarScale")
 local teamChanged = playerStream:flatMap(function (player)
@@ -50,10 +65,11 @@ end)
 -- Render character when added AND when job changed AND when outfitsEnabled changed
 jobChanged:merge(jobCharacterStream, outfitsEnabledChanged, avatarScaleChanged, teamChanged)
 	:throttle(0.1) -- they will usually fire in quick succession
+	:pipe(waitForJobGene)
 	:subscribe(jobsUtil.renderPlayerCharacter)
 
 -- Render gear when job is changed
-jobChanged:tap(print):subscribe(jobsUtil.givePlayerJobGear)
+jobChanged:subscribe(jobsUtil.givePlayerJobGear)
 
 -- Keep track of a player's loaded avatar
 playerStream:subscribe(function (player)

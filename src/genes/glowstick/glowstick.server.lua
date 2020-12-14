@@ -12,6 +12,7 @@ local axis = env.packages.axis
 local genes = env.src.genes
 
 -- modules
+local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
@@ -35,5 +36,5 @@ genesUtil.observeStateValue(genes.glowstick, "cracked"):subscribe(function (inst
 		if sound then sound:Play() end
 	end
 	instance.LightPart.Material = (cracked and Enum.Material.Neon or Enum.Material.SmoothPlastic)
-	instance.LightPart.PointLight.Enabled = cracked
+	fx.setFXEnabled(instance, cracked)
 end)

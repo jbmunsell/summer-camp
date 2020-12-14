@@ -9,6 +9,7 @@ return {
 	state = {
 		jobs = {
 			job = env.res.jobs.camper,
+			-- job = tableau.null,
 			outfitsEnabled = true,
 			avatarScale = env.config.character.scaleDefault.Value,
 			gear = {},

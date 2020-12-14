@@ -58,5 +58,8 @@ end
 
 -- Team changed
 local teamChanged = rx.Observable.fromProperty(env.LocalPlayer, "Team", true)
+	:filter(function (team)
+		return genesUtil.hasGeneTag(team, genes.team)
+	end)
 teamChanged:subscribe(setTeam)
 teamChanged:subscribe(showChangeText)

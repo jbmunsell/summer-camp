@@ -346,6 +346,7 @@ glib.clearLayoutContents(instances.jobContainer)
 jobSelection.seeds.DummyJobFrame:Clone().Parent = instances.jobContainer
 instances.jobContainer.DummyJobFrame.Visible = true
 for i, job in pairs(jobListing) do
+	genesUtil.waitForGene(job, genes.job)
 	createJobFrame(job, i)
 end
 

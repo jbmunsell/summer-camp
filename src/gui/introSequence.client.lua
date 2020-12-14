@@ -18,14 +18,6 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 
--- Quick lab check
-if StarterGui:FindFirstChild("config") then
-	if StarterGui.config.disableIntro.Value then
-		warn("Gui disabled; returning")
-		return
-	end
-end
-
 ---------------------------------------------------------------------------------------------------
 -- Instances
 ---------------------------------------------------------------------------------------------------
@@ -64,6 +56,29 @@ jobSelection.Enabled = false
 teamSelect.Enabled = false
 splashScreen.Enabled = true
 
+-- Bind core gui visible to basically everything else NOT being visible
+local function fromDisabled(gui)
+	return rx.Observable.fromProperty(gui, "Enabled", true):map(dart.boolNot)
+end
+fromDisabled(splashScreen):combineLatest(fromDisabled(teamSelect), fromDisabled(jobSelection), dart.boolAll)
+	:subscribe(function (v)
+		coreGui.Enabled = v
+	end)
+
+-- Quick lab check
+if StarterGui:FindFirstChild("config") then
+	if StarterGui.config.disableIntro.Value then
+		warn("Gui disabled; requesting first team and returning")
+		genesUtil.getInstanceStream(genes.team)
+			:first()
+			:subscribe(dart.forward(genes.team.net.TeamChangeRequested))
+		jobSelection.Enabled = false
+		teamSelect.Enabled = false
+		splashScreen.Enabled = false
+		return
+	end
+end
+
 -- Buttons and genes
 local playButton = splashScreen:FindFirstChild("PlayButton", true)
 genesUtil.waitForGene(playButton, genes.guiButton)
@@ -101,12 +116,3 @@ end)
 jobSelected:subscribe(function ()
 	teamSelect.Enabled = true
 end)
-
--- Bind core gui visible to basically everything else NOT being visible
-local function fromDisabled(gui)
-	return rx.Observable.fromProperty(gui, "Enabled", true):map(dart.boolNot)
-end
-fromDisabled(splashScreen):combineLatest(fromDisabled(teamSelect), fromDisabled(jobSelection), dart.boolAll)
-	:subscribe(function (v)
-		coreGui.Enabled = v
-	end)

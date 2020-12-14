@@ -140,7 +140,6 @@ rx.Observable.fromProperty(teamSelect, "Enabled"):filter():subscribe(function ()
 		:mapToLatest(inspectingTeam)
 		:subscribe(function (...)
 			teamSelect.Enabled = false
-			-- coreGui.Enabled = true
 			env.src.genes.team.net.TeamChangeRequested:FireServer(...)
 		end)
 end)
