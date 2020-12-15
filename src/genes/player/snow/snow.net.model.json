@@ -1,0 +1,17 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "GatheringStarted"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "BuildingChangeRequested"
+		},
+		{
+			"ClassName": "RemoteEvent",
+			"Name": "GatheringStopped"
+		}
+	]
+}
