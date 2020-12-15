@@ -11,7 +11,7 @@ local UserInputService = game:GetService("UserInputService")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local ragdoll = env.src.ragdoll
+local ragdoll = env.src.character.ragdoll
 local pickup = genes.pickup
 local actions = env.src.gui.core.actions
 

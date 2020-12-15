@@ -9,7 +9,7 @@
 -- env
 local env     = require(game:GetService("ReplicatedStorage").src.env)
 local axis    = env.packages.axis
-local ragdoll = env.src.ragdoll
+local ragdoll = env.src.character.ragdoll
 
 -- modules
 require(env.packages.Ragdoll)

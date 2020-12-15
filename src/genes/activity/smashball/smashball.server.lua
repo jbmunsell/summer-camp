@@ -13,7 +13,7 @@ local axis = env.packages.axis
 local genes = env.src.genes
 local activity = genes.activity
 local smashball = activity.smashball
-local ragdoll = env.src.ragdoll
+local ragdoll = env.src.character.ragdoll
 
 -- modules
 local rx = require(axis.lib.rx)

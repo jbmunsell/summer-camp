@@ -12,7 +12,7 @@ local Players = game:GetService("Players")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
-local ragdoll = env.src.ragdoll
+local ragdoll = env.src.character.ragdoll
 
 -- modules
 local fx = require(axis.lib.fx)

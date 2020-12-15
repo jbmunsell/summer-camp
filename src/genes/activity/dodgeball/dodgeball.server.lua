@@ -14,7 +14,7 @@ local genes = env.src.genes
 local activity = genes.activity
 local dodgeball = activity.dodgeball
 local dodgeballBall = genes.dodgeballBall
-local ragdoll = env.src.ragdoll
+local ragdoll = env.src.character.ragdoll
 
 -- modules
 local rx = require(axis.lib.rx)

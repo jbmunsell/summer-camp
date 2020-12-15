@@ -10,7 +10,7 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local ragdoll = env.src.ragdoll
+local ragdoll = env.src.character.ragdoll
 local genes = env.src.genes
 local bananaPeel = genes.bananaPeel
 
