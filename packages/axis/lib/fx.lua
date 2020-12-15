@@ -96,6 +96,15 @@ function fx.setEmittersEnabled(instance, enabled)
 	end
 end
 
+-- Emit
+function fx.emit(instance, count)
+	for _, descendant in pairs(instance:GetDescendants()) do
+		if descendant:IsA("ParticleEmitter") then
+			descendant:Emit(count)
+		end
+	end
+end
+
 -- Clear emitters
 function fx.clearEmitters(instance)
 	for _, descendant in pairs(instance:GetDescendants()) do
