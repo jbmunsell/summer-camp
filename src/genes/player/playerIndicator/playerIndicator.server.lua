@@ -40,6 +40,7 @@ local function getPlayerIndicator(player)
 end
 
 local function setTeam(indicator, team)
+	genesUtil.waitForGene(indicator, genes.teamLink)
 	indicator.state.teamLink.team.Value = team
 end
 
