@@ -26,7 +26,7 @@ local playerUtil = require(genes.player.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init
-playerUtil.softInitPlayerGene(sessionTime)
+playerUtil.initPlayerGene(sessionTime)
 
 -- Increase on heartbeat
 rx.Observable.heartbeat():subscribe(function (dt)

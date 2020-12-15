@@ -47,7 +47,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init
-playerUtil.hardInitPlayerGene(genes.player.chat)
+playerUtil.initPlayerGene(genes.player.chat)
 
 -- Update on changed
 genesUtil.observeStateValue(genes.player.chat, "color")

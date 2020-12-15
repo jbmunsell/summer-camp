@@ -42,6 +42,7 @@ local function createBackpack(player)
 	genesUtil.waitForGene(player, genes.player.jobs)
 	local backpack = env.res.character.PlayerBackpack:Clone()
 	backpack.Parent = ReplicatedStorage
+	genesUtil.waitForGene(backpack, genes.color)
 	fx.new("ScaleEffect", backpack)
 	player.state.characterBackpack.instance.Value = backpack
 
@@ -97,7 +98,7 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init
-local playerStream = playerUtil.softInitPlayerGene(characterBackpack)
+local playerStream = playerUtil.initPlayerGene(characterBackpack)
 
 -- Create instance for each gene
 playerStream:subscribe(createBackpack)

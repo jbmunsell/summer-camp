@@ -30,7 +30,7 @@ local patchUtil = require(genes.patch.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init gene
-local playerStream = playerUtil.hardInitPlayerGene(genes.player.jobs)
+local playerStream = playerUtil.initPlayerGene(genes.player.jobs)
 local jobCharacterStream = playerStream:flatMap(function (player)
 	return rx.Observable.fromInstanceEvent(player, "CharacterAdded")
 		:startWith(player.Character)
