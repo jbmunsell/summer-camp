@@ -5,7 +5,7 @@ local genes = env.src.genes
 return {
 	instanceTag = "gene_snowball",
 	name = "snowball",
-	genes = { genes.throw },
+	genes = { genes.projectile },
 	state = {
 		interact = {
 			switches = {
@@ -18,6 +18,11 @@ return {
 	},
 
 	config = {
+		projectile = {
+			minThrowVelocity = 70,
+			maxThrowVelocity = 150,
+		},
+
 		snowball = {
 		},
 	},

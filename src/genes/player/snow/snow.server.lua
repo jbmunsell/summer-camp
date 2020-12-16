@@ -15,7 +15,6 @@ local genes = env.src.genes
 local rx = require(axis.lib.rx)
 local fx = require(axis.lib.fx)
 local dart = require(axis.lib.dart)
-local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 local playerUtil = require(genes.player.util)
@@ -32,7 +31,6 @@ local VoxelResolution = 4
 local SnowBuildRadius = 2
 local SnowMeltTimer = 5
 local SnowObserveRegionSize = Vector3.new(16, 16, 16)
-local SnowParticleCount = 5
 
 -- Cache entire terrain map
 local originalMaterials, originalOccupancies
@@ -52,17 +50,6 @@ end
 
 -- Set kneeling animation, sound, and particles enabled
 local function setSnowFXEnabled(player, enabled)
-end
-
--- Emit snow particles at point
-local function emitSnowParticlesAtPosition(position, count)
-	local emitter = env.res.snow.SnowMeltEmitter:Clone()
-	emitter.Size = Vector3.new(2, 2, 2)
-	emitter.CFrame = CFrame.new(position)
-	emitter.Parent = workspace
-	fx.setFXEnabled(emitter, false)
-	fx.emit(emitter, count or SnowParticleCount)
-	fx.smoothDestroy(emitter)
 end
 
 -- Gather snow
@@ -89,6 +76,7 @@ local function gatherSnow(player)
 		ball.ScaleEffect.Value = scale
 	end
 	local function pickupSnowball()
+		pickupUtil.unequipCharacter(player.Character)
 		pickupUtil.equip(player.Character, ball)
 	end
 
@@ -111,7 +99,7 @@ local function buildSnowAtPosition(position)
 	workspace.Terrain:FillBall(position, SnowBuildRadius, Enum.Material.Snow)
 	local changedMaterials, changedOccupancies = workspace.Terrain:ReadVoxels(region, VoxelResolution)
 
-	emitSnowParticlesAtPosition(position)
+	snowUtil.emitSnowParticlesAtPosition(position)
 
 	local changedCount = 0
 	local function spawnTimer(globalIndex)
@@ -166,7 +154,7 @@ local function revertTerrainAtIndex(globalIndex)
 	local occ = { { { originalOccupancies[globalIndex.X][globalIndex.Y][globalIndex.Z] } } }
 	workspace.Terrain:WriteVoxels(region, VoxelResolution, mat, occ)
 
-	emitSnowParticlesAtPosition(region.CFrame.p)
+	snowUtil.emitSnowParticlesAtPosition(region.CFrame.p)
 end
 
 -- Update terrain timers

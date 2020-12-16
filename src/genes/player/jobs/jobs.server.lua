@@ -66,6 +66,7 @@ end)
 jobChanged:merge(jobCharacterStream, outfitsEnabledChanged, avatarScaleChanged, teamChanged)
 	:throttle(0.1) -- they will usually fire in quick succession
 	:pipe(waitForJobGene)
+	:filter(function (player) return player.Character end)
 	:subscribe(jobsUtil.renderPlayerCharacter)
 
 -- Render gear when job is changed

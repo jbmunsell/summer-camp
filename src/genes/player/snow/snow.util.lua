@@ -11,10 +11,25 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 
 -- modules
+local fx = require(axis.lib.fx)
 local axisUtil = require(axis.lib.axisUtil)
 
 -- lib
 local snowUtil = {}
+
+-- Emit snow particles at point
+function snowUtil.emitSnowParticlesAtPosition(position, count, prepare)
+	local emitter = env.res.snow.SnowMeltEmitter:Clone()
+	emitter.Size = Vector3.new(2, 2, 2)
+	emitter.CFrame = CFrame.new(position)
+	emitter.Parent = workspace
+	if prepare then
+		prepare(emitter)
+	end
+	fx.setFXEnabled(emitter, false)
+	fx.emit(emitter, count or 5)
+	fx.smoothDestroy(emitter)
+end
 
 -- Raycast player ground
 function snowUtil.raycastPlayerGround(player, offset)
