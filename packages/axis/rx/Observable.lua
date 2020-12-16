@@ -150,9 +150,9 @@ function Observable.from(o, b)
 			return Observable.fromInstanceEvent(o, "Changed"):startWithArgs(o.Value)
 		elseif o:IsA("RemoteEvent") then
 			if RunService:IsServer() then
-				return Observable.from(o.OnServerEvent)
+				return Observable.fromInstanceEvent(o, "OnServerEvent")
 			elseif RunService:IsClient() then
-				return Observable.from(o.OnClientEvent)
+				return Observable.fromInstanceEvent(o, "OnClientEvent")
 			end
 		else
 			error("Unable to create Observable from instance class '" .. o.ClassName .. "'")

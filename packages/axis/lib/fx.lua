@@ -554,6 +554,8 @@ function fx.new(effectType, instance, startingValue)
 	effect.Name = effectType
 	effectClass.init(effect, instance, startingValue)
 	CollectionService:AddTag(effect, effectType)
+	
+	return effect
 end
 
 -- drive effects

@@ -114,16 +114,25 @@ end
 
 -- Get position
 function axisUtil.getCFrame(instance)
+	return axisUtil.makeGetCFrame(instance)()
+end
+function axisUtil.makeGetCFrame(instance)
 	if instance:IsA("Model") then
-		local primary = instance.PrimaryPart
-		if not primary then
-			error("Attempt to call getPosition on a model with no PrimaryPart: " .. instance:GetFullName())
+		return function ()
+			local primary = instance.PrimaryPart
+			if not primary then
+				error("Attempt to call getCFrame on a model with no PrimaryPart: " .. instance:GetFullName())
+			end
+			return primary.CFrame
 		end
-		return primary.CFrame
 	elseif instance:IsA("BasePart") then
-		return instance.CFrame
+		return function ()
+			return instance.CFrame
+		end
 	elseif instance:IsA("Attachment") then
-		return instance.WorldCFrame
+		return function ()
+			return instance.WorldCFrame
+		end
 	else
 		error("Unable to get CFrame for value of type " .. typeof(instance))
 	end
@@ -132,10 +141,17 @@ function axisUtil.getPosition(instance)
 	return axisUtil.getCFrame(instance).p
 end
 function axisUtil.setCFrame(instance, cframe)
+	axisUtil.makeSetCFrame(instance)(cframe)
+end
+function axisUtil.makeSetCFrame(instance)
 	if instance:IsA("Model") then
-		instance:SetPrimaryPartCFrame(cframe)
+		return function (cframe)
+			instance:SetPrimaryPartCFrame(cframe)
+		end
 	elseif instance:IsA("BasePart") then
-		instance.CFrame = cframe
+		return function (cframe)
+			instance.CFrame = cframe
+		end
 	-- elseif instance:IsA("Attachment") then
 	-- 	return instance.WorldCFrame
 	else
