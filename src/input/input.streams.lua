@@ -25,8 +25,7 @@ inputStreams.click = rx.Observable.from(UserInputService.InputBegan)
 		and (input.UserInputType == Enum.UserInputType.MouseButton1
 		or   input.KeyCode == Enum.KeyCode.ButtonR2)
 	end)
-	:merge(rx.Observable.from(UserInputService.TouchTapInWorld):tap(print):reject(dart.select(2)))
-	:map(dart.constant(nil))
+	:merge(rx.Observable.from(UserInputService.TouchTapInWorld):reject(dart.select(2)))
 
 -- activation ended
 inputStreams.activationEnded = rx.Observable.from(UserInputService.InputEnded)

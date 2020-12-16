@@ -288,12 +288,20 @@ function genesUtil.addInterface(instance, gene)
 	interface.Name = geneData.name
 
 	local events = listing.events or {}
+	local remoteEvents = listing.remoteEvents or {}
 	local functions = listing.functions or {}
+	local remoteFunctions = listing.remoteFunctions or {}
 	for _, eventName in pairs(events) do
 		Instance.new("BindableEvent", interface).Name = eventName
 	end
+	for _, eventName in pairs(remoteEvents) do
+		Instance.new("RemoteEvent", interface).Name = eventName
+	end
 	for _, fname in pairs(functions) do
 		Instance.new("BindableFunction", interface).Name = fname
+	end
+	for _, fname in pairs(remoteFunctions) do
+		Instance.new("RemoteFunction", interface).Name = fname
 	end
 end
 
