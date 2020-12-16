@@ -168,6 +168,14 @@ function axisUtil.getLocalHumanoid()
 	local character = player and player.Character
 	return character and character:FindFirstChildWhichIsA("Humanoid")
 end
+function axisUtil.getLocalAnimator()
+	if not RunService:IsClient() then
+		error("axisUtil.getLocalAnimator can only be called from the client.")
+	end
+	local player = Players.LocalPlayer
+	local character = player and player.Character
+	return character and character:FindFirstChildWhichIsA("Humanoid"):WaitForChild("Animator")
+end
 function axisUtil.getLocalHumanoidRootPart()
 	if not RunService:IsClient() then
 		error("axisUtil.getLocalHumanoidRootPart can only be called from the client.")
@@ -175,6 +183,15 @@ function axisUtil.getLocalHumanoidRootPart()
 	local player = Players.LocalPlayer
 	local character = player and player.Character
 	return character and character:FindFirstChild("HumanoidRootPart")
+end
+
+-- Stop a playing animation track by its source animation
+function axisUtil.stopAnimationTrack(animator, animation)
+	for _, track in pairs(animator:GetPlayingAnimationTracks()) do
+		if track.Animation == animation then
+			track:Stop()
+		end
+	end
 end
 
 -- Set properties
