@@ -70,15 +70,8 @@ rx.Observable.from(env.LocalPlayer.CharacterAdded)
 -- init gene for all players
 genesUtil.initGene(genes.player.snow)
 
--- When the user presses R, check if they are standing over snow
+-- When the user presses G, check if they are standing over snow and gather snowball
 rx.Observable.from(Enum.KeyCode.G)
 	:filter(dart.equals(Enum.UserInputState.Begin))
 	:filter(dart.bind(snowUtil.isPlayerStandingOnSnow, env.LocalPlayer))
 	:subscribe(startGatheringSnow)
-
--- Bind snow building to Q pressed
-rx.Observable.from(Enum.KeyCode.Q)
-	:map(function (state)
-		return state == Enum.UserInputState.Begin
-	end)
-	:subscribe(dart.forward(snowNet.BuildingChangeRequested))
