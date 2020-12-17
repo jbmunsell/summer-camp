@@ -24,6 +24,7 @@ local fxClasses = {
 	"Sparkles",
 	"Light",
 	"Beam",
+	"Trail",
 	"ParticleEmitter",
 	"BillboardGui",
 }
