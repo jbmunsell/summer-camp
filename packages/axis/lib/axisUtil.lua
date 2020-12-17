@@ -18,6 +18,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local axis = script.Parent.Parent
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local easing = require(axis.lib.easing)
 
 -- lib
 local axisUtil = {}
@@ -367,22 +368,32 @@ local function getAttachments(a, aName, b, bName)
 	return att_a, att_b
 end
 function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
+	tweenInfo = tweenInfo or SmoothAttachTweenInfo
+
 	local att_a, att_b = getAttachments(a, aName, b, bName)
 
 	local info = axisUtil.computeAttachInfo(att_a, att_b)
 
+	local original = att_b.Parent.CFrame
 	local weld = Instance.new("Weld", a)
 	weld.C0 = info.current
 	weld.Part0 = info.att_a.Parent
 	weld.Part1 = info.att_b.Parent
 
-	local tween = TweenService:Create(weld, tweenInfo or SmoothAttachTweenInfo, { C0 = info.target })
-
-	tween.Completed:Connect(function ()
+	local t = rx.BehaviorSubject.new(0)
+	local terminator = t:filter(function (x)
+		return x >= tweenInfo.Time
+	end):first()
+	rx.Observable.from(RunService.Stepped):takeUntil(terminator):subscribe(function (_, dt)
+		local nt = t:getValue() + dt
+		t:push(nt)
+		local targetCFrame = att_a.Parent.CFrame:toWorldSpace(info.target)
+		local d = math.min(1, nt / tweenInfo.Time)
+		local lcf = original:lerp(targetCFrame, easing.outCubic(d))
+		weld.C0 = att_a.Parent.CFrame:toObjectSpace(lcf)
 	end)
-	tween:Play()
 
-	return weld, tween, info
+	return weld, info
 end
 function axisUtil.snapAttachAttachments(a, aName, b, bName)
 	local att_a, att_b = getAttachments(a, aName, b, bName)

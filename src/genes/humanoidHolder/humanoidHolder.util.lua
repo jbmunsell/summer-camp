@@ -53,7 +53,7 @@ function humanoidHolderUtil.renderHumanoidHolder(holder)
 	axisUtil.destroyChildren(holder, "HumanoidHoldWeld")
 	if owner then
 		-- Smooth attach owner to this instance
-		local weld, _, attachInfo = axisUtil.smoothAttach(holder, owner.Parent,
+		local weld, attachInfo = axisUtil.smoothAttach(holder, owner.Parent,
 			"WaistBackAttachment", humanoidHolderData.tweenInInfo)
 		holder.state.humanoidHolder.entryOffset.Value = attachInfo.current
 		weld.Name = "HumanoidHoldWeld"
