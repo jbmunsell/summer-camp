@@ -205,24 +205,3 @@ local function shuffleTip()
 	tipLabel.Text = tip.Value
 end
 rx.Observable.interval(20):subscribe(shuffleTip)
-
----------------------------------------------------------------------------------------------------
--- Give admin gear to admins
----------------------------------------------------------------------------------------------------
-
-local function isAdmin(player)
-	return collection.getValue(env.config.admins, player.UserId) or RunService:IsStudio()
-end
-
-rx.Observable.from(Players.PlayerAdded)
-	:startWithTable(Players:GetPlayers())
-	:filter(isAdmin)
-	:subscribe(function (player)
-		for _, gear in pairs(env.res.adminGear:GetChildren()) do
-			local copy = gear:Clone()
-			copy.Parent = ReplicatedStorage
-			genesUtil.waitForGene(copy, genes.pickup)
-			pickupUtil.stowObjectForPlayer(player, copy)
-			print("granting ", player.Name, copy.Name)
-		end
-	end)
