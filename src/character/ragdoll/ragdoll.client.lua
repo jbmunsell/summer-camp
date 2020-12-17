@@ -7,15 +7,15 @@
 --
 
 -- env
-local env     = require(game:GetService("ReplicatedStorage").src.env)
-local axis    = env.packages.axis
+local env = require(game:GetService("ReplicatedStorage").src.env)
+local axis = env.packages.axis
 local ragdoll = env.src.character.ragdoll
 
 -- modules
 require(env.packages.Ragdoll)
-local rx            = require(axis.lib.rx)
-local dart          = require(axis.lib.dart)
-local axisUtil      = require(axis.lib.axisUtil)
+local rx = require(axis.lib.rx)
+local dart = require(axis.lib.dart)
+local axisUtil = require(axis.lib.axisUtil)
 local ragdollConfig = require(ragdoll.config)
 
 -- Variables
