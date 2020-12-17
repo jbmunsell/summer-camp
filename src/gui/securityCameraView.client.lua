@@ -35,7 +35,6 @@ genesUtil.waitForGene(colorCorrection, genes.propertySwitcher)
 ---------------------------------------------------------------------------------------------------
 
 local function shiftViewIndex(delta)
-	print("shifting viewIndex by ", delta)
 	local v = viewIndex:getValue() + delta
 	viewIndex:push((v - 1) % #securityCameraParts + 1)
 end

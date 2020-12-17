@@ -24,7 +24,6 @@ local playerUtil = {}
 function playerUtil.initPlayerGene(gene)
 	-- init gene
 	genesUtil.initGene(gene)
-	print("initializing " .. tostring(gene))
 
 	-- If server, wait for each player's first cabin request to add player gene
 	if RunService:IsServer() then

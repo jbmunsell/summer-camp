@@ -32,7 +32,6 @@ end)
 -- Attach patch on request
 rx.Observable.from(genes.patch.net.AttachRequested)
 	:filter(function (player, instance)
-		print(player, instance)
 		return instance.state.pickup.owner.Value == player
 	end)
 	:subscribe(patchUtil.attachPatch)

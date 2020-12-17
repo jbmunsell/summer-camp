@@ -112,12 +112,10 @@ pickupUtil.getActivatedStream(genes.projectile):subscribe(function (instance, in
 	if instance.config.projectile.chargeable.Value then
 		local charging = instance.state.projectile.charging
 		charging.Value = true
-		print("started charging")
 		rx.Observable.fromProperty(input, "UserInputState")
 			:filter(dart.equals(Enum.UserInputState.End))
 			:first()
 			:subscribe(function ()
-				print("stopped charging")
 				charging.Value = false
 			end)
 	else

@@ -428,7 +428,6 @@ local mouseDragScale = rx.Observable.fromInstanceEvent(instances.scaleSlider.Sli
 local thumbstickScale = connectWhileEnabled(rx.Observable.from(UserInputService.InputChanged))
 	:reject(dart.select(2))
 	:filter(isRightStick)
-	:tap(dart.printConstant("right stick input changed"))
 	:map(function (input) return input.Position.X end)
 	:merge(rx.Observable.from(UserInputService.InputEnded)
 		:filter(isRightStick)

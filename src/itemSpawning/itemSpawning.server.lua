@@ -74,7 +74,6 @@ local function placeRandomItemAtAttachment(attachment, itemList)
 		Instance.new("ObjectValue", attachment).Name = "spawnedInstance"
 	end
 	if attachment.spawnedInstance.Value then
-		print("Attachment still has object; returning")
 		return
 	end
 

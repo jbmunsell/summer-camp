@@ -51,13 +51,12 @@ end
 local function bindGamepadButton(instance)
 	local button = Enum.KeyCode[instance.config.guiButton.gamepadButton.Value]
 	local terminator = rx.Observable.from(instance.state.guiButton.gamepadControlEnabled):reject()
-	print("Binding gamepad button " .. instance:GetFullName())
 	rx.Observable.from(button, 2001)
 		:filter(dart.equals(Enum.UserInputState.Begin))
 		:takeUntil(terminator)
 		:subscribe(function ()
 			instance.interface.guiButton.Activated:Fire()
-		end, nil, dart.printConstant("Unbinding gamepad button " .. instance:GetFullName()))
+		end)
 end
 
 ---------------------------------------------------------------------------------------------------

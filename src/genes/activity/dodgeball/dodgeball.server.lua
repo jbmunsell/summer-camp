@@ -58,13 +58,9 @@ local function dropPlayer(dodgeballInstance, player)
 	if not activityUtil.isPlayerInRoster(dodgeballInstance, player) then return end
 
 	if player.Character then
-		print("Attempting to strip balls")
 		for _, ball in pairs(dodgeballInstance.functional.balls:GetChildren()) do
-			print("checking ball")
 			if ball.state.pickup.holder.Value == player.Character then
-				print("Character is holding ball; stripping")
 				pickupUtil.stripObject(ball)
-				print("stripped")
 			end
 		end
 		soundUtil.playSound(env.res.audio.sounds.Whistle, player.Character.PrimaryPart)

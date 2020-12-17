@@ -83,7 +83,6 @@ function jobsUtil.givePlayerGear(player, gearFolder, process)
 		local copy = gear:Clone()
 		if genesUtil.hasGeneTag(copy, genes.playerProperty) then
 			copy.state.playerProperty.owner.Value = player
-			print("Set playerProperty owner")
 		end
 		copy.Parent = ReplicatedStorage
 		genesUtil.waitForGene(copy, genes.pickup)
@@ -108,7 +107,6 @@ function jobsUtil.givePlayerJobGear(player, job)
 	collection.clear(player.state.jobs.gear)
 
 	-- Give new
-	print("giving ", player, " gear for " .. job:GetFullName())
 	jobsUtil.givePlayerGear(player, job.config.job.gear, function (instance)
 		collection.addValue(player.state.jobs.gear, instance)
 	end)

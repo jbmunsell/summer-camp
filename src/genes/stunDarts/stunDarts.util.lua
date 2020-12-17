@@ -97,7 +97,6 @@ function stunDartsUtil.stunAndAffix(firingInstance, projectile, hit)
 	ragdoll.net.Push:FireClient(player)
 	cleanup
 		:filter(function () return player.Character == character end)
-		:tap(print)
 		:map(dart.constant(player))
 		:subscribe(dart.forward(ragdoll.net.Pop))
 end
