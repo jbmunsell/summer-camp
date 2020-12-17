@@ -29,7 +29,13 @@ local doorUtil = require(door.util)
 ---------------------------------------------------------------------------------------------------
 
 -- init class
-genesUtil.initGene(door)
+genesUtil.initGene(door):subscribe(function (instance)
+	for _, d in pairs(instance:GetDescendants()) do
+		if d:IsA("BasePart") then
+			pcall(function () d:SetNetworkOwner(nil) end)
+		end
+	end
+end)
 
 -- Render door state according to value
 genesUtil.observeStateValue(door, "open")
