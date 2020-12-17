@@ -83,7 +83,6 @@ function pickupUtil.equip(character, object)
 	-- Destroy any stationary welds
 	axisUtil.destroyChildren(object, "StationaryWeld")
 
-	-- Place in workspace if not already
 	-- 	This is for equipping stowed objects
 	local isInWorkspace = object:IsDescendantOf(workspace)
 	if not isInWorkspace then
@@ -92,20 +91,29 @@ function pickupUtil.equip(character, object)
 		object.Parent = workspace
 	end
 
-	-- If in workspace already, then smooth attach
-	-- Otherwise, snap attach
-	local attach = isInWorkspace
-		and axisUtil.smoothAttach
-		or axisUtil.snapAttach
-	local weld = attach(character, object, "RightGripAttachment")
-	weld.Name = "RightGripWeld"
-
 	-- Set holder value
-	object.state.pickup.holder.Value = character
-	local player = dart.getPlayerFromCharacter(character)
+	local player = Players:GetPlayerFromCharacter(character)
 	if player then
 		object.state.pickup.owner.Value = player
 	end
+	object.state.pickup.holder.Value = character
+end
+
+-- Render grip
+function pickupUtil.renderGrip(instance, holder)
+	-- If in workspace already, then smooth attach
+	-- Otherwise, snap attach
+	local attach = true --isInWorkspace
+		and axisUtil.smoothAttach
+		or axisUtil.snapAttach
+	local weld = attach(holder, instance, "RightGripAttachment")
+	weld.Name = "RightGripWeld"
+
+	-- Destroy on changed
+	rx.Observable.from(instance.state.pickup.holder.Changed)
+		:map(dart.constant(weld))
+		:first()
+		:subscribe(dart.destroy)
 end
 
 -- Get character held objects

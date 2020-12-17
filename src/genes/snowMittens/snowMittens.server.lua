@@ -41,6 +41,7 @@ local function gatherSnow(instance)
 
 	-- Snowball
 	local ball = env.res.snow.Snowball:Clone()
+	ball:SetPrimaryPartCFrame(CFrame.new(result.Position))
 	fx.new("ScaleEffect", ball)
 	local weld = Instance.new("Weld")
 	weld.Part0 = workspace.Terrain

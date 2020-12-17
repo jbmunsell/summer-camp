@@ -42,15 +42,12 @@ rx.Observable.from(env.LocalPlayer.CharacterAdded)
 	:filter()
 	:subscribe(pickupUtil.trackCharacterHeldObjects)
 
--- Play equip on equip
--- 	The server does this exact same thing, but it also tells the clients
--- 	and has the clients perform the functionality as well. This way the clients
--- 	each tween the object and get a nice smooth equip animation
-rx.Observable.from(pickup.net.ObjectEquipped)
-	:subscribe(function (character, object)
-		pickupUtil.unequipCharacter(character)
-		pickupUtil.equip(character, object)
+-- When local player starts holding an object, tween the grip (if it's not in the workspace)
+genesUtil.observeStateValue(genes.pickup, "holder")
+	:filter(function (_, holder)
+		return holder and holder == env.LocalPlayer.Character
 	end)
+	:subscribe(pickupUtil.renderGrip)
 
 -- Simple activation pass
 local activatedStream = inputStreams.click

@@ -187,20 +187,16 @@ local dropStream = rx.Observable.from(pickup.net.DropRequested)
 dropStream:subscribe(pickupUtil.tryDropHeldObjects)
 
 -- Set an object's network owner according to who OWNS it
-genesUtil.observeStateValue(pickup, "owner"):subscribe(function (instance, owner)
+genesUtil.observeStateValue(pickup, "holder"):subscribe(function (instance, holder)
 	-- local root = instance
-	if not instance:IsDescendantOf(workspace) then return end
+	if not instance:IsDescendantOf(workspace) or instance:FindFirstChild("StationaryWeld", true) then return end
 	local root = instance
 	if instance:IsA("Model") then
 		root = instance.PrimaryPart
 	end
-	pcall(function ()
-		if owner then
-			root:SetNetworkOwner(owner)
-		else
-			root:SetNetworkOwnershipAuto()
-		end
-	end)
+	root = root:GetRootPart() or root
+	local player = holder and Players:GetPlayerFromCharacter(holder)
+	root:SetNetworkOwner(player)
 end)
 
 -- Destroy all of a player's stowed items when they leave the server
