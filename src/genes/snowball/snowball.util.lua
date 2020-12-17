@@ -9,11 +9,10 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
-local genes = env.src.genes
 
 -- modules
 local fx = require(axis.lib.fx)
-local snowUtil = require(genes.player.snow.util)
+local snowUtil = require(env.src.snow.util)
 
 -- lib
 local snowballUtil = {}

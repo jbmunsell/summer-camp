@@ -51,9 +51,9 @@ local function throw(instance, chargeProportion, target)
 
 	-- Projectile firing
 	local function fireProjectile()
+		genes.projectile.net.ReleaseRequested:FireServer(instance, start, target, velocity)
 		pickupUtil.stripObject(instance)
 		projectileUtil.fireOwnedProjectile(instance, start, target, velocity)
-		genes.projectile.net.ReleaseRequested:FireServer(instance, start, target, velocity)
 	end
 
 	-- Stop charge anim and play throw anim
@@ -126,5 +126,4 @@ end)
 -- Fire projectiles when the server tells us to
 rx.Observable.from(genes.projectile.net.ProjectileFired)
 	:reject(dart.equals(env.LocalPlayer)) -- don't re-fire our own projectiles
-	:map(dart.drop(1)) -- drop the sender
 	:subscribe(projectileUtil.fireProjectile)

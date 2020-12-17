@@ -12,11 +12,12 @@ return {
 			chargeTime = 0,
 			owner = tableau.null,
 			velocityMagnitude = 0,
+			launched = false,
 		},
 	},
 
 	interface = {
-		events = { "LocalHit", "ServerHit" },
+		events = { "LocalThrown", "LocalHit", "ServerHit" },
 		remoteEvents = { "RemoteHit" },
 	},
 

@@ -24,6 +24,7 @@ return {
 		},
 
 		snowball = {
+			ragdollScaleMin = 2.5,
 		},
 	},
 }

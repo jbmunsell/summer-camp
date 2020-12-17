@@ -16,7 +16,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
-local snowUtil = require(genes.player.snow.util)
+local snowUtil = require(env.src.snow.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Variables

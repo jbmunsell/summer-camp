@@ -19,12 +19,12 @@ local dart = require(axis.lib.dart)
 local projectileUtil = {}
 
 -- Fire projectile
-function projectileUtil.rootFireProjectile(instance, start, target, velocityMagnitude, owned)
+function projectileUtil.rootFireProjectile(thrower, instance, start, target, velocityMagnitude, owned)
 	-- Folders
-	print("root firing")
 	assert(instance:IsA("Model"), "projectile gene only works with models")
 	local config = instance.config.projectile
 	local interface = instance.interface.projectile
+	local state = instance.state.projectile
 	local primary = instance.PrimaryPart
 	instance.state.projectile.velocityMagnitude.Value = velocityMagnitude
 
@@ -39,6 +39,8 @@ function projectileUtil.rootFireProjectile(instance, start, target, velocityMagn
 	primary.Anchored = true
 	primary.CanCollide = false
 	instance:SetPrimaryPartCFrame(CFrame.new(start, target))
+	state.launched.Value = true
+	instance.interface.projectile.LocalThrown:Fire(thrower, start, target, velocity)
 
 	-- Pulse
 	if not owned then
@@ -70,10 +72,11 @@ function projectileUtil.rootFireProjectile(instance, start, target, velocityMagn
 	end)
 end
 function projectileUtil.fireOwnedProjectile(instance, start, target, velocity)
-	projectileUtil.rootFireProjectile(instance, start, target, velocity, true)
+	projectileUtil.rootFireProjectile(env.LocalPlayer, instance, start, target, velocity, true)
 end
-function projectileUtil.fireProjectile(instance, start, target, velocity)
-	projectileUtil.rootFireProjectile(instance, start, target, velocity, false)
+function projectileUtil.fireProjectile(thrower, instance, start, target, velocity)
+	print("firing unowned projectile")
+	projectileUtil.rootFireProjectile(thrower, instance, start, target, velocity, false)
 end
 
 -- return lib

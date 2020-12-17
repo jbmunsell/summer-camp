@@ -1,9 +1,9 @@
 --
 --	Jackson Munsell
---	14 Dec 2020
---	snow.server.lua
+--	16 Dec 2020
+--	snowMittens.server.lua
 --
---	snow gene server driver
+--	snowMittens gene server driver
 --
 
 -- env
@@ -12,27 +12,31 @@ local axis = env.packages.axis
 local genes = env.src.genes
 
 -- modules
-local rx = require(axis.lib.rx)
 local fx = require(axis.lib.fx)
+local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
-local playerUtil = require(genes.player.util)
-local snowUtil = require(genes.player.snow.util)
-
-local snowNet = genes.player.snow.net
+local snowUtil = require(env.src.snow.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
 -- Gather snow
-local function gatherSnow(player)
+local function gatherSnow(instance)
 	-- Terminator stream
-	local terminator = rx.Observable.from(player.state.snow.gathering):reject():first()
+	local player = instance.state.pickup.owner.Value
+	if not player then
+		error("Attempt to gather snow with no player instance")
+	end
+	local terminator = rx.Observable.from(instance.state.snowMittens.gathering)
+		:reject()
+		:merge(rx.Observable.fromInstanceLeftGame(instance))
+		:first()
 
 	-- Get ground
-	local result = snowUtil.raycastPlayerGround(player, CFrame.new(0, 0, -2))
+	local result = snowUtil.raycastPlayerGround(player, CFrame.new(0, 0, -3))
 	if not result or not result.Position then return end
 
 	-- Snowball
@@ -45,6 +49,7 @@ local function gatherSnow(player)
 	weld.Name = "StationaryWeld"
 	weld.Parent = ball
 	ball.Parent = workspace
+	fx.setFXEnabled(ball, false)
 	genesUtil.waitForGene(ball, genes.pickup)
 	local function setBallScale(scale)
 		ball.ScaleEffect.Value = scale
@@ -62,7 +67,9 @@ local function gatherSnow(player)
 		:subscribe(setBallScale)
 
 	-- When they stop gathering, give them this object as a pickup
-	terminator:subscribe(pickupSnowball)
+	terminator
+		:filter(function () return instance:IsDescendantOf(game) end)
+		:subscribe(pickupSnowball)
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -70,19 +77,30 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- init gene for all players
-playerUtil.initPlayerGene(genes.player.snow)
+genesUtil.initGene(genes.snowMittens)
 
 -- When they start gathering, run a heartbeat stream to increase scale
-genesUtil.observeStateValue(genes.player.snow, "gathering")
+genesUtil.observeStateValue(genes.snowMittens, "gathering")
 	:filter(dart.select(2))
 	:map(dart.select(1))
 	:subscribe(gatherSnow)
 
 -- Process requests
-rx.Observable.from(snowNet.GatheringStarted)
+local gatherStart = rx.Observable.from(genes.snowMittens.net.GatheringStarted)
 	:filter(snowUtil.isPlayerStandingOnSnow)
-	:map(dart.drag(true))
-	:merge(rx.Observable.from(snowNet.GatheringStopped):map(dart.drag(false)))
-	:subscribe(function (player, gathering)
-		player.state.snow.gathering.Value = gathering
+	:filter(function (player, instance)
+		return player.Character and
+		instance.state.pickup.holder.Value == player.Character
+	end)
+local gatherStop = rx.Observable.from(genes.snowMittens.net.GatheringStopped)
+	:filter(function (player, instance)
+		return instance.state.pickup.owner.Value == player
+	end)
+local function transform(gatherStream, bool)
+	return gatherStream:map(dart.select(2)):map(dart.drag(bool))
+end
+transform(gatherStart, true)
+	:merge(transform(gatherStop, false))
+	:subscribe(function (instance, gathering)
+		instance.state.snowMittens.gathering.Value = gathering
 	end)

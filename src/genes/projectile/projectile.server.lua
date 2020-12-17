@@ -14,10 +14,8 @@ local genes = env.src.genes
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
-local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
-local projectileUtil = require(genes.projectile.util)
 
 ---------------------------------------------------------------------------------------------------
 -- Streams
