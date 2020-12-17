@@ -22,6 +22,7 @@ local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
 local genesUtil = require(genes.util)
+local characterUtil = require(env.src.character.util)
 local inputStreams
 if RunService:IsClient() then
 	inputStreams = require(env.src.input.streams)
@@ -329,7 +330,7 @@ function pickupUtil.teleportCharacterWithHeldObjects(character, cframe)
 			instance:SetPrimaryPartCFrame(instance:GetPrimaryPartCFrame() * delta)
 		end
 	end
-	character:SetPrimaryPartCFrame(cframe)
+	characterUtil.teleportCharacter(character, cframe)
 end
 
 -- return lib

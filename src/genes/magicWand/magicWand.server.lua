@@ -24,5 +24,6 @@ genesUtil.initGene(genes.magicWand)
 -- Teleport on activated
 pickupUtil.getActivatedStream(genes.magicWand):subscribe(function (character, _, target)
 	local cframe = character:GetPrimaryPartCFrame()
-	character:SetPrimaryPartCFrame(cframe - cframe.p + target + Vector3.new(0, 3, 0))
+	cframe = cframe - cframe.p + target + Vector3.new(0, 3, 0)
+	pickupUtil.teleportCharacterWithHeldObjects(character, cframe)
 end)
