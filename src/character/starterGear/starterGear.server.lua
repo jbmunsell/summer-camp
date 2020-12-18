@@ -40,4 +40,8 @@ end
 
 rx.Observable.from(Players.PlayerAdded)
 	:startWithTable(Players:GetPlayers())
-	:subscribe(givePlayerStarterGear)
+	:subscribe(function (player)
+		spawn(function ()
+			givePlayerStarterGear(player)
+		end)
+	end)
