@@ -42,7 +42,6 @@ end
 
 local function placeObject(player, instance, raycastResult, rotation)
 	-- Place object
-	print(rotation)
 	local copy = worldAttachUtil.createCopy(instance)
 	copy.Parent = workspace
 	local instanceAttachment = worldAttachUtil.getStickAttachment(copy)
@@ -105,9 +104,5 @@ rx.Observable.from(genes.worldAttach.net.AttachRequested)
 			rotation
 	end)
 	:filter(dart.boolAll)
-	:filter(function (player, instance, raycastResult)
-		local p = axisUtil.getPlayerHumanoidRootPart(player).Position
-		local d = (raycastResult.Position - p).magnitude
-		return d <= instance.config.worldAttach.attachRange.Value
-	end)
+	:filter(worldAttachUtil.verifyRaycastResult)
 	:subscribe(placeObject)

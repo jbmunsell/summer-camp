@@ -18,7 +18,8 @@ return {
 
 	config = {
 		worldAttach = {
-			attachableTags = {},
+			attachableTags = {"terrain"},
+			attachableTerrainMaterials = {},
 			count = 3,
 
 			attachRange = 20,

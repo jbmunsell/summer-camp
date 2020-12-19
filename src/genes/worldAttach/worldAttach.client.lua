@@ -7,7 +7,6 @@
 --
 
 -- env
-local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
@@ -60,6 +59,7 @@ local function packageRaycastData()
 		Instance = result.Instance,
 		Position = result.Position,
 		Normal = result.Normal,
+		Material = result.Material,
 	}
 end
 
@@ -68,28 +68,9 @@ local function renderPreview(instance)
 
 	local result = raycastMouse()
 	local hit = result and result.Position
-	local root = axisUtil.getLocalHumanoidRootPart()
 	local show = false
 	if instance and hit and result.Instance then
-		local config = instance and instance.config.worldAttach
-		local range = config.attachRange.Value
-		local isInRange = (root and (hit - root.Position).magnitude <= range)
-
-		if isInRange and result.Instance then
-			local tags = config.attachableTags:GetChildren()
-			if #tags > 0 then
-				for _, value in pairs(tags:GetChildren()) do
-					local tag = value.Value
-					local tagged = axisUtil.getTaggedAncestor(result.Instance, tag, true)
-					if tagged then
-						show = true
-						break
-					end
-				end
-			else
-				show = true
-			end
-		end
+		show = worldAttachUtil.verifyRaycastResult(env.LocalPlayer, instance, result)
 
 		if show then
 			local stickAttachment = worldAttachUtil.getStickAttachment(preview)
