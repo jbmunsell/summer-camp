@@ -16,7 +16,7 @@ return {
 		activity = {
 			isCompetitive = true,
 			lockPitch = true,
-			-- trophy = env.res.activities.SoccerTrophy,
+			trophy = env.res.activities.SnowballTrophy,
 			-- patch = env.res.activities.SoccerWinPatch,
 			displayName = "Snowball Fight",
 			analyticsName = "kingOfTheHill",

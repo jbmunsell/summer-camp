@@ -27,6 +27,16 @@ local pickupUtil = require(genes.pickup.util)
 -- lib
 local activityUtil = {}
 
+-- Temporary pitch sharing function
+function activityUtil.pitchHasActiveGame(instance)
+	for _, c in pairs(instance:GetChildren()) do
+		if genesUtil.hasGeneTag(c, genes.activity) then
+			if c.state.activity.inSession.Value then return true end
+		end
+	end
+	return false
+end
+
 -- Is in session
 function activityUtil.isInSession(activityInstance)
 	return activityInstance.state.activity.inSession.Value
@@ -65,9 +75,10 @@ end
 
 -- is player competing
 function activityUtil.getPlayerActivity(player)
-	return genesUtil.getInstances(activity):first(function (activityInstance)
+	local activityInstance = genesUtil.getInstances(activity):first(function (activityInstance)
 		return activityUtil.isPlayerInRoster(activityInstance, player)
 	end)
+	return activityInstance
 end
 function activityUtil.isPlayerCompeting(player)
 	return activityUtil.getPlayerActivity(player) and true or nil

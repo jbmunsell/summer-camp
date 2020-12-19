@@ -3,7 +3,7 @@ local genes = env.src.genes
 -- local tableau = require(env.packages.axis.lib.tableau)
 
 return {
-	instanceTag = "gene_freezeTag",
+	instanceTag = "gene_activityFreezeTag",
 	name = "freezeTag",
 	genes = { genes.activity },
 	state = {
@@ -15,7 +15,7 @@ return {
 		activity = {
 			isCompetitive = true,
 			lockPitch = true,
-			-- trophy = env.res.activities.SoccerTrophy,
+			trophy = env.res.activities.FreezeTagTrophy,
 			-- patch = env.res.activities.SoccerWinPatch,
 			displayName = "Freeze Tag",
 			analyticsName = "freezeTag",

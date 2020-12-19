@@ -243,7 +243,8 @@ activityUtil.getPlayerRemovedFromRosterStream(genes.activity):subscribe(stripPla
 -- 	and will create an infinite loop if single-threaded
 local rosterFullStream = activities
 	:flatMap(function (activityInstance)
-		return rx.Observable.from(activityInstance.state.activity.roster:GetChildren()):flatMap(collection.observeChanged)
+		return rx.Observable.from(activityInstance.state.activity.roster:GetChildren())
+			:flatMap(collection.observeChanged)
 			:map(dart.constant(activityInstance))
 	end)
 	:filter(function (activityInstance)
@@ -265,6 +266,14 @@ local rosterCollectingStart = activities
 			:map(function () return #enrolled:GetChildren() end)
 			:filter(dart.equals(activityInstance.config.activity.teamCount.Value))
 			:map(dart.constant(activityInstance))
+
+			-- Temporary wait for open pitch. Needs improvement badly
+			:map(function ()
+				if activityInstance.config.activity.sharesPitch.Value then
+					repeat wait() until not activityUtil.pitchHasActiveGame(activityInstance.Parent)
+				end
+				return activityInstance
+			end)
 	end)
 	:share()
 rosterCollectingStart

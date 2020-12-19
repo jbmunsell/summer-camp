@@ -192,6 +192,9 @@ genesUtil.observeStateValue(pickup, "holder"):subscribe(function (instance, hold
 	local root = instance
 	if instance:IsA("Model") then
 		root = instance.PrimaryPart
+		if not root then
+			error(instance:GetFullName() .. " does not have a PrimaryPart")
+		end
 	end
 	root = root:GetRootPart() or root
 

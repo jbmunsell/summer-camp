@@ -27,6 +27,7 @@ return {
 		activity = {
 			isCompetitive = false,
 			lockPitch = false,
+			sharesPitch = false,
 			rosterCollectionTimer = 25,
 			trophy = tableau.null,
 			teamCount = 1,

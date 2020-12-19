@@ -30,17 +30,27 @@ local function renderPlayerFrozen(player, frozen)
 	local root = axisUtil.getPlayerHumanoidRootPart(player)
 	if not root then return end
 
-	-- TODO: Create ice box around player
+	-- Create ice box around player
+	axisUtil.destroyChildren(character, "IceBlock")
+	if frozen then
+		local ice = env.res.snow.IceBlock:Clone()
+		local weld = Instance.new("Weld")
+		weld.Part0 = root
+		weld.Part1 = ice
+		weld.Parent = ice
+		ice.CFrame = root.CFrame
+		ice.Parent = character
+	end
 
 	-- Weld them to the terrain to prevent movement????????
 	axisUtil.destroyChildren(character, "FreezeTagWeld")
 	if frozen then
-		local weld = Instance.new("Weld")
-		weld.Part0 = workspace.Terrain
-		weld.Part1 = root
-		weld.C0 = root.CFrame
-		weld.Name = "FreezeTagWeld"
-		weld.Parent = character
+		local freezeWeld = Instance.new("Weld")
+		freezeWeld.C0 = root.CFrame
+		freezeWeld.Part0 = workspace.Terrain
+		freezeWeld.Part1 = root
+		freezeWeld.Name = "FreezeTagWeld"
+		freezeWeld.Parent = character
 	end
 end
 local function renderPlayerFreezer(player, freezer)
@@ -95,17 +105,17 @@ local function handlePlayersTouching(a, b)
 	-- 	then freeze the other one
 	if a.Team ~= b.Team then
 		if aState.freezer.Value and not bState.freezer.Value then
-			b.frozen.Value = true
+			bState.frozen.Value = true
 		elseif bState.freezer.Value and not aState.freezer.Value then
-			a.frozen.Value = true
+			aState.frozen.Value = true
 		end
 
 	-- If they're on the same team and NEITHER is a freezer,
 	-- 	then unfreeze both
 	else
 		if not aState.freezer.Value and not bState.freezer.Value then
-			a.frozen.Value = false
-			b.frozen.Value = false
+			aState.frozen.Value = false
+			bState.frozen.Value = false
 		end
 	end
 end
@@ -161,9 +171,10 @@ instanceStream:flatMap(function (activityInstance)
 end):subscribe(function (activityInstance)
 	foreachPlayer(activityInstance, function (a)
 		foreachPlayer(activityInstance, function (b)
+			if a == b then return end
 			local aroot = axisUtil.getPlayerHumanoidRootPart(a)
 			local broot = axisUtil.getPlayerHumanoidRootPart(b)
-			if aroot and broot and (aroot.Position - broot.Position).magnitude <= 2 then
+			if aroot and broot and (aroot.Position - broot.Position).magnitude <= 3 then
 				handlePlayersTouching(a, b)
 			end
 		end)
@@ -191,6 +202,7 @@ freezerChanged:subscribe(renderPlayerFreezer)
 
 -- Declare winner when a team is entirely frozen
 scoreChangedStream
+	:filter(activityUtil.isInPlay)
 	:map(function (activityInstance) return activityInstance, getWinningTeam(activityInstance) end)
 	:filter(dart.select(2))
 	:subscribe(activityUtil.declareWinner)
