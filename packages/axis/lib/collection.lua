@@ -38,7 +38,9 @@ function collection.getValue(folder, value)
 end
 function collection.getRandom(folder)
 	local children = folder:GetChildren()
-	return children[math.random(1, #children)]
+	if #children > 0 then
+		return children[math.random(1, #children)]
+	end
 end
 
 -- get index
