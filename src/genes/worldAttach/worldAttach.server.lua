@@ -62,13 +62,11 @@ local function placeObject(player, instance, raycastResult, rotation)
 
 	-- Detach and destroy stream
 	local config = instance.config.worldAttach
-	local isStuckToCharacter = (raycastResult.Instance.Parent.Name == "PlayerBackpack")
-	if not isStuckToCharacter then
-		for _, p in pairs(Players:GetPlayers()) do
-			if p.Character and raycastResult.Instance:IsDescendantOf(p.Character) then
-				isStuckToCharacter = true
-				break
-			end
+	local isStuckToCharacter = false
+	for _, p in pairs(Players:GetPlayers()) do
+		if p.Character and raycastResult.Instance:IsDescendantOf(p.Character) then
+			isStuckToCharacter = true
+			break
 		end
 	end
 	local dur = config[isStuckToCharacter and "characterAttachTimer" or "attachTimer"].Value

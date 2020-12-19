@@ -46,11 +46,11 @@ function inputUtil.getToolRaycastParams()
 end
 
 -- Raycast mouse
-function inputUtil.raycastMouse()
+function inputUtil.raycastMouse(params)
 	local mousePosition = UserInputService:GetMouseLocation()
 	local ray = workspace.CurrentCamera:ViewportPointToRay(mousePosition.X, mousePosition.Y)
 	local dir = ray.Direction * 1000
-	local result = workspace:Raycast(ray.Origin, dir, raycastParams)
+	local result = workspace:Raycast(ray.Origin, dir, params or raycastParams)
 	return result, ray.Origin + dir
 end
 

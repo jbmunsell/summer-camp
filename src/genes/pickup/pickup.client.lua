@@ -29,7 +29,6 @@ local inputStreams = require(input.streams)
 ---------------------------------------------------------------------------------------------------
 
 local function renderGrip(grip)
-	print("render grip")
 	-- grip.C0 = grip.Part0.RightGripAttachment.CFrame * grip.Part1.RightGripAttachment.CFrame
 end
 

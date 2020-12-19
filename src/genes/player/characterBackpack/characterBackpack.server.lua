@@ -26,45 +26,20 @@ local playerUtil = require(genes.player.util)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
--- Set backpack enabled
-local function attachBackpackToCharacter(instance, character)
-	axisUtil.destroyChild(instance, "AttachWeld")
-	instance.Parent = workspace
-	wait()
-	local weld = axisUtil.snapAttach(character, instance, "BodyBackAttachment")
-	weld.Name = "AttachWeld"
-	weld.Parent = instance
-end
-
 -- Create backpack
 local function createBackpack(player)
 	-- Create backpack instance
+	wait() -- required for weird character spawning timeline
 	genesUtil.waitForGene(player, genes.player.jobs)
 	local backpack = env.res.character.PlayerBackpack:Clone()
-	backpack.Parent = ReplicatedStorage
+	backpack.Parent = player.Character
+	axisUtil.snapAttach(player.Character, backpack, "BodyBackAttachment")
 	genesUtil.waitForGene(backpack, genes.color)
 	fx.new("ScaleEffect", backpack)
 	player.state.characterBackpack.instance.Value = backpack
 
 	-- Terminator stream
-	-- NOTE: We cannot use the delay operator because the stream completes
-	-- 	since it's technically a :first(), so delay observer push will be debounced
 	local terminator = rx.Observable.fromInstanceLeftGame(backpack)
-	terminator
-		:reject(function () return player.state.characterBackpack.destroyed.Value end)
-		:subscribe(function ()
-			delay(0.1, dart.bind(createBackpack, player))
-		end)
-
-	-- Attach to new characters while backpack exists
-	rx.Observable.fromInstanceEvent(player, "CharacterAdded")
-		:startWith(player.Character)
-		:filter(function (c)
-			return c and c:FindFirstChild("Humanoid")
-			and c.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead
-		end)
-		:takeUntil(terminator)
-		:subscribe(dart.bind(attachBackpackToCharacter, backpack))
 
 	-- Set color according to team
 	local isLeaderStream = rx.Observable.from(player.state.jobs.job):map(dart.equals(env.res.jobs.teamLeader))
@@ -84,15 +59,6 @@ local function createBackpack(player)
 		end)
 end
 
--- Destroy player backpack
-local function destroyPlayerBackpack(player)
-	player.state.characterBackpack.destroyed.Value = true
-	local instance = player.state.characterBackpack.instance.Value
-	if instance then
-		instance:Destroy()
-	end
-end
-
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
@@ -100,10 +66,10 @@ end
 -- init
 local playerStream = playerUtil.initPlayerGene(characterBackpack)
 
--- Create instance for each gene
-playerStream:subscribe(createBackpack)
-
--- Destroy backpacks on player left
-rx.Observable.from(Players.PlayerRemoving)
-	:filter(dart.follow(genesUtil.hasFullState, characterBackpack))
-	:subscribe(destroyPlayerBackpack)
+-- Create backpack on character added
+playerStream:flatMap(function (player)
+	return rx.Observable.from(player.CharacterAdded)
+		:startWith(player.Character)
+		:filter()
+		:map(dart.constant(player))
+end):subscribe(createBackpack)

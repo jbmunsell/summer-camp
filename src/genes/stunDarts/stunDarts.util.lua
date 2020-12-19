@@ -42,13 +42,6 @@ local function getPlayerFromHit(hit)
 	local player = axisUtil.getPlayerFromCharacterDescendant(hit)
 	if player then return player end
 
-	for _, p in pairs(genesUtil.getInstances(genes.player.characterBackpack):raw()) do
-		local backpack = p.state.characterBackpack.instance.Value
-		if backpack and hit:IsDescendantOf(backpack) then
-			return p
-		end
-	end
-
 	for _, v in pairs(genesUtil.getInstances(genes.pickup):raw()) do
 		if (hit == v or hit:IsDescendantOf(v)) then
 			local p = Players:GetPlayerFromCharacter(v.state.pickup.holder.Value)

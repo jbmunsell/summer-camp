@@ -25,6 +25,9 @@ local inputUtil = require(env.src.input.util)
 -- Variables
 ---------------------------------------------------------------------------------------------------
 
+local raycastParams = RaycastParams.new()
+raycastParams.CollisionGroup = "Default"
+
 local preview = rx.BehaviorSubject.new()
 
 local gui = env.PlayerGui:WaitForChild("Core").Container.PatchDisplay
@@ -44,15 +47,15 @@ rx.Observable.from(env.LocalPlayer.state.characterBackpack.instance)
 ---------------------------------------------------------------------------------------------------
 
 local function renderPreview()
-	local result = inputUtil.raycastMouse()
-	local instance = preview:getValue()
+	local result = inputUtil.raycastMouse(raycastParams)
+	local previewInstance = preview:getValue()
 	local localBackpack = localBackpackSubject:getValue()
 	if result and result.Instance and localBackpack and result.Instance:IsDescendantOf(localBackpack) then
-		instance.CFrame = CFrame.new(result.Position, result.Position + result.Normal)
+		previewInstance.CFrame = CFrame.new(result.Position, result.Position + result.Normal)
 			* CFrame.Angles(0, math.pi * 0.5, 0)
-		instance.Parent = workspace
+		previewInstance.Parent = workspace
 	else
-		instance.Parent = ReplicatedStorage
+		previewInstance.Parent = ReplicatedStorage
 	end
 end
 
@@ -91,7 +94,7 @@ end):subscribe(renderPreview)
 
 -- Send request on activated
 pickupUtil.getActivatedStream(genes.patch):subscribe(function (instance)
-	local result = inputUtil.raycastMouse()
+	local result = inputUtil.raycastMouse(raycastParams)
 	local p = preview:getValue()
 	local localBackpack = localBackpackSubject:getValue()
 	if p and p:IsDescendantOf(workspace) and
