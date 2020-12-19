@@ -19,6 +19,7 @@ return {
 			isCollectingRoster = false,
 			winningTeam = tableau.null,
 			gear = {},
+			ragdolls = {},
 		},
 	},
 
@@ -29,6 +30,7 @@ return {
 			rosterCollectionTimer = 25,
 			trophy = tableau.null,
 			teamCount = 1,
+			minPlayersPerTeam = 1,
 			maxPlayersPerTeam = 100,
 			
 			displayName = "Activity",

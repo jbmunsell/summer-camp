@@ -44,7 +44,6 @@ local function destroyBall(_, ball)
 	ball:Destroy()
 end
 local function spawnBall(dodgeballInstance)
-	-- local spawnIndex = getBalls(dodgeballInstance):size() + 1
 	local spawnIndex = #dodgeballInstance.functional.balls:GetChildren() + 1
 	local ball = dodgeballInstance.config.dodgeball.ball.Value:Clone()
 	ball.CFrame = CFrame.new(dodgeballInstance.functional.BallSpawns[spawnIndex].Position)
@@ -67,20 +66,6 @@ local function dropPlayer(dodgeballInstance, player)
 		collection.addValue(dodgeballInstance.state.dodgeball.ragdolls, player.Character)
 	end
 	ragdoll.net.Push:FireClient(player)
-end
-local function spawnPlayer(dodgeballInstance, player)
-	local functional = dodgeballInstance.functional
-	local teamIndex = activityUtil.getPlayerTeamIndex(dodgeballInstance, player)
-	local spawnPlane = functional["Team" .. teamIndex .. "SpawnPlane"]
-	activityUtil.spawnPlayersInPlane({ player }, spawnPlane, functional.CourtCenter.Position)
-end
-local function spawnAllPlayers(dodgeballInstance)
-	for i = 1, 2 do
-		local players = dodgeballInstance.state.activity.roster[i]:GetChildren()
-		for _, value in pairs(players) do
-			spawnPlayer(dodgeballInstance, value.Value)
-		end
-	end
 end
 local function releasePlayerRagdoll(dodgeballInstance, player)
 	ragdoll.net.Pop:FireClient(player)
@@ -131,31 +116,13 @@ local function dragBalls(observable)
 end
 
 -- init
-local dodgeballInstances = genesUtil.initGene(dodgeball)
+genesUtil.initGene(dodgeball)
 
 -- Session streams
-local sessionStart, sessionEnd = genesUtil.crossObserveStateValue(dodgeball, activity, "inSession")
-	:partition(dart.select(2))
-
--- Play start stream (when roster collection is complete)
-local playStartStream = sessionStart:flatMap(function (activityInstance)
-	return rx.Observable.from(activityInstance.state.activity.isCollectingRoster.Changed)
-		:filter(dart.bind(activityUtil.isInSession, activityInstance))
-		:reject()
-		:first()
-		:map(dart.constant(activityInstance))
-end)
-
--- Roster changed
+local sessionStart, sessionEnd = activityUtil.getSessionStateStreams(dodgeball)
+local playStartStream = activityUtil.getPlayStartStream(dodgeball)
 local playerRemovedFromRoster = activityUtil.getPlayerRemovedFromRosterStream(dodgeball)
-
--- Score changed
-local scoreChangedStream = dodgeballInstances:flatMap(function (dodgeballInstance)
-	local score = dodgeballInstance.state.activity.score
-	return rx.Observable.from(score:GetChildren())
-		:flatMap(rx.Observable.from)
-		:map(dart.constant(dodgeballInstance))
-end)
+local scoreChangedStream = activityUtil.getScoreChangedStream(dodgeball)
 
 -- Character died
 local playerLeft = rx.Observable.from(Players.PlayerRemoving)
@@ -203,8 +170,8 @@ local playerHitByBall = genesUtil.getInstanceStream(dodgeballBall)
 
 -- Spawn players on session start
 sessionStart:subscribe(activityUtil.ejectPlayers)
-playStartStream:subscribe(spawnAllPlayers)
-activityUtil.getPlayerAddedToRosterStream(dodgeball):subscribe(spawnPlayer)
+playStartStream:subscribe(activityUtil.spawnAllPlayers)
+activityUtil.getPlayerAddedToRosterStream(dodgeball):subscribe(activityUtil.spawnPlayer)
 
 -- Get player out when they are touched by a hot ball OR their character dies
 playerDied

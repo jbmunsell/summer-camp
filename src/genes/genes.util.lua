@@ -378,6 +378,18 @@ function genesUtil.observeStateValue(gene, stateValueName, transform)
 	return genesUtil.crossObserveStateValue(gene, gene, stateValueName, transform)
 end
 
+-- Deep observe state value
+function genesUtil.deepObserveStateValue(gene, keys)
+	local geneName = require(gene.data).name
+	return genesUtil.getInstanceStream(gene):flatMap(function (instance)
+		local v = instance.state[geneName]
+		for _, key in pairs(keys) do
+			v = v[key]
+		end
+		return rx.Observable.from(v):map(dart.carry(instance))
+	end)
+end
+
 -- Cross observe state
 -- 	Similar to observeStateValue, but this function uses the instance stream of the first gene
 -- 	while observing a state value from another gene.

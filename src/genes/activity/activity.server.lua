@@ -137,12 +137,13 @@ end
 local function startPlay(activityInstance)
 	-- Get state
 	local state = activityInstance.state.activity
+	local config = activityInstance.config.activity
 
 	-- If we have players on both teams, then start a match
 	local hasBoth = true
-	for i = 1, activityInstance.config.activity.teamCount.Value do
+	for i = 1, config.teamCount.Value do
 		local folder = state.roster[i]
-		if #folder:GetChildren() == 0 then
+		if #folder:GetChildren() < config.minPlayersPerTeam.Value then
 			hasBoth = false
 			break
 		end

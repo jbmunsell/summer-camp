@@ -234,11 +234,11 @@ volleyActiveBallMoved:subscribe(function (soccerInstance, ball)
 end)
 
 -- Declare winner on winning goal
-local winneringTeamStream = winningGoalStream
+local winningTeamStream = winningGoalStream
 	:map(function (soccerInstance, teamIndex)
 		return soccerInstance, soccerInstance.state.activity.sessionTeams[teamIndex].Value
 	end)
-winneringTeamStream:subscribe(activityUtil.declareWinner)
+winningTeamStream:subscribe(activityUtil.declareWinner)
 
 -----------------------------------
 -- Scoreboard subscriptions

@@ -12,6 +12,7 @@ local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
 local activity = genes.activity
+local ragdoll = env.src.character.ragdoll
 
 -- modules
 local rx = require(axis.lib.rx)
@@ -56,6 +57,10 @@ end
 function activityUtil.getTeamIndex(activityInstance, team)
 	local value = collection.getValue(activityInstance.state.activity.sessionTeams, team)
 	return value and tonumber(value.Name)
+end
+function activityUtil.changeTeamScore(activityInstance, team, delta)
+	local scoreValue = activityInstance.state.activity.score[activityUtil.getTeamIndex(activityInstance, team)]
+	scoreValue.Value = scoreValue.Value + delta
 end
 
 -- is player competing
@@ -162,8 +167,9 @@ function activityUtil.getSingleTeamLeftStream(gene)
 			return activityInstance.state.activity.winningTeam.Value
 		end)
 		:map(function (instance)
+			local minPlayers = instance.config.activity.minPlayersPerTeam.Value
 			for i = 1, 2 do
-				if #instance.state.activity.roster[i]:GetChildren() == 0 then
+				if #instance.state.activity.roster[i]:GetChildren() < minPlayers then
 					return instance, instance.state.activity.sessionTeams[3 - i].Value
 				end
 			end
@@ -186,6 +192,29 @@ end
 function activityUtil.isTeamRosterFull(activityInstance, team)
 	local maxPlayers = activityInstance.config.activity.maxPlayersPerTeam.Value
 	return #activityUtil.getTeamRoster(activityInstance, team):GetChildren() == maxPlayers
+end
+
+-- Activity streams
+function activityUtil.getSessionStateStreams(activityGene)
+	return genesUtil.crossObserveStateValue(activityGene, activity, "inSession")
+		:partition(dart.select(2))
+end
+function activityUtil.getPlayStartStream(activityGene)
+	local sessionStart = activityUtil.getSessionStateStreams(activityGene)
+	return sessionStart:flatMap(function (activityInstance)
+		return rx.Observable.from(activityInstance.state.activity.isCollectingRoster.Changed)
+			:filter(dart.bind(activityUtil.isInSession, activityInstance))
+			:reject()
+			:first()
+			:map(dart.constant(activityInstance))
+	end)
+end
+function activityUtil.getScoreChangedStream(activityGene)
+	return genesUtil.getInstanceStream(activityGene):flatMap(function (instance)
+		return rx.Observable.from(instance.state.activity.score:GetChildren())
+			:flatMap(rx.Observable.from)
+			:map(dart.constant(instance))
+	end)
 end
 
 -- Declare winner
@@ -244,7 +273,15 @@ function activityUtil.spawnPlayer(activityInstance, player)
 	local teamIndex = activityUtil.getTeamIndex(activityInstance, player.Team)
 	if teamIndex then
 		local plane = activityInstance.functional["Team" .. teamIndex .. "SpawnPlane"]
-		activityUtil.spawnPlayersInPlane({ player }, plane)
+		activityUtil.spawnPlayersInPlane({ player }, plane, activityInstance.functional.PitchCenter.Position)
+	end
+end
+function activityUtil.spawnAllPlayers(activityInstance)
+	for i = 1, 2 do
+		local players = activityInstance.state.activity.roster[i]:GetChildren()
+		for _, value in pairs(players) do
+			activityUtil.spawnPlayer(activityInstance, value.Value)
+		end
 	end
 end
 
@@ -264,6 +301,28 @@ function activityUtil.ejectPlayers(activityInstance)
 			activityUtil.ejectPlayerFromActivity(activityInstance, player)
 		end
 	end
+end
+
+-- Ragdolling
+function activityUtil.ragdollPlayer(activityInstance, player)
+	if player.Character then
+		collection.addValue(activityInstance.state.activity.ragdolls, player.Character)
+	end
+	ragdoll.net.Push:FireClient(player)
+end
+function activityUtil.releasePlayerRagdoll(activityInstance, player)
+	ragdoll.net.Pop:FireClient(player)
+	collection.removeValue(activityInstance.state.activity.ragdolls, player.Character)
+end
+function activityUtil.releaseAllRagdolls(activityInstance)
+	local ragdolls = activityInstance.state.activity.ragdolls
+	for _, v in pairs(ragdolls:GetChildren()) do
+		local player = v.Value and Players:GetPlayerFromCharacter(v.Value)
+		if player then
+			activityUtil.releasePlayerRagdoll(activityInstance, player)
+		end
+	end
+	collection.clear(ragdolls)
 end
 
 -- return lib

@@ -71,7 +71,7 @@ function projectileUtil.rootFireProjectile(thrower, instance, start, target, vel
 				local result = workspace:Raycast(last:toWorldSpace(offset).p, delta:toWorldSpace(offset).p, params)
 				if result and result.Instance then
 					new = new - new.p + result.Position
-					new = new:toObjectSpace(offset:inverse())
+					new = new:toWorldSpace(offset:inverse())
 					interface.RemoteHit:FireServer(result.Instance, result.Position)
 					interface.LocalHit:Fire(result.Instance, result.Position)
 					break
