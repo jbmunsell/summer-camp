@@ -12,37 +12,22 @@ local axis = env.packages.axis
 local genes = env.src.genes
 
 -- modules
+local rx = require(axis.lib.rx)
+local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
+local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
-
--- Variables
-local nextId = 0
 
 -- lib
 local plantInGroundUtil = {}
 
--- Create id
-local function createId(instance)
-	nextId = nextId + 1
-	instance.state.plantInGround.plantId.Value = nextId
-	local attachment = instance:FindFirstChild("PlantAttachment", true)
-	if not attachment then error("No 'PlantAttachment' found in " .. instance:GetFullName()) end
-	attachment.Name = attachment.Name .. instance.state.plantInGround.plantId.Value
-end
-
 -- Try planting object in the ground
 function plantInGroundUtil.tryPlant(instance)
+	-- Strip from holder
 	pickupUtil.stripObject(instance)
 
-	-- Set value if not already
-	local id = instance.state.plantInGround.plantId
-	if id.Value < 0 then
-		createId(instance)
-	end
-
 	-- Grab attachment
-	local attachmentName = "PlantAttachment" .. id.Value
-	local attachment = instance:FindFirstChild(attachmentName, true)
+	local attachment = instance:FindFirstChild("PlantAttachment", true)
 	if not attachment then error("No PlantAttachment found in " .. instance:GetFullName()) end
 
 	-- Preserve Y rotation
@@ -54,19 +39,22 @@ function plantInGroundUtil.tryPlant(instance)
 	if not raycastResult or raycastResult.Instance ~= workspace.Terrain then return end
 
 	-- Create new terrain attachment for planting
-	if not workspace.Terrain:FindFirstChild(attachmentName) then
-		Instance.new("Attachment", workspace.Terrain).Name = attachmentName
-	end
-	local terrainAttachment = workspace.Terrain[attachmentName]
+	local terrainAttachment = Instance.new("Attachment", workspace.Terrain)
 	terrainAttachment.CFrame = CFrame.new(raycastResult.Position, raycastResult.Position + rot)
 
 	-- Smooth attach the things
-	local weld = axisUtil.smoothAttach(workspace.Terrain, instance, attachmentName)
+	local weld = axisUtil.smoothAttachAttachments(workspace.Terrain, terrainAttachment, instance, "PlantAttachment")
 	weld.Name = "StationaryWeld"
 	weld.Parent = instance
+	rx.Observable.fromInstanceLeftGame(weld)
+		:first()
+		:map(dart.constant(terrainAttachment))
+		:subscribe(dart.destroy)
 
 	-- Planted is TRUE
-	instance.state.plantInGround.planted.Value = true
+	if genesUtil.hasGeneTag(instance, genes.plantInGround) then
+		instance.state.plantInGround.planted.Value = true
+	end
 end
 
 -- return lib

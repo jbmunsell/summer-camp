@@ -14,6 +14,7 @@ return {
 		},
 
 		snowball = {
+			planted = false,
 		},
 	},
 
@@ -24,7 +25,8 @@ return {
 		},
 
 		snowball = {
-			ragdollScaleMin = 2.5,
+			ragdollScaleMin = 3,
+			meltTimer = 3 * 60,
 		},
 	},
 }

@@ -57,7 +57,7 @@ rx.Observable.from(genes.projectile.net.ReleaseRequested)
 			math.clamp(velocity, vmin, vmax)
 	end)
 	:subscribe(function (player, instance, start, target, velocity)
-		pickupUtil.stripObject(instance)
 		instance.state.projectile.owner.Value = player
+		pickupUtil.stripObject(instance)
 		genes.projectile.net.ProjectileFired:FireAllClients(player, instance, start, target, velocity)
 	end)
