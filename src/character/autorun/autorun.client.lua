@@ -22,7 +22,7 @@ local pickupUtil = require(genes.pickup.util)
 -- Variables
 ---------------------------------------------------------------------------------------------------
 
-local runningChanged = env.src.autorun.net.RunningChanged
+local runningChanged = env.src.character.autorun.net.RunningChanged
 
 local RunningFOV = 75
 local WalkingFOV = 70

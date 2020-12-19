@@ -55,7 +55,7 @@ end
 -- Streams
 ---------------------------------------------------------------------------------------------------
 
-rx.Observable.from(env.src.autorun.net.RunningChanged)
+rx.Observable.from(env.src.character.autorun.net.RunningChanged)
 	:map(function (player, running)
 		return player.Character, running
 	end)
