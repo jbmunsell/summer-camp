@@ -36,6 +36,10 @@ function collection.getValue(folder, value)
 	return tableau.from(folder:GetChildren())
 		:first(function (v) return v.Value == value end)
 end
+function collection.getRandom(folder)
+	local children = folder:GetChildren()
+	return children[math.random(1, #children)]
+end
 
 -- get index
 function collection.getIndex(folder, value)
