@@ -50,26 +50,28 @@ function worldAttachUtil.verifyRaycastResult(player, instance, raycastResult)
 	local verified = false
 
 	if isInRange and raycastResult.Instance then
-		local tags = config.attachableTags:GetChildren()
-		if #tags > 0 then
-			for _, value in pairs(tags) do
-				local tag = value.Value
-				local tagged = axisUtil.getTaggedAncestor(raycastResult.Instance, tag, true)
-				if tagged then
-					verified = true
-					break
-				end
+		if raycastResult.Instance == workspace.Terrain then
+			local materials = config.attachableTerrainMaterials:GetChildren()
+			if #materials > 0 then
+				local materialString = string.match(tostring(raycastResult.Material), "([^%.]*)$")
+				verified = collection.getValue(config.attachableTerrainMaterials, materialString)
+			else
+				verified = true
 			end
 		else
-			verified = true
-		end
-	end
-
-	if raycastResult.Instance == workspace.Terrain then
-		local materials = config.attachableTerrainMaterials:GetChildren()
-		if #materials > 0 then
-			local materialString = string.match(tostring(raycastResult.Material), "([^%.]*)$")
-			verified = collection.getValue(config.attachableTerrainMaterials, materialString)
+			local tags = config.attachableTags:GetChildren()
+			if #tags > 0 then
+				for _, value in pairs(tags) do
+					local tag = value.Value
+					local tagged = axisUtil.getTaggedAncestor(raycastResult.Instance, tag, true)
+					if tagged then
+						verified = true
+						break
+					end
+				end
+			else
+				verified = true
+			end
 		end
 	end
 

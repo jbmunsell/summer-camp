@@ -18,6 +18,7 @@ local fx = require(axis.lib.fx)
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 local worldAttachUtil = require(genes.worldAttach.util)
@@ -79,6 +80,12 @@ local function placeObject(player, instance, raycastResult, rotation)
 
 	-- Decrease count
 	instance.state.worldAttach.count.Value = instance.state.worldAttach.count.Value - 1
+
+	-- Play sound
+	local sound = config.attachSound.Value
+	if sound then
+		soundUtil.playSound(sound, instanceAttachment)
+	end
 end
 
 ---------------------------------------------------------------------------------------------------

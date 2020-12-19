@@ -21,6 +21,8 @@ return {
 
 		worldAttach = {
 			count = 10,
+
+			attachSound = env.res.genes.stickyNoteStack.sounds.PageTurn,
 		},
 	},
 }

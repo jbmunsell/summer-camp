@@ -1,6 +1,6 @@
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local genes = env.src.genes
--- local tableau = require(env.packages.axis.lib.tableau)
+local tableau = require(env.packages.axis.lib.tableau)
 
 return {
 	instanceTag = "gene_worldAttach",
@@ -18,7 +18,7 @@ return {
 
 	config = {
 		worldAttach = {
-			attachableTags = {"terrain"},
+			attachableTags = {},
 			attachableTerrainMaterials = {},
 			count = 3,
 
@@ -28,6 +28,8 @@ return {
 			characterAttachTimer = 20,
 			attachTimer = 5 * 60,
 			removeAfterOwnerLeft = true,
+
+			attachSound = tableau.null,
 		},
 	},
 }
