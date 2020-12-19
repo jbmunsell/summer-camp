@@ -203,7 +203,10 @@ function axisUtil.setProperties(instance, properties)
 end
 
 -- Get tagged ancestor
-function axisUtil.getTaggedAncestor(instance, tag)
+function axisUtil.getTaggedAncestor(instance, tag, checkInstance)
+	if checkInstance and CollectionService:HasTag(instance, tag) then
+		return instance
+	end
 	while instance and instance ~= game do
 		instance = instance.Parent
 		if CollectionService:HasTag(instance, tag) then
