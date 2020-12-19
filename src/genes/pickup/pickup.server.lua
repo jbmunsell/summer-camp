@@ -188,15 +188,33 @@ dropStream:subscribe(pickupUtil.tryDropHeldObjects)
 
 -- Set an object's network owner according to who OWNS it
 genesUtil.observeStateValue(pickup, "holder"):subscribe(function (instance, holder)
-	-- local root = instance
 	if not instance:IsDescendantOf(workspace) or instance:FindFirstChild("StationaryWeld", true) then return end
 	local root = instance
 	if instance:IsA("Model") then
 		root = instance.PrimaryPart
 	end
 	root = root:GetRootPart() or root
+
 	local player = holder and Players:GetPlayerFromCharacter(holder)
 	root:SetNetworkOwner(player)
+
+	if holder then
+		local weld = axisUtil.smoothAttach(holder, instance, "RightGripAttachment")
+		weld.Name = "RightGrip"
+		weld.Parent = holder
+		-- local rightGrip = instance:FindFirstChild("RightGripAttachment", true)
+		-- local weld = Instance.new("Weld")
+		-- weld.Part0 = holder:FindFirstChild("RightHand")
+		-- weld.Part1 = rightGrip.Parent
+		-- weld.C0 = weld.Part0.CFrame:toObjectSpace(weld.Part1.CFrame)
+		-- weld.Name = "RightGrip"
+		-- weld.Parent = holder
+		-- if not player then
+		-- 	weld.C0 = holder:FindFirstChild("RightGripAttachment", true).CFrame * rightGrip.CFrame
+		-- else
+		-- 	print("player grabbed; allowing them to set grip")
+		-- end
+	end
 end)
 
 -- Destroy all of a player's stowed items when they leave the server

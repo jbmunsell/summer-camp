@@ -99,23 +99,6 @@ function pickupUtil.equip(character, object)
 	object.state.pickup.holder.Value = character
 end
 
--- Render grip
-function pickupUtil.renderGrip(instance, holder)
-	-- If in workspace already, then smooth attach
-	-- Otherwise, snap attach
-	local attach = true --isInWorkspace
-		and axisUtil.smoothAttach
-		or axisUtil.snapAttach
-	local weld = attach(holder, instance, "RightGripAttachment")
-	weld.Name = "RightGripWeld"
-
-	-- Destroy on changed
-	rx.Observable.from(instance.state.pickup.holder.Changed)
-		:map(dart.constant(weld))
-		:first()
-		:subscribe(dart.destroy)
-end
-
 -- Get character held objects
 -- 	Init held object tracker
 local _characterHeldObjects = {}
@@ -169,13 +152,9 @@ end
 -- Strip object
 -- 	This function breaks an object's grip weld and clears its holder and owner state values
 function pickupUtil.stripObject(object)
-	if object.state.pickup.holder.Value then
-		tableau.from(object.state.pickup.holder.Value:GetDescendants())
-			:filter(function (instance)
-				return instance.Name == "RightGripWeld"
-				and instance.Part1 and (instance.Part1 == object or instance.Part1:IsDescendantOf(object))
-			end)
-			:foreach(dart.destroy)
+	local holder = object.state.pickup.holder.Value
+	if holder then
+		axisUtil.destroyChildren(holder, "RightGrip")
 	end
 	-- object.Parent = workspace
 	pushDropDebounce(object)
@@ -205,14 +184,12 @@ end
 -- Drop character objects
 function pickupUtil.releaseHeldObjects(character)
 	-- Destroy grip welds
-	tableau.from(character:GetDescendants())
-		:filter(dart.isNamed("RightGripWeld"))
-		:foreach(dart.destroy)
+	axisUtil.destroyChildren(character, "RightGrip")
 
 	-- Clear holder
 	pickupUtil.getCharacterHeldObjects(character)
 		:foreach(function (instance)
-			clearHolder(instance)
+			clearHolder(instance) -- this should destroy grip welds
 			-- if instance:IsDescendantOf(workspace) then
 			-- 	instance.Parent = workspace
 			-- end

@@ -28,6 +28,11 @@ local inputStreams = require(input.streams)
 -- Functions
 ---------------------------------------------------------------------------------------------------
 
+local function renderGrip(grip)
+	print("render grip")
+	-- grip.C0 = grip.Part0.RightGripAttachment.CFrame * grip.Part1.RightGripAttachment.CFrame
+end
+
 ---------------------------------------------------------------------------------------------------
 -- Streams
 ---------------------------------------------------------------------------------------------------
@@ -43,11 +48,14 @@ rx.Observable.from(env.LocalPlayer.CharacterAdded)
 	:subscribe(pickupUtil.trackCharacterHeldObjects)
 
 -- When local player starts holding an object, tween the grip (if it's not in the workspace)
-genesUtil.observeStateValue(genes.pickup, "holder")
-	:filter(function (_, holder)
-		return holder and holder == env.LocalPlayer.Character
+rx.Observable.from(env.LocalPlayer.CharacterAdded)
+	:startWith(env.LocalPlayer.Character)
+	:filter()
+	:switchMap(function (character)
+		return rx.Observable.from(character.ChildAdded)
 	end)
-	:subscribe(pickupUtil.renderGrip)
+	:filter(dart.isNamed("RightGrip"))
+	:subscribe(renderGrip)
 
 -- Simple activation pass
 local activatedStream = inputStreams.click
