@@ -9,10 +9,12 @@
 -- env
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
+local genes = env.src.genes
 
 -- modules
 local fx = require(axis.lib.fx)
 local axisUtil = require(axis.lib.axisUtil)
+local pickupUtil = require(genes.pickup.util)
 
 -- lib
 local snowUtil = {}
@@ -36,6 +38,8 @@ function snowUtil.raycastPlayerGround(player, offset)
 	local root = axisUtil.getPlayerHumanoidRootPart(player)
 	local params = RaycastParams.new()
 	params.CollisionGroup = "IndicatorRaycast"
+	params.FilterType = Enum.RaycastFilterType.Blacklist
+	params.FilterDescendantsInstances = pickupUtil.getCharacterHeldObjects(player.Character):raw()
 	return root and workspace:Raycast((root.CFrame * (offset or CFrame.new())).p, Vector3.new(0, -10, 0), params)
 end
 
