@@ -43,6 +43,13 @@ function projectileUtil.rootFireProjectile(thrower, instance, start, target, vel
 	instance.interface.projectile.LocalThrown:Fire(thrower, start, target, velocity)
 
 	-- Pulse
+	local offsets = {
+		CFrame.new(0, 0, 0),
+		CFrame.new(-primary.Size.X * 0.4, 0, 0),
+		CFrame.new(primary.Size.X * 0.4, 0, 0),
+		CFrame.new(0, primary.Size.Y * 0.4, 0),
+		CFrame.new(0, -primary.Size.Y * 0.4, 0),
+	}
 	if not owned then
 		rx.Observable.from(interface.RemoteHit):subscribe(dart.forward(interface.LocalHit))
 	end
@@ -54,21 +61,26 @@ function projectileUtil.rootFireProjectile(thrower, instance, start, target, vel
 		velocity = velocity + Vector3.new(0, -workspace.Gravity * (1 - floatForce) * dt, 0)
 
 		-- Position
-		local last = instance:GetPrimaryPartCFrame().p
+		local last = instance:GetPrimaryPartCFrame()
 		local new = last + velocity * dt
+		local delta = new - last.p
 
 		-- Raycast to see if we hit something
 		if owned then
-			local result = workspace:Raycast(last, (new - last), params)
-			if result and result.Instance then
-				new = result.Position
-				interface.RemoteHit:FireServer(result.Instance, result.Position)
-				interface.LocalHit:Fire(result.Instance, result.Position)
+			for _, offset in pairs(offsets) do
+				local result = workspace:Raycast(last:toWorldSpace(offset).p, delta:toWorldSpace(offset).p, params)
+				if result and result.Instance then
+					new = new - new.p + result.Position
+					new = new:toObjectSpace(offset:inverse())
+					interface.RemoteHit:FireServer(result.Instance, result.Position)
+					interface.LocalHit:Fire(result.Instance, result.Position)
+					break
+				end
 			end
 		end
 
 		-- Set CFrame
-		instance:SetPrimaryPartCFrame(CFrame.new(new, new + (new - last)))
+		instance:SetPrimaryPartCFrame(CFrame.new(new.p, new.p + delta.p))
 	end)
 end
 function projectileUtil.fireOwnedProjectile(instance, start, target, velocity)
