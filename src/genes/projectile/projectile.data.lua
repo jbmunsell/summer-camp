@@ -28,6 +28,9 @@ return {
 			chargeTime = 3.0,
 			minThrowVelocity = 50,
 			maxThrowVelocity = 100,
+
+			hitSound = tableau.null,
+			launchSound = tableau.null,
 		},
 	},
 }

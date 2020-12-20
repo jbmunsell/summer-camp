@@ -14,6 +14,7 @@ local genes = env.src.genes
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 

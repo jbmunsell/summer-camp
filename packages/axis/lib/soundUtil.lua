@@ -7,6 +7,7 @@
 --
 
 -- modules
+local CollectionService = game:GetService("CollectionService")
 
 -- lib
 local soundUtil = {}
@@ -35,6 +36,22 @@ function soundUtil.playSound(sound, parent)
 end
 function soundUtil.playSoundGlobal(sound)
 	return soundUtil.playSound(sound, workspace)
+end
+
+-- Play sound at point
+function soundUtil.playSoundAtPoint(sound, point)
+	local p = Instance.new("Part")
+	CollectionService:AddTag(p, "FXPart")
+	p.CanCollide = false
+	p.Anchored = true
+	p.Transparency = 1
+	p.Size = Vector3.new(1, 1, 1)
+	p.CFrame = CFrame.new(point)
+	p.Parent = workspace
+	local soundInstance = soundUtil.playSound(sound, p)
+	soundInstance.Ended:Connect(function ()
+		p:Destroy()
+	end)
 end
 
 -- return lib

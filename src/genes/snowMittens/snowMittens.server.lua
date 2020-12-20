@@ -15,6 +15,7 @@ local genes = env.src.genes
 local fx = require(axis.lib.fx)
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 local snowUtil = require(env.src.snow.util)
@@ -41,6 +42,7 @@ local function gatherSnow(instance)
 
 	-- Snowball
 	local ball = env.res.snow.Snowball:Clone()
+	local gatheringSound = soundUtil.playSound(env.res.snow.audio.SnowGather, ball)
 	ball:SetPrimaryPartCFrame(CFrame.new(result.Position))
 	fx.new("ScaleEffect", ball)
 	local weld = Instance.new("Weld")
@@ -56,6 +58,8 @@ local function gatherSnow(instance)
 		ball.ScaleEffect.Value = scale
 	end
 	local function pickupSnowball()
+		gatheringSound:Stop()
+		gatheringSound:Destroy()
 		pickupUtil.unequipCharacter(player.Character)
 		pickupUtil.equip(player.Character, ball)
 	end

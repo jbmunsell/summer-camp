@@ -22,6 +22,9 @@ return {
 		projectile = {
 			minThrowVelocity = 70,
 			maxThrowVelocity = 150,
+
+			hitSound = env.res.snow.audio.SnowballHit,
+			launchSound = env.res.snow.audio.SnowballThrow,
 		},
 
 		snowball = {

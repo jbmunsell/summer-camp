@@ -15,6 +15,7 @@ local genes = env.src.genes
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 local inputUtil = require(env.src.input.util)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
@@ -75,6 +76,18 @@ end
 
 -- init gene
 local projectiles = genesUtil.initGene(genes.projectile)
+
+-- Play sound on hit
+projectiles:flatMap(function (instance)
+	return rx.Observable.from(instance.interface.projectile.LocalHit)
+		:map(dart.select(2))
+		:map(dart.carry(instance))
+end):subscribe(function (instance, position)
+	local sound = instance.config.projectile.hitSound.Value
+	if sound then
+		soundUtil.playSoundAtPoint(sound, position)
+	end
+end)
 
 -- Play charge animation according to projectile charging
 pickupUtil.getLocalCharacterHoldingStream(genes.projectile):switchMap(function (instance)

@@ -14,6 +14,7 @@ local genes = env.src.genes
 -- modules
 local fx = require(axis.lib.fx)
 local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 local pickupUtil = require(genes.pickup.util)
 
 -- lib
@@ -25,6 +26,7 @@ function snowUtil.emitSnowParticlesAtPosition(position, count, prepare)
 	emitter.Size = Vector3.new(2, 2, 2)
 	emitter.CFrame = CFrame.new(position)
 	emitter.Parent = workspace
+	soundUtil.playSound(env.res.snow.audio.SnowMelt, emitter)
 	if prepare then
 		prepare(emitter)
 	end

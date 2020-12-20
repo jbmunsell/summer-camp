@@ -14,6 +14,8 @@ local axis = env.packages.axis
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
+local axisUtil = require(axis.lib.axisUtil)
+local soundUtil = require(axis.lib.soundUtil)
 
 -- lib
 local projectileUtil = {}
@@ -27,6 +29,12 @@ function projectileUtil.rootFireProjectile(thrower, instance, start, target, vel
 	local state = instance.state.projectile
 	local primary = instance.PrimaryPart
 	instance.state.projectile.velocityMagnitude.Value = velocityMagnitude
+
+	-- Play sound
+	local sound = instance.config.projectile.launchSound.Value
+	if sound then
+		soundUtil.playSound(sound, axisUtil.getPlayerHumanoidRootPart(thrower))
+	end
 
 	-- Raycast params
 	local params = RaycastParams.new()
