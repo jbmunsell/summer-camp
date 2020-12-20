@@ -24,6 +24,7 @@ local plantInGroundUtil = {}
 -- Try planting object in the ground
 function plantInGroundUtil.tryPlant(instance)
 	-- Strip from holder
+	if not instance:IsDescendantOf(workspace) then return end
 	pickupUtil.stripObject(instance)
 
 	-- Grab attachment

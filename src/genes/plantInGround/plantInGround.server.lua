@@ -37,5 +37,6 @@ plants:filter(function (instance) return instance.config.plantInGround.initPlant
 		:map(dart.select(1)))
 	:reject(function (instance)
 		return instance.state.pickup.owner.Value -- This is to prevent planting objects when you stow them
+		or instance.state.plantInGround.planted.Value
 	end)
 	:subscribe(plantInGroundUtil.tryPlant)

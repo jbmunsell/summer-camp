@@ -188,6 +188,7 @@ dropStream:subscribe(pickupUtil.tryDropHeldObjects)
 
 -- Set an object's network owner according to who OWNS it
 genesUtil.observeStateValue(pickup, "holder"):subscribe(function (instance, holder)
+	wait()
 	if not instance:IsDescendantOf(workspace) or instance:FindFirstChild("StationaryWeld", true) then return end
 	local root = instance
 	if instance:IsA("Model") then
@@ -197,9 +198,16 @@ genesUtil.observeStateValue(pickup, "holder"):subscribe(function (instance, hold
 		end
 	end
 	root = root:GetRootPart() or root
+	if root == workspace.Terrain then return end
 
 	local player = holder and Players:GetPlayerFromCharacter(holder)
-	root:SetNetworkOwner(player)
+	local result, err = pcall(function () root:SetNetworkOwner(player) end)
+	if not result then
+		error("Pickup error with " .. instance:GetFullName() .. ": " .. root:GetFullName() .. ": " .. tostring(err))
+	end
+	-- if not root:IsGrounded() then
+		-- root:SetNetworkOwner(player)
+	-- end
 
 	if holder then
 		local weld = axisUtil.smoothAttach(holder, instance, "RightGripAttachment")

@@ -8,10 +8,7 @@
 --
 
 -- env
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local env = require(game:GetService("ReplicatedStorage").src.env)
 local axis = env.packages.axis
 local genes = env.src.genes
@@ -21,9 +18,7 @@ local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
 local tableau = require(axis.lib.tableau)
 local axisUtil = require(axis.lib.axisUtil)
-local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
-local pickupUtil = require(genes.pickup.util)
 local scheduleUtil = require(env.src.schedule.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -57,8 +52,8 @@ end
 local SpawnHandlers = {
 	[objects.Balloon] = function (attachment, balloonInstance)
 		local weld = axisUtil.snapAttachAttachments(attachment.Parent, attachment, balloonInstance, "StickAttachment")
-		weld.Parent = balloonInstance
 		weld.Name = "StationaryWeld"
+		weld.Parent = balloonInstance
 	end,
 
 	[objects.Ball] = function (_, ball)

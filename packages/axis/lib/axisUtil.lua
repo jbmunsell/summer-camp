@@ -10,7 +10,6 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
-local PhysicsService = game:GetService("PhysicsService")
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -390,6 +389,7 @@ function axisUtil.smoothAttachAttachments(a, aName, b, bName, tweenInfo)
 	rx.Observable.from(RunService.Stepped):takeUntil(terminator):subscribe(function (_, dt)
 		local nt = t:getValue() + dt
 		t:push(nt)
+		if not att_a.Parent then return end
 		local targetCFrame = att_a.Parent.CFrame:toWorldSpace(info.target)
 		local d = math.min(1, nt / tweenInfo.Time)
 		local lcf = original:lerp(targetCFrame, easing.outCubic(d))
