@@ -190,6 +190,39 @@ scheduleUtil.getTimeOfDayStream(22):subscribe(function ()
 end)
 
 ---------------------------------------------------------------------------------------------------
+-- Winter item spawning
+---------------------------------------------------------------------------------------------------
+
+local winterSpawned = {}
+scheduleUtil.getTimeOfDayStream(8.2):merge(scheduleUtil.getTimeOfDayStream(14)):subscribe(function ()
+	for _, child in pairs(env.res.winterItems:GetChildren()) do
+		local copy = child:Clone()
+		copy.Parent = workspace
+		table.insert(winterSpawned, copy)
+
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = workspace.Terrain
+		weld.Part1 = (copy:IsA("Model") and copy.PrimaryPart or copy)
+		weld.Name = "StationaryWeld"
+		weld.Parent = copy
+
+		if #winterSpawned % 5 == 0 then
+			wait()
+		end
+	end
+end)
+scheduleUtil.getTimeOfDayStream(21.8):subscribe(function ()
+	for _, item in pairs(winterSpawned) do
+		item:Destroy()
+
+		if #winterSpawned % 3 == 0 then
+			wait()
+		end
+	end
+	winterSpawned = {}
+end)
+
+---------------------------------------------------------------------------------------------------
 -- Tip generation
 ---------------------------------------------------------------------------------------------------
 

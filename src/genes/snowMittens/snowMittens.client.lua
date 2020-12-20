@@ -64,11 +64,13 @@ local function startGatheringSnow(instance)
 	end
 
 	-- When the humanoid moves or dies, stop gathering
-	rx.Observable.from(humanoid.Died)
-		:merge(rx.Observable.fromInstanceLeftGame(humanoid),
-			humanoidRunning:reject(dart.lessThan(1)))
-		:first()
-		:subscribe(stopGathering)
+	delay(0.2, function ()
+		rx.Observable.from(humanoid.Died)
+			:merge(rx.Observable.fromInstanceLeftGame(humanoid),
+				humanoidRunning:reject(dart.lessThan(1)))
+			:first()
+			:subscribe(stopGathering)
+	end)
 end
 
 ---------------------------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ return {
 			isCompetitive = true,
 			lockPitch = true,
 			trophy = env.res.activities.FreezeTagTrophy,
-			-- patch = env.res.activities.SoccerWinPatch,
+			patch = env.res.activities.FreezeTagPatch,
 			displayName = "Freeze Tag",
 			analyticsName = "freezeTag",
 			activityPromptImage = "",

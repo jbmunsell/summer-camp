@@ -78,14 +78,14 @@ local function placeObject(player, instance, raycastResult, rotation)
 		:first()
 		:subscribe(dart.bind(detachInstance, copy))
 
-	-- Decrease count
-	instance.state.worldAttach.count.Value = instance.state.worldAttach.count.Value - 1
-
 	-- Play sound
 	local sound = config.attachSound.Value
 	if sound then
 		soundUtil.playSound(sound, instanceAttachment)
 	end
+
+	-- Decrease count
+	instance.state.worldAttach.count.Value = instance.state.worldAttach.count.Value - 1
 end
 
 ---------------------------------------------------------------------------------------------------

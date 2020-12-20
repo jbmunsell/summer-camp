@@ -135,7 +135,8 @@ rx.Observable.fromProperty(teamSelect, "Enabled"):filter():subscribe(function ()
 	inspectingTeam:takeUntil(terminator):subscribe(renderInspectingTeam)
 
 	-- Send join request on click
-	rx.Observable.from(teamSelect:FindFirstChild("JoinButton", true).interface.guiButton.Activated)
+	local joinButton = teamSelect:FindFirstChild("JoinButton", true)
+	rx.Observable.from(joinButton:WaitForChild("interface").guiButton.Activated)
 		:first()
 		:mapToLatest(inspectingTeam)
 		:subscribe(function (...)

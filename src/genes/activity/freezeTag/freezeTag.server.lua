@@ -55,10 +55,22 @@ local function renderPlayerFrozen(player, frozen)
 end
 local function renderPlayerFreezer(player, freezer)
 	-- Get stuff
+	local character = player.Character
+	local root = axisUtil.getPlayerHumanoidRootPart(player)
+	if not root then return end
 
-	-- TODO: Remove outfit
-
-	-- TODO: Add outfit if freezer
+	-- Create freezer around player
+	axisUtil.destroyChildren(character, "_Freezer")
+	if freezer then
+		local freezerModel = env.res.snow.Freezer:Clone()
+		freezerModel.Name = "_Freezer"
+		local weld = Instance.new("Weld")
+		weld.Part0 = character.UpperTorso
+		weld.Part1 = freezerModel.PrimaryPart
+		weld.Parent = freezerModel
+		freezerModel:SetPrimaryPartCFrame(root.CFrame)
+		freezerModel.Parent = character
+	end
 end
 
 -- Score
@@ -67,7 +79,8 @@ local function updateScore(activityInstance)
 	for i = 1, 2 do
 		local score = 0
 		for _, v in pairs(state.roster[i]:GetChildren()) do
-			if v.Value and not v.Value.state.activityData.freezeTag.frozen.Value then
+			local tagState = v.Value and v.Value.state.activityData.freezeTag
+			if not tagState.freezer.Value and not tagState.frozen.Value then
 				score = score + 1
 			end
 		end
@@ -76,9 +89,9 @@ local function updateScore(activityInstance)
 end
 local function getWinningTeam(activityInstance)
 	local state = activityInstance.state.activity
-	for _, val in pairs(state.score:GetChildren()) do
-		if val.Value == 0 then
-			return state.sessionTeams[val.Name].Value
+	for i = 1, 2 do
+		if state.score[i].Value == 0 then
+			return state.sessionTeams[3 - i].Value
 		end
 	end
 end
@@ -147,6 +160,7 @@ local sessionStart = activityUtil.getSessionStateStreams(genes.activity.freezeTa
 local playStartStream = activityUtil.getPlayStartStream(genes.activity.freezeTag)
 local scoreChangedStream = activityUtil.getScoreChangedStream(genes.activity.freezeTag)
 local playerRemovedFromRosterStream = activityUtil.getPlayerRemovedFromRosterStream(genes.activity.freezeTag)
+local playerAddedToRosterStream = activityUtil.getPlayerAddedToRosterStream(genes.activity.freezeTag)
 
 -- Player frozen changed
 local frozenChanged = genesUtil.deepObserveStateValue(genes.player.activityData, {"freezeTag", "frozen"})
@@ -162,6 +176,7 @@ activityUtil.getSingleTeamLeftStream(genes.activity.freezeTag):subscribe(activit
 -- Spawn players on session start
 sessionStart:subscribe(activityUtil.ejectPlayers)
 playStartStream:subscribe(activityUtil.spawnAllPlayers)
+activityUtil.getPlayerAddedToRosterStream(genes.activity.freezeTag):subscribe(activityUtil.spawnPlayer)
 
 -- Set scoreboard and team link on go
 sessionStart:subscribe(function (activityInstance)
@@ -204,6 +219,7 @@ frozenChanged
 	end)
 	:filter()
 	:filter(dart.follow(genesUtil.hasGeneTag, genes.activity.freezeTag))
+	:merge(playerAddedToRosterStream, playerRemovedFromRosterStream)
 	:subscribe(updateScore)
 
 -- Render freeze according to value

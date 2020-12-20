@@ -163,8 +163,8 @@ local function createTrophy(activityInstance, team)
 	local config = activityInstance.config.activity
 	local pitch = config.pitch.Value
 	local teamIndex = activityUtil.getTeamIndex(activityInstance, team)
-	local teamSpawn = pitch:FindFirstChild("Team" .. teamIndex .. "TrophySpawn")
-	local trophySpawn = teamSpawn or pitch.TrophySpawn
+	local teamSpawn = pitch.functional:FindFirstChild("Team" .. teamIndex .. "TrophySpawn")
+	local trophySpawn = teamSpawn or pitch.functional.TrophySpawn
 	local trophy = config.trophy.Value:Clone()
 	trophy:SetPrimaryPartCFrame(trophySpawn.CFrame)
 	trophy.Parent = workspace
@@ -290,7 +290,9 @@ rosterCollectingStart
 genesUtil.observeStateValue(activity, "inSession"):filter(dart.select(2)):subscribe(function (activityInstance)
 	if not activityInstance.config.activity.lockPitch.Value then return end
 	rx.Observable.interval(0.5)
-		:takeUntil(rx.Observable.from(activityInstance.state.activity.inSession):reject())
+		:takeUntil(rx.Observable.from(activityInstance.state.activity.inSession)
+			:reject())
+			-- :merge(rx.Observable.from(activityInstance.state.activity.winningTeam)))
 		:subscribe(dart.bind(lockPitch, activityInstance))
 end)
 

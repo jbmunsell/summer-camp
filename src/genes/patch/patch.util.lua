@@ -36,16 +36,23 @@ function patchUtil.attachPatch(player, patch, offset)
 		-- * CFrame.Angles(0, math.pi * 0.5, 0)
 	state.owner.Value = player
 
+	genesUtil.removeGeneTag(patch, genes.pickup)
+	genesUtil.removeGeneTag(patch, genes.patch)
+	local copy = patch:Clone()
+
 	-- Get player backpack
 	local backpack = player.state.characterBackpack.instance.Value
-	patch.Parent = backpack
+	copy.Parent = backpack
+	copy:SetNetworkOwner(player)
 	local weld = Instance.new("Weld")
 	weld.Part0 = backpack.Handle
-	weld.Part1 = patch
+	weld.Part1 = copy
 	weld.C0 = state.attachmentCFrame.Value
-	weld.Parent = patch
+	weld.Parent = copy
 
 	fx.logScaleWithValue(backpack, backpack.ScaleEffect.Value)
+
+	patch:Destroy()
 end
 
 -- Give player patch

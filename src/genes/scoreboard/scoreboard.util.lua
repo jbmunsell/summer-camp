@@ -40,7 +40,7 @@ function scoreboardUtil.setTeams(instance, teamsFolder)
 end
 function scoreboardUtil.setScore(instance, score)
 	for i = 1, 2 do
-		getTeamLabels(instance, i).scoreLabel.Text = tostring(score[i])
+		getTeamLabels(instance, i).scoreLabel.Text = tostring(math.floor(score[i]))
 	end
 end
 function scoreboardUtil.setTime(instance, secondsRemaining)

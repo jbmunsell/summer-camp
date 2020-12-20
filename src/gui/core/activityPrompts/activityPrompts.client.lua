@@ -51,7 +51,9 @@ local function createStartupPrompt(activityInstance)
 	prompt.MainLabel.Text = string.upper(config.displayName.Value)
 	prompt:FindFirstChild("ActivityImage", true).Image = config.activityPromptImage.Value
 	for _, value in pairs(state.sessionTeams:GetChildren()) do
-		prompt:FindFirstChild("Team" .. value.Name, true).state.teamLink.team.Value = value.Value
+		local frame = prompt:FindFirstChild("Team" .. value.Name, true)
+		repeat wait() until frame:FindFirstChild("state")
+		frame.state.teamLink.team.Value = value.Value
 	end
 
 	-- Create streams

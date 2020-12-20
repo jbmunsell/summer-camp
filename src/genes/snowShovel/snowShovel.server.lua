@@ -38,6 +38,7 @@ do
 	local region = Region3.new(corner * -1, corner):ExpandToGrid(VoxelResolution)
 	originalMaterials, originalOccupancies = workspace.Terrain:ReadVoxels(region, VoxelResolution)
 	globalIndexPositionShift = corner
+	print(#originalMaterials)
 end
 
 -- Build snow at position
@@ -75,6 +76,7 @@ local function buildSnowAtPosition(position)
 				local globalIndex = (region.CFrame.p - region.Size * 0.5 + globalIndexPositionShift)
 					* (1 / VoxelResolution) + Vector3.new(x, y, z)
 				local gx, gy, gz = globalIndex.X, globalIndex.Y, globalIndex.Z
+				print(gx, gy, gz)
 
 				if (preMaterials[x][y][z] ~= changedMaterials[x][y][z]
 					or preOccupances[x][y][z] ~= changedOccupancies[x][y][z])

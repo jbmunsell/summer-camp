@@ -20,6 +20,7 @@ local inputUtil = require(env.src.input.util)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 local projectileUtil = require(genes.projectile.util)
+local inputStreams = require(env.src.input.streams)
 
 local projectileAnimations = env.res.genes.projectile.animations
 
@@ -118,15 +119,21 @@ projectiles:flatMap(function (instance)
 				state.chargeTime.Value / config.chargeTime.Value,
 				inputUtil.getMouseHit()
 		end)
-end):subscribe(throw)
+end):delay(0.03):subscribe(throw)
 
 -- Get pickup stream
 pickupUtil.getActivatedStream(genes.projectile):subscribe(function (instance, input)
-	if instance.config.projectile.chargeable.Value then
-		local charging = instance.state.projectile.charging
+	local charging = instance.state.projectile.charging
+	if instance.config.projectile.chargeable.Value and not charging.Value then
 		charging.Value = true
-		rx.Observable.fromProperty(input, "UserInputState")
-			:filter(dart.equals(Enum.UserInputState.End))
+		local terminator
+		if typeof(input) == "Instance" then
+			terminator = rx.Observable.fromProperty(input, "UserInputState")
+				:filter(dart.equals(Enum.UserInputState.End))
+		else
+			terminator = inputStreams.click
+		end
+		terminator
 			:first()
 			:subscribe(function ()
 				charging.Value = false

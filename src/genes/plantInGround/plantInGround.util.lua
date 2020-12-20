@@ -36,7 +36,10 @@ function plantInGroundUtil.tryPlant(instance)
 	local rot = Vector3.new(alook.X, 0, alook.Z)
 
 	-- Get terrain hit point
-	local raycastResult = workspace:Raycast(attachment.WorldPosition, Vector3.new(0, -10, 0))
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Blacklist
+	params.FilterDescendantsInstances = { instance }
+	local raycastResult = workspace:Raycast(attachment.WorldPosition, Vector3.new(0, -20, 0), params)
 	if not raycastResult or raycastResult.Instance ~= workspace.Terrain then return end
 
 	-- Create new terrain attachment for planting

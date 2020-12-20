@@ -53,11 +53,11 @@ local function gatherSnow(instance)
 	weld.Parent = ball
 	ball.Parent = workspace
 	fx.setFXEnabled(ball, false)
-	genesUtil.waitForGene(ball, genes.pickup)
 	local function setBallScale(scale)
 		ball.ScaleEffect.Value = scale
 	end
 	local function pickupSnowball()
+		genesUtil.waitForGene(ball, genes.pickup)
 		gatheringSound:Stop()
 		gatheringSound:Destroy()
 		pickupUtil.unequipCharacter(player.Character)

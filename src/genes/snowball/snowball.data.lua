@@ -29,7 +29,7 @@ return {
 
 		snowball = {
 			ragdollScaleMin = 3,
-			meltTimer = 3 * 60,
+			meltTimer = 5 * 60,
 		},
 	},
 }

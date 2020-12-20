@@ -72,7 +72,10 @@ isCompetingStream:combineLatest(menuEnabledStream, isDayStream, function (activi
 
 	local activityTrack
 	if activityInstance then
-		if genesUtil.hasGeneTag(activityInstance, genes.activity.captureTheFlag) then
+		if genesUtil.hasGeneTag(activityInstance, genes.activity.captureTheFlag)
+		or genesUtil.hasGeneTag(activityInstance, genes.activity.kingOfTheHill)
+		or genesUtil.hasGeneTag(activityInstance, genes.activity.freezeTag)
+		then
 			activityTrack = tracks.CTFTrack
 		else
 			activityTrack = tracks.CompetitiveTrack

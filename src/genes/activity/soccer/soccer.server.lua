@@ -97,7 +97,7 @@ local function spawnBall(soccerInstance)
 	ball.CFrame = functional.BallSpawn.CFrame
 	ball.Velocity = Vector3.new()
 	ball.Parent = functional
-	ball:SetNetworkOwner(nil)
+	-- ball:SetNetworkOwner(nil)
 end
 
 -- Rendering

@@ -27,11 +27,13 @@ local function getKingTeam(activityInstance)
 	-- Check all players to see if they are inside the hill
 	local state = activityInstance.state.activity
 	local pitch = activityInstance.config.activity.pitch.Value
+	local captureZone = pitch.functional.CaptureZone
 	local has = {}
 	for _, teamFolder in pairs(state.roster:GetChildren()) do
 		for _, playerValue in pairs(teamFolder:GetChildren()) do
 			local root = axisUtil.getPlayerHumanoidRootPart(playerValue.Value)
-			if root and axisUtil.isPointInPartXZ(root.Position, pitch.functional.CaptureZone) then
+			if root and axisUtil.isPointInPartXZ(root.Position, captureZone)
+			and root.Position.Y > captureZone.Position.Y then
 				table.insert(has, teamFolder)
 				break
 			end
@@ -99,7 +101,8 @@ local function carryActivity(obs)
 		return genesUtil.hasGeneTag(activityInstance, genes.activity.kingOfTheHill)
 	end)
 end
-local playerDroppedStream = genesUtil.deepObserveStateValue(genes.player.activityData, {"kingOfTheHill", "hits"})
+local hitsChanged = genesUtil.deepObserveStateValue(genes.player.activityData, {"kingOfTheHill", "hits"})
+local playerDroppedStream = hitsChanged
 	:filter(function (_, hits)
 		return hits == 0
 	end)
@@ -111,6 +114,36 @@ local playerDroppedStream = genesUtil.deepObserveStateValue(genes.player.activit
 
 -- Terminate when an entire team leaves
 activityUtil.getSingleTeamLeftStream(genes.activity.kingOfTheHill):subscribe(activityUtil.zeroJoinTerminate)
+
+-- Show and hide billboard according to this person being in a roster
+local playerStream = genesUtil.getInstanceStream(genes.player.activityData)
+playerStream
+	:flatMap(function (player)
+		return rx.Observable.from(player.CharacterAdded):startWith(player.Character):filter()
+	end)
+	:subscribe(function (character)
+		local gui = env.res.snow.HitsGui:Clone()
+		gui.Enabled = false
+		gui.Parent = character.Head
+	end)
+playerStream
+	:flatMap(function (player)
+		return activityUtil.getPlayerActivityStream(player):map(dart.drag(player))
+	end)
+	:subscribe(function (activityInstance, player)
+		local gui = player.Character.Head:WaitForChild("HitsGui")
+		gui.Enabled = activityInstance and genesUtil.hasGeneTag(activityInstance, genes.activity.kingOfTheHill)
+	end)
+
+-- Render number of hearts on hits changed
+hitsChanged:subscribe(function (player, hits)
+	if player.Character then
+		local gui = player.Character.Head:WaitForChild("HitsGui")
+		for i = 1, 3 do
+			gui:FindFirstChild("Heart" .. i, true).Visible = (i <= hits)
+		end
+	end
+end)
 
 -- Set scoreboard and team link on go
 sessionStart:subscribe(function (activityInstance)
@@ -150,7 +183,8 @@ sessionEnd:delay(2):subscribe(activityUtil.releaseAllRagdolls)
 -- Change flag team according to capturing team
 genesUtil.observeStateValue(genes.activity.kingOfTheHill, "capturingTeam")
 	:subscribe(function (activityInstance, team)
-		local pitch = activityInstance.config.pitch.Value
+		local pitch = activityInstance.config.activity.pitch.Value
+		genesUtil.waitForGene(pitch.Banner, genes.teamLink)
 		pitch.Banner.state.teamLink.team.Value = team
 	end)
 
@@ -161,7 +195,7 @@ instanceStream:flatMap(function (activityInstance)
 		and rx.Observable.heartbeat():map(dart.carry(team))
 		or rx.Observable.never()
 	end):map(dart.carry(activityInstance))
-end):tap(print):subscribe(activityUtil.changeTeamScore)
+end):subscribe(activityUtil.changeTeamScore)
 
 -- Declare a winner when the score threshold is crossed
 scoreChangedStream

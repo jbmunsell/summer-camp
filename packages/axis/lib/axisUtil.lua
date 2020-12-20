@@ -249,12 +249,9 @@ function axisUtil.isPointInPart(point, part)
 	and		point.Z >= math.min(a.Z, b.Z) and point.Z <= math.max(a.Z, b.Z)
 end
 function axisUtil.isPointInPartXZ(point, part)
-	local a = part.CFrame * CFrame.new(-part.Size * 0.5)
-	local b = a * CFrame.new(part.Size)
-	a, b = a.p, b.p
-	
-	return	point.X >= math.min(a.X, b.X) and point.X <= math.max(a.X, b.X)
-	and		point.Z >= math.min(a.Z, b.Z) and point.Z <= math.max(a.Z, b.Z)
+	local offset = part.CFrame:pointToObjectSpace(point)
+	local hsize = part.Size * 0.5
+	return math.abs(offset.X) <= hsize.X and math.abs(offset.Z) <= hsize.Z
 end
 
 -- Calculate mass of a whole model

@@ -15,7 +15,6 @@ local playerIndicator = genes.player.playerIndicator
 
 -- modules
 local rx = require(axis.lib.rx)
-local dart = require(axis.lib.dart)
 local genesUtil = require(genes.util)
 
 ---------------------------------------------------------------------------------------------------
@@ -34,7 +33,8 @@ local function renderIndicatorPosition(indicator)
 	local player = indicator.state.playerIndicator.player.Value
 	local character = player and player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
-	local result = root and workspace:Raycast(root.Position, Vector3.new(0, -20, 0), raycastParams)
+	local result = root and workspace:Raycast(root.Position + Vector3.new(0, -1, 0),
+		Vector3.new(0, -20, 0), raycastParams)
 	local position = result and result.Position
 
 	if position then
