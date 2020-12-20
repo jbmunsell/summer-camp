@@ -79,7 +79,7 @@ end
 -- Start collecting roster
 local function getRosterTimerLabels(activityInstance)
 	local labels = {}
-	for _, label in pairs(activityInstance:GetDescendants()) do
+	for _, label in pairs(activityInstance.config.activity.pitch.Value:GetDescendants()) do
 		if label.Name == "RosterTimerLabel" then
 			table.insert(labels, label)
 		end
@@ -160,10 +160,12 @@ end
 -- Create trophy for activity instance and team, place it at the spawn
 local function createTrophy(activityInstance, team)
 	-- Create trophy
+	local config = activityInstance.config.activity
+	local pitch = config.pitch.Value
 	local teamIndex = activityUtil.getTeamIndex(activityInstance, team)
-	local teamSpawn = activityInstance.functional:FindFirstChild("Team" .. teamIndex .. "TrophySpawn")
-	local trophySpawn = teamSpawn or activityInstance.functional.TrophySpawn
-	local trophy = activityInstance.config.activity.trophy.Value:Clone()
+	local teamSpawn = pitch:FindFirstChild("Team" .. teamIndex .. "TrophySpawn")
+	local trophySpawn = teamSpawn or pitch.TrophySpawn
+	local trophy = config.trophy.Value:Clone()
 	trophy:SetPrimaryPartCFrame(trophySpawn.CFrame)
 	trophy.Parent = workspace
 	trophy.state.teamLink.team.Value = team
@@ -184,7 +186,7 @@ local function setGatePartVisible(part, visible)
 	part.CanCollide = visible
 end
 local function initGates(activityInstance)
-	tableau.from(activityInstance:GetDescendants())
+	tableau.from(activityInstance.config.activity.pitch.Value:GetDescendants())
 		:filter(function (m)
 			return m.Name == "GateOpen" or m.Name == "GateClosed"
 		end)
@@ -193,7 +195,7 @@ end
 local function renderGates(activityInstance)
 	local inSession = activityInstance.state.activity.inSession.Value
 	local function work(modelName, visible)
-		local models = tableau.from(activityInstance:GetDescendants())
+		local models = tableau.from(activityInstance.config.activity.pitch.Value:GetDescendants())
 			:filter(dart.isNamed(modelName))
 		models:foreach(function (m)
 			m:WaitForChild("TransparencyEffect").Value = (visible and 0 or 1)
@@ -208,11 +210,12 @@ end
 
 -- Lock the pitch to only players in the roster
 local function lockPitch(activityInstance)
+	local pitch = activityInstance.config.activity.pitch.Value
 	for _, player in pairs(Players:GetPlayers()) do
 		local root = axisUtil.getPlayerHumanoidRootPart(player)
 		if root then
 			local inRoster = activityUtil.isPlayerInRoster(activityInstance, player)
-			local inPitch = axisUtil.isPointInPartXZ(root.Position, activityInstance.functional.PitchBounds)
+			local inPitch = axisUtil.isPointInPartXZ(root.Position, pitch.functional.PitchBounds)
 			if inRoster ~= inPitch then
 				if inRoster then
 					activityUtil.spawnPlayer(activityInstance, player)
@@ -269,8 +272,9 @@ local rosterCollectingStart = activities
 
 			-- Temporary wait for open pitch. Needs improvement badly
 			:map(function ()
-				if activityInstance.config.activity.sharesPitch.Value then
-					repeat wait() until not activityUtil.pitchHasActiveGame(activityInstance.Parent)
+				local config = activityInstance.config.activity
+				if config.sharesPitch.Value then
+					repeat wait() until not activityUtil.pitchHasActiveGame(config.pitch.Value)
 				end
 				return activityInstance
 			end)

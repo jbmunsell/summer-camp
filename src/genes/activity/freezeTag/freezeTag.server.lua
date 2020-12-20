@@ -163,6 +163,16 @@ activityUtil.getSingleTeamLeftStream(genes.activity.freezeTag):subscribe(activit
 sessionStart:subscribe(activityUtil.ejectPlayers)
 playStartStream:subscribe(activityUtil.spawnAllPlayers)
 
+-- Set scoreboard and team link on go
+sessionStart:subscribe(function (activityInstance)
+	local pitch = activityInstance.config.activity.pitch.Value
+	activityUtil.updateScoreboardTeams(activityInstance)
+	for i = 1, 2 do
+		pitch["ArenaProps" .. i].state.teamLink.team.Value = activityInstance.state.activity.sessionTeams[i].Value
+	end
+end)
+scoreChangedStream:subscribe(activityUtil.updateScoreboardScore)
+
 -- Players touching
 instanceStream:flatMap(function (activityInstance)
 	return rx.Observable.from(activityInstance.state.activity.inSession):switchMap(function (inSession)

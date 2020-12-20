@@ -26,11 +26,12 @@ local activityUtil = require(genes.activity.util)
 local function getKingTeam(activityInstance)
 	-- Check all players to see if they are inside the hill
 	local state = activityInstance.state.activity
+	local pitch = activityInstance.config.activity.pitch.Value
 	local has = {}
 	for _, teamFolder in pairs(state.roster:GetChildren()) do
 		for _, playerValue in pairs(teamFolder:GetChildren()) do
 			local root = axisUtil.getPlayerHumanoidRootPart(playerValue.Value)
-			if root and axisUtil.isPointInPartXZ(root.Position, activityInstance.functional.CaptureZone) then
+			if root and axisUtil.isPointInPartXZ(root.Position, pitch.functional.CaptureZone) then
 				table.insert(has, teamFolder)
 				break
 			end
@@ -111,6 +112,16 @@ local playerDroppedStream = genesUtil.deepObserveStateValue(genes.player.activit
 -- Terminate when an entire team leaves
 activityUtil.getSingleTeamLeftStream(genes.activity.kingOfTheHill):subscribe(activityUtil.zeroJoinTerminate)
 
+-- Set scoreboard and team link on go
+sessionStart:subscribe(function (activityInstance)
+	local pitch = activityInstance.config.activity.pitch.Value
+	activityUtil.updateScoreboardTeams(activityInstance)
+	for i = 1, 2 do
+		pitch["ArenaProps" .. i].state.teamLink.team.Value = activityInstance.state.activity.sessionTeams[i].Value
+	end
+end)
+scoreChangedStream:subscribe(activityUtil.updateScoreboardScore)
+
 -- Spawn players on session start
 sessionStart:subscribe(activityUtil.ejectPlayers)
 playStartStream:subscribe(activityUtil.spawnAllPlayers)
@@ -135,6 +146,13 @@ end):subscribe(decreaseHitCount)
 -- Ragdolling and freeing
 playerDroppedStream:subscribe(activityUtil.ragdollPlayer)
 sessionEnd:delay(2):subscribe(activityUtil.releaseAllRagdolls)
+
+-- Change flag team according to capturing team
+genesUtil.observeStateValue(genes.activity.kingOfTheHill, "capturingTeam")
+	:subscribe(function (activityInstance, team)
+		local pitch = activityInstance.config.pitch.Value
+		pitch.Banner.state.teamLink.team.Value = team
+	end)
 
 -- Increase team score on heartbeat
 instanceStream:flatMap(function (activityInstance)

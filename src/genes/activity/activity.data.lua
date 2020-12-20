@@ -28,6 +28,7 @@ return {
 			isCompetitive = false,
 			lockPitch = false,
 			sharesPitch = false,
+			pitch = tableau.null,
 			rosterCollectionTimer = 25,
 			trophy = tableau.null,
 			teamCount = 1,

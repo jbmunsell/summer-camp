@@ -23,15 +23,17 @@ local collection = require(axis.lib.collection)
 local genesUtil = require(genes.util)
 local scheduleStreams = require(env.src.schedule.streams)
 local pickupUtil = require(genes.pickup.util)
+local scoreboardUtil = require(genes.scoreboard.util)
 
 -- lib
 local activityUtil = {}
 
 -- Temporary pitch sharing function
 function activityUtil.pitchHasActiveGame(instance)
-	for _, c in pairs(instance:GetChildren()) do
-		if genesUtil.hasGeneTag(c, genes.activity) then
-			if c.state.activity.inSession.Value then return true end
+	for _, activityInstance in pairs(genesUtil.getInstances(genes.activity):raw()) do
+		if activityInstance.config.activity.pitch.Value == instance
+		and activityInstance.state.activity.inSession.Value then
+			return true
 		end
 	end
 	return false
@@ -282,9 +284,10 @@ function activityUtil.spawnPlayersInPlane(players, plane, lookAtPosition)
 end
 function activityUtil.spawnPlayer(activityInstance, player)
 	local teamIndex = activityUtil.getTeamIndex(activityInstance, player.Team)
+	local pitch = activityInstance.config.activity.pitch.Value
 	if teamIndex then
-		local plane = activityInstance.functional["Team" .. teamIndex .. "SpawnPlane"]
-		activityUtil.spawnPlayersInPlane({ player }, plane, activityInstance.functional.PitchCenter.Position)
+		local plane = pitch.functional["Team" .. teamIndex .. "SpawnPlane"]
+		activityUtil.spawnPlayersInPlane({ player }, plane, pitch.functional.PitchCenter.Position)
 	end
 end
 function activityUtil.spawnAllPlayers(activityInstance)
@@ -298,12 +301,14 @@ end
 
 -- Eject players from instance
 function activityUtil.ejectPlayerFromActivity(activityInstance, player)
-	local ejectionSpawnPlane = activityInstance:FindFirstChild("EjectionSpawnPlane", true)
+	local pitch = activityInstance.config.activity.pitch.Value
+	local ejectionSpawnPlane = pitch:FindFirstChild("EjectionSpawnPlane", true)
 	if not ejectionSpawnPlane then return end
 	activityUtil.spawnPlayersInPlane({ player }, ejectionSpawnPlane)
 end
 function activityUtil.ejectPlayers(activityInstance)
-	local pitchBounds = activityInstance:FindFirstChild("PitchBounds", true)
+	local pitch = activityInstance.config.activity.pitch.Value
+	local pitchBounds = pitch:FindFirstChild("PitchBounds", true)
 	assert(pitchBounds, activityInstance:GetFullName() .. " does not have pitch bounds.")
 
 	for _, player in pairs(Players:GetPlayers()) do
@@ -334,6 +339,17 @@ function activityUtil.releaseAllRagdolls(activityInstance)
 		end
 	end
 	collection.clear(ragdolls)
+end
+
+-- Scoreboard business
+function activityUtil.updateScoreboardTeams(activityInstance)
+	local pitch = activityInstance.config.activity.pitch.Value
+	scoreboardUtil.setTeams(pitch.Scoreboard, activityInstance.state.activity.sessionTeams)
+end
+function activityUtil.updateScoreboardScore(activityInstance)
+	local score = tableau.valueObjectsToTable(activityInstance.state.activity.score)
+	local pitch = activityInstance.config.activity.pitch.Value
+	scoreboardUtil.setScore(pitch.Scoreboard, score)
 end
 
 -- return lib
