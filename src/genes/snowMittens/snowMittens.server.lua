@@ -42,7 +42,7 @@ local function gatherSnow(instance)
 
 	-- Snowball
 	local ball = env.res.snow.Snowball:Clone()
-	local gatheringSound = soundUtil.playSound(env.res.snow.audio.SnowGather, ball)
+	local gatheringSound = soundUtil.playSound(env.res.snow.audio.SnowGather, ball.PrimaryPart)
 	ball:SetPrimaryPartCFrame(CFrame.new(result.Position))
 	fx.new("ScaleEffect", ball)
 	local weld = Instance.new("Weld")
@@ -57,11 +57,15 @@ local function gatherSnow(instance)
 		ball.ScaleEffect.Value = scale
 	end
 	local function pickupSnowball()
-		genesUtil.waitForGene(ball, genes.pickup)
 		gatheringSound:Stop()
 		gatheringSound:Destroy()
-		pickupUtil.unequipCharacter(player.Character)
-		pickupUtil.equip(player.Character, ball)
+		if instance:IsDescendantOf(game) then
+			genesUtil.waitForGene(ball, genes.pickup)
+			pickupUtil.unequipCharacter(player.Character)
+			pickupUtil.equip(player.Character, ball)
+		else
+			ball:Destroy()
+		end
 	end
 
 	-- Create snowball and increase size until stopped gathering
@@ -73,7 +77,7 @@ local function gatherSnow(instance)
 
 	-- When they stop gathering, give them this object as a pickup
 	terminator
-		:filter(function () return instance:IsDescendantOf(game) end)
+		-- :filter(function () return instance:IsDescendantOf(game) end)
 		:subscribe(pickupSnowball)
 end
 
