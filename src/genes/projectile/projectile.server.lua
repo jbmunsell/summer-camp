@@ -14,7 +14,6 @@ local genes = env.src.genes
 -- modules
 local rx = require(axis.lib.rx)
 local dart = require(axis.lib.dart)
-local soundUtil = require(axis.lib.soundUtil)
 local genesUtil = require(genes.util)
 local pickupUtil = require(genes.pickup.util)
 
@@ -42,7 +41,7 @@ end)
 -- Release requested
 rx.Observable.from(genes.projectile.net.ReleaseRequested)
 	-- Make sure player is holding this
-	:filter(function (player, instance, start, target, velocity)
+	:filter(function (player, instance)
 		local holder = instance.state.pickup.holder.Value
 		return holder and holder == player.Character
 	end)
