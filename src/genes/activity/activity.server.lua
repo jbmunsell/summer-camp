@@ -345,7 +345,7 @@ local winnerDeclared = genesUtil.observeStateValue(activity, "winningTeam")
 	:filter(dart.select(2))
 
 -- Create trophy when a winner is declared
-winnerDeclared:subscribe(createTrophy)
+-- winnerDeclared:subscribe(createTrophy)
 winnerDeclared:subscribe(awardPatches)
 winnerDeclared:map(dart.select(1)):delay(1.0):subscribe(activityUtil.stopSession)
 
