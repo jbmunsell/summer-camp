@@ -1,6 +1,7 @@
 # Ignore mac platform files
 *.DS_Store
 _assembled/*
+places/*
 packages/Ragdoll.rbxmx
 res/*
 *.sublime-workspace
